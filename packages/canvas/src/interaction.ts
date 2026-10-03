@@ -109,6 +109,26 @@ export interface GenerationCandidateOutputPosition {
 
 export type CandidatePosition = { x: number; y: number };
 
+/** Find free space below the insertion point without moving existing work. */
+export function findFreeNodePosition(
+  nodes: readonly Pick<BaseNode, 'x' | 'y' | 'width' | 'height'>[],
+  rect: Pick<BaseNode, 'x' | 'y' | 'width' | 'height'>,
+): CandidatePosition {
+  const gap = 32;
+  let y = rect.y;
+  for (;;) {
+    const collisions = nodes.filter(
+      (node) =>
+        rect.x < node.x + node.width + gap &&
+        rect.x + rect.width + gap > node.x &&
+        y < node.y + node.height + gap &&
+        y + rect.height + gap > node.y,
+    );
+    if (!collisions.length) return { x: rect.x, y };
+    y = Math.max(...collisions.map((node) => node.y + node.height + gap));
+  }
+}
+
 /** Places persisted, unreviewed candidates as read-only Canvas previews near their task. */
 export function layoutGenerationCandidateOutputs(
   nodes: readonly BaseNode[],

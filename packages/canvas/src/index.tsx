@@ -46,6 +46,7 @@ import {
 } from './interaction';
 
 export type { CanvasInteractionMode } from './interaction';
+export { findFreeNodePosition } from './interaction';
 
 export type CanvasNode =
   | TextNode

@@ -178,7 +178,7 @@ React Flow 不能成为 domain store。
 技术：
 
 ```text
-Three.js / R3F / Drei
+Three.js / R3F / OrbitControls
 ```
 
 - GLB / GLTF

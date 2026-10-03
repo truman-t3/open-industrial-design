@@ -4,6 +4,7 @@ import {
   canvasInteractionPolicy,
   connectionCurve,
   connectionTargetAt,
+  findFreeNodePosition,
   layoutGenerationCandidateOutputs,
   verticalConnectionCurve,
 } from './interaction';
@@ -27,6 +28,25 @@ const generation = {
   height: 300,
 } as BaseNode;
 const nodes = [source, generation];
+
+describe('new node placement', () => {
+  const rect = { x: 160, y: 180, width: 320, height: 240 };
+  it('keeps an unoccupied insertion point', () => {
+    expect(findFreeNodePosition([], rect)).toEqual({ x: 160, y: 180 });
+  });
+  it('skips successive collisions and preserves existing positions', () => {
+    const occupied = [rect, { ...rect, y: 450 }];
+    const before = structuredClone(occupied);
+    expect(findFreeNodePosition(occupied, rect)).toEqual({ x: 160, y: 722 });
+    expect(occupied).toEqual(before);
+  });
+  it('places consecutive sketches and models with spacing, ignoring distant columns', () => {
+    const occupied = [{ ...rect, x: 900, height: 2000 }, rect];
+    const model = { ...rect, height: 220, ...findFreeNodePosition(occupied, rect) };
+    expect(model.y).toBe(452);
+    expect(findFreeNodePosition([...occupied, model], rect).y).toBe(704);
+  });
+});
 
 describe('canvas connection interaction', () => {
   it('separates object selection from canvas panning', () => {

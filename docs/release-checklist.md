@@ -1,4 +1,16 @@
-# Open Industrial Design Community Edition v0.1 — Release Checklist
+# Open Industrial Design v0.1.0-alpha.1 — Release Checklist
+
+## 最新核验 2026年10月3日
+
+- [x] 独立 GitHub 源码安装／构建、首次 Linux CI、本地 252 项测试通过。
+- [x] README 首页中文说明、明确版本号、示例命名和新增节点避让修复。
+- [x] 隔离 Chromium 中草图、GLB／截图、节点移动、备份导入及刷新恢复核验。
+- [ ] 21 张运行时图片使用／再分发范围、2 类运行时资产分发记录收口。
+- [ ] 提供公众或分发接收者可访问的对应源码；当前 GitHub 仓库仍为私有。
+- [ ] 真实 GPU、原生中文输入法及实体设备覆盖。
+- [ ] 独立分发资料门槛通过后，发布 `v0.1.0-alpha.1` 预发布版本。
+
+以下为分阶段历史核验和原始产品清单。当前包级声明缺口为 0；旧“4 个包待补”“23 张分发图片”等数量已被 [发布状态](./release-status.md) 替代，不作为当前待办。
 
 ## Canvas AI 本轮收尾状态 2026年10月1日
 

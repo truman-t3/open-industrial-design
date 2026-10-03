@@ -39,6 +39,7 @@ import {
 } from '@open-industrial-design/ai-openai-compatible';
 import {
   CanvasWorkspace,
+  findFreeNodePosition,
   type CanvasNode,
   type CanvasInteractionMode,
   useCanvasRuntimeStore,
@@ -1075,10 +1076,7 @@ export function App() {
     setDemoOpening(true);
     setStorageError(undefined);
     const createdAt = Date.now();
-    const projectName = `便携灯具探索示例 · ${new Date(createdAt).toLocaleTimeString(
-      locale === 'zh-CN' ? 'zh-CN' : 'en-US',
-      { hour12: false },
-    )}`;
+    const projectName = locale === 'zh-CN' ? '便携灯具探索示例' : 'Portable Lamp Exploration';
     try {
       const images = await Promise.all(
         demoImages.map(async (image) => ({
@@ -2054,8 +2052,7 @@ export function App() {
       const modelNode = createModel3DNode({
         boardId: board.id,
         assetId,
-        x: 160 + (nodes.length % 3) * 48,
-        y: 180 + (nodes.length % 3) * 48,
+        ...findFreeNodePosition(nodes, { x: 160, y: 180, width: 320, height: 220 }),
         width: 320,
         height: 220,
         rotation: 0,
@@ -2961,8 +2958,12 @@ export function App() {
                     sketchDocumentId,
                     previewAssetId,
                     label: 'Sketch — working study',
-                    x: 160 + (nodes.length % 3) * 52,
-                    y: 180 + (nodes.length % 3) * 48,
+                    ...findFreeNodePosition(nodes, {
+                      x: 160,
+                      y: 180,
+                      width: 320,
+                      height: 240,
+                    }),
                     width: 320,
                     height: 240,
                     rotation: 0,
