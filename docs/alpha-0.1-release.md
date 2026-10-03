@@ -2,7 +2,13 @@
 
 Version: `0.1.0-alpha.1`
 
-## Prepared prerelease summary (not published)
+## Source-only prerelease scope
+
+The owner authorized public source publication on 2026-10-03. The repository is public and GitHub's private vulnerability reporting API confirms it is enabled. Create the prerelease only after anonymous exact-commit source comparison and final CI succeed; consult GitHub Releases for the published state. No compiled web assets, desktop installers, hosted deployment, private QA records or user data are included.
+
+The default build notice generator still marks corresponding-source availability as pending. Its strict compiled-distribution gate remains intentionally closed; public source release does not certify compiled downloads. Later compiled releases must bind and verify that declaration. Older private/preparation statements below are historical.
+
+## Prepared prerelease summary
 
 Title and tag: **Open Industrial Design v0.1.0-alpha.1** / **`v0.1.0-alpha.1`**.
 

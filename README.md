@@ -8,11 +8,26 @@
 
 # Open Industrial Design v0.1.0-alpha.1
 
+<p align="center">
+  <a href="https://github.com/truman-t3/open-industrial-design/releases"><img src="https://img.shields.io/badge/version-0.1.0--alpha.1-2563eb" alt="Version 0.1.0-alpha.1"></a>
+  <a href="https://github.com/truman-t3/open-industrial-design/actions/workflows/quality.yml"><img src="https://github.com/truman-t3/open-industrial-design/actions/workflows/quality.yml/badge.svg" alt="CI status"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MPL--2.0-blue" alt="Source license MPL-2.0"></a>
+  <a href="./docs/release-status.md"><img src="https://img.shields.io/badge/status-Community_Alpha-orange" alt="Community Alpha"></a>
+</p>
+
+<p align="center">从设计意图开始，探索、比较并保留你的产品方案。<br>Explore, compare, and preserve product ideas before CAD.</p>
+
+<p align="center">
+  <a href="#中文介绍">简体中文</a> · <a href="#english-overview">English</a> · <a href="#快速开始">快速开始</a> · <a href="#示例流程">示例流程</a> · <a href="./docs/community-alpha-quickstart.md">使用指南</a> · <a href="https://github.com/truman-t3/open-industrial-design/releases">Releases</a>
+</p>
+
+> **Community Alpha**：适合体验和反馈，重要项目请先导出备份。AI 使用自己的 API Key，费用由所选服务商收取；本项目不是 CAD，也不保证模型生成质量。
+
 ## 中文介绍
 
 **Open Industrial Design** 是面向工业设计师的本地优先、支持自带 API Key（BYOK）的设计探索工作台。它将参考图、草图、概念方案、变体、CMF、设计血缘和轻量 3D 评审组织在同一个项目中，服务于进入 CAD 之前的探索与决策。
 
-当前应用版本：**`0.1.0-alpha.1`**。计划发布标签：**`v0.1.0-alpha.1`**。目前仍处于发布准备阶段，尚未发布 GitHub Release；仓库目录名中的旧版本后缀不是应用版本。
+当前应用版本：**`0.1.0-alpha.1`**。本轮源码预发布标签：**`v0.1.0-alpha.1`**，发布记录见 [Releases](https://github.com/truman-t3/open-industrial-design/releases)。不提供托管服务或桌面安装包；仓库目录名中的旧版本后缀不是应用版本。
 
 ### 已有能力
 
@@ -23,11 +38,28 @@
 - **3D 评审**：导入 GLB／GLTF，旋转、平移、缩放、切换标准视角，捕捉预览；不是 CAD 建模器。
 - **本地项目与备份**：多画板、自动保存、刷新恢复和 `.oidproj` 导入导出；API Key 不进入项目备份。
 
+### 示例流程
+
+以同一款便携灯具为例，从草图探索产品方向，再比较方案与使用场景。以下是内置示例素材，不是本次实时生成结果，也不是工作台界面截图。
+
+| 草图输入                                               | 概念方案                                                    | 使用场景                                                  |
+| ------------------------------------------------------ | ----------------------------------------------------------- | --------------------------------------------------------- |
+| ![便携灯具草图](./brand/demo/portable-lamp-sketch.png) | ![便携灯具概念方案](./brand/demo/portable-lamp-concept.png) | ![便携灯具场景示例](./brand/demo/portable-lamp-scene.png) |
+
+示例来源：Open Industrial Design / truman-t3，AI 辅助制作；按 [CC BY 4.0 及署名说明](./DEMO_ASSETS_LICENSE.md) 使用。示例效果不构成对任意模型的能力保证。
+
+1. **表达意图**：导入参考图或完成草图，连接生成任务的主图／参考图端口。
+2. **探索方向**：选择草图渲染、CMF 或场景等任务，填写要求，确认服务商后手动生成。
+3. **比较结果**：独立选择、移动候选，比较差异；可继续探索，不必立即采纳。
+4. **保留决策**：采纳为方案、变体或参考图，查看设计血缘，并导出 `.oidproj` 备份。
+
 ### 快速开始
 
 已核验环境：Node.js **24.14.0**、pnpm **11.19.0**。
 
 ```bash
+git clone https://github.com/truman-t3/open-industrial-design.git
+cd open-industrial-design
 pnpm install --frozen-lockfile --ignore-scripts
 pnpm dev
 ```
@@ -50,7 +82,7 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-最后一项是独立的分发资料检查：图片许可与当前运行时捆绑记录已收口，公众源码渠道尚未验证，因此仍会阻止正式发布。**测试通过不等于已经获准正式分发。**
+最后一项是独立的成品分发资料检查：图片许可与当前运行时捆绑记录已收口，但构建脚本仍保留待绑定的对应源码声明，默认输出 `dist/licenses` 草稿并阻止成品分发。本轮仅发布可自行构建的源码预发布版，不附加编译成品。**源码发布不等于网页成品或安装包已通过分发验收。**
 
 当前不支持 CAD 编辑／导出、STEP／IGES、专用超分辨率／抠图、AI 3D 生成、云同步、账号及多人协作。模型效果与大包体积优化另行推进。
 
@@ -60,7 +92,7 @@ pnpm run notices:check
 
 内置 8 张便携灯具示例图现采用 **CC BY 4.0**，允许注明来源后修改、再分发和商用，详见 [示例图片许可及署名格式](./DEMO_ASSETS_LICENSE.md)。品牌素材不适用此许可，仍遵守原品牌规则。
 
-通过 [Issues](https://github.com/truman-t3/open-industrial-design/issues) 反馈 Bug、提交功能建议或询问使用问题；通过 Pull Request 贡献修复和文档。中文或英文均可，请先阅读 [贡献指南](./CONTRIBUTING.md)。仓库仍为私有时，仅有访问权限的协作者能使用这些入口。
+通过 [Issues](https://github.com/truman-t3/open-industrial-design/issues) 反馈 Bug、提交功能建议或询问使用问题；通过 Pull Request 贡献修复和文档。中文或英文均可，请先阅读 [贡献指南](./CONTRIBUTING.md)。
 
 不要上传 API Key、私人工程或未脱敏日志；安全漏洞请先阅读 [安全反馈说明](./SECURITY.md)，不要在公开 Issue 中披露。当前不承诺固定回复时间，不启用自动回复或额外讨论区。
 
@@ -116,7 +148,7 @@ Open the local URL printed by Vite. Before a release candidate, run:
 pnpm run release:check
 ```
 
-On Windows PowerShell, use `pnpm.cmd` if script execution blocks `pnpm`. This gate verifies version consistency, the committed minimal GLB fixture, formatting, linting, notice-script regressions, TypeScript, unit tests, and the production build. Web builds include an explicitly incomplete `dist/licenses` draft. The separate `pnpm run notices:check` distribution-text gate currently fails on unresolved notices and source availability; quality success is not release approval. See the Chinese [usage and backup guide](./docs/community-alpha-quickstart.md), [notice preparation](./licenses/README.md) and [release gate](./docs/alpha-0.1-release.md).
+On Windows PowerShell, use `pnpm.cmd` if script execution blocks `pnpm`. This gate verifies version consistency, the committed minimal GLB fixture, formatting, linting, notice-script regressions, TypeScript, unit tests, and the production build. This prerelease is source-only, with no compiled downloads or hosted deployment. Web builds still produce a `dist/licenses` draft: `pnpm run notices:check` blocks compiled distribution until its corresponding-source declaration is bound and verified. See the Chinese [usage and backup guide](./docs/community-alpha-quickstart.md), [notice preparation](./licenses/README.md) and [release gate](./docs/alpha-0.1-release.md).
 
 ## Known Alpha limitations
 

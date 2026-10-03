@@ -1,6 +1,12 @@
 # Community Alpha 发布状态
 
-当前版本为 `0.1.0-alpha.1`，处于发布准备阶段，尚未完成正式公开发布。架构规划中的未来功能不是已实现能力；现有能力和使用限制以 [README](../README.md) 和 [使用指南](./community-alpha-quickstart.md) 为准。
+当前版本为 `0.1.0-alpha.1`。仓库已按所有者授权公开，GitHub 私密漏洞报告 API 已确认启用。本轮按源码预发布范围准备 `v0.1.0-alpha.1`，最终是否已发布以 [GitHub Releases](https://github.com/truman-t3/open-industrial-design/releases) 为准，不提供编译包、桌面安装包或托管部署。架构规划中的未来功能不是已实现能力；现有能力和使用限制以 [README](../README.md) 和 [使用指南](./community-alpha-quickstart.md) 为准。
+
+## 本轮公开范围与后续成品门槛
+
+README 已增加中英导航、版本／CI／许可／Alpha 徽章、复用现有素材的示例流程和完整克隆启动命令。SECURITY.md 按所有者批准更新私密报告入口，不改变报告范围或响应承诺。
+
+源码预发布须核对匿名下载的精确提交与本地文件一致、CI 成功后才创建 Release。构建脚本的 `pendingSourceAvailability` 仍为默认待定，因此 `notices:check` 不宣称通过，`dist/licenses` 仍是草稿；本轮不上传这些编译产物。后续成品分发需实现和核验与精确源码绑定的声明。以下较早日期的私有仓库、未发布及测试记录保留为历史，不覆盖本节范围。
 
 ## 已完成的技术核验
 
