@@ -56,6 +56,12 @@ pnpm run notices:check
 
 源码采用 **MPL-2.0（不是 MIT）**，贡献采用 **DCO 1.1**；品牌和示例图片不自动沿用代码许可证。详见 [发布状态](./docs/release-status.md)、[使用与备份指南](./docs/community-alpha-quickstart.md)、[源码许可](./SOURCE_LICENSE.md) 和 [品牌规则](./TRADEMARKS.md)。
 
+## 参与社区
+
+通过 [Issues](https://github.com/truman-t3/open-industrial-design/issues) 反馈 Bug、提交功能建议或询问使用问题；通过 Pull Request 贡献修复和文档。中文或英文均可，请先阅读 [贡献指南](./CONTRIBUTING.md)。仓库仍为私有时，仅有访问权限的协作者能使用这些入口。
+
+不要上传 API Key、私人工程或未脱敏日志；安全漏洞请先阅读 [安全反馈说明](./SECURITY.md)，不要在公开 Issue 中披露。当前不承诺固定回复时间，不启用自动回复或额外讨论区。
+
 ## English overview
 
 **Open Industrial Design** is an open-source, local-first, model-agnostic industrial design workspace for early product exploration.

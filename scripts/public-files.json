@@ -1,4 +1,8 @@
 [
+  ".github/ISSUE_TEMPLATE/bug_report.md",
+  ".github/ISSUE_TEMPLATE/feature_request.md",
+  ".github/ISSUE_TEMPLATE/question.md",
+  ".github/pull_request_template.md",
   ".github/workflows/quality.yml",
   ".gitignore",
   ".prettierignore",
@@ -7,6 +11,7 @@
   "DCO.txt",
   "LICENSE",
   "README.md",
+  "SECURITY.md",
   "SOURCE_LICENSE.md",
   "THIRD_PARTY_NOTICES.md",
   "TRADEMARKS.md",
