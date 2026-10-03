@@ -1,0 +1,37 @@
+{
+  "name": "open-industrial-design",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "build": "pnpm --filter @open-industrial-design/web build",
+    "dev": "pnpm --filter @open-industrial-design/web dev",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "fixtures:check": "pnpm --filter @open-industrial-design/three-viewer run fixture:check",
+    "version:check": "node scripts/check-version.mjs",
+    "source:bundle": "node scripts/source-bundle.mjs",
+    "source:test": "node --test scripts/source-bundle.test.mjs",
+    "publication:check": "node scripts/publication-check.mjs",
+    "publication:test": "node --test scripts/publication-check.test.mjs",
+    "notices:test": "node --test scripts/license-notices.test.mjs scripts/release-assets.test.mjs scripts/runtime-notice-evidence.test.mjs scripts/local-runtime-assets.test.mjs scripts/package-provenance.test.mjs",
+    "notices:check": "node scripts/build-license-notices.mjs --check",
+    "release:check": "pnpm run version:check && pnpm run fixtures:check && pnpm run format:check && pnpm run lint && pnpm run notices:test && pnpm run source:test && pnpm run publication:test && pnpm run typecheck && pnpm run test && pnpm run build",
+    "test": "pnpm --recursive --if-present run test",
+    "typecheck": "pnpm --recursive run typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "10.10.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.12.0",
+    "jsdom": "30.0.1",
+    "prettier": "3.9.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.0"
+  }
+}

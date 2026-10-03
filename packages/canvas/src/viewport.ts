@@ -1,0 +1,67 @@
+import type { Viewport } from '@open-industrial-design/design-model';
+
+export function zoomViewport(
+  viewport: Viewport,
+  zoom: number,
+  anchor: { x: number; y: number },
+): Viewport {
+  const nextZoom = Math.min(4, Math.max(0.1, zoom));
+  return {
+    x: anchor.x - ((anchor.x - viewport.x) / viewport.zoom) * nextZoom,
+    y: anchor.y - ((anchor.y - viewport.y) / viewport.zoom) * nextZoom,
+    zoom: nextZoom,
+  };
+}
+
+/** View-only framing: never changes node layout or selection. */
+export function fitCanvasViewport(
+  nodes: readonly {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation?: number;
+    hidden?: boolean;
+  }[],
+  size: { width: number; height: number },
+): Viewport | undefined {
+  const visible = nodes.filter(
+    (node) =>
+      !node.hidden &&
+      [node.x, node.y, node.width, node.height].every(Number.isFinite) &&
+      node.width > 0 &&
+      node.height > 0,
+  );
+  if (!visible.length || size.width <= 0 || size.height <= 0) return undefined;
+  const corners = visible.flatMap((node) => {
+    const angle = ((node.rotation ?? 0) * Math.PI) / 180;
+    return [
+      [0, 0],
+      [node.width, 0],
+      [0, node.height],
+      [node.width, node.height],
+    ].map(([x, y]) => ({
+      x: node.x + x! * Math.cos(angle) - y! * Math.sin(angle),
+      y: node.y + x! * Math.sin(angle) + y! * Math.cos(angle),
+    }));
+  });
+  const left = Math.min(...corners.map((point) => point.x));
+  const right = Math.max(...corners.map((point) => point.x));
+  const top = Math.min(...corners.map((point) => point.y));
+  const bottom = Math.max(...corners.map((point) => point.y));
+  const zoom = Math.min(
+    1,
+    Math.max(
+      0.1,
+      Math.min(
+        Math.max(1, size.width - 64) / (right - left),
+        Math.max(1, size.height - 112) / (bottom - top),
+      ),
+    ),
+  );
+  return {
+    x: size.width / 2 - ((left + right) / 2) * zoom,
+    y: size.height / 2 - ((top + bottom) / 2) * zoom,
+    zoom,
+  };
+}

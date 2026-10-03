@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-02",
+  "status": "DRAFT_NOT_APPROVED_FOR_DISTRIBUTION",
+  "brandOriginDeclaration": {
+    "confirmedAt": "2026-10-03",
+    "scope": "The 13 records with role brand; not the demo or reference-only records",
+    "source": "Direct project-owner statement in this task",
+    "statement": "品牌图片是我原创 我利用GPT image2.5制作的",
+    "toolAsReported": "GPT image2.5",
+    "boundary": "Owner-confirmed creation provenance, not independent model-version verification, a creation date, a legal determination of copyright or trademark rights, or an instruction to publish."
+  },
+  "images": [
+    {
+      "file": "demo/portable-lamp-cmf-blue.png",
+      "sha256": "211a7ac3f84422b9617732a964739ef680f3b42a70384cda88756dacc930fa03",
+      "size": 1684439,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-29",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-concept.png",
+      "sha256": "fe26ed9d01ca6e17be3ea17ff7ca3149ddb9e26e1f565fd079074e272bd30fc4",
+      "size": 1820447,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-23",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-detail-handle.png",
+      "sha256": "b2d55321b4940d0b8d9880529046d7ee020b4eb1e33f8f890d2164c75f1f258d",
+      "size": 2280642,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-29",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-detail-knob.png",
+      "sha256": "7b40c70372949b49f22df4b92051ecd8606141ecbecb29d781d4eb4d0a1a19d7",
+      "size": 2300450,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-29",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-reference.png",
+      "sha256": "e318b2e9e0ac70b454a6f2915e446d738985142e9f91370160b34de7fda3b899",
+      "size": 2215473,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-23",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-scene.png",
+      "sha256": "6528547f1c7375c4c469a0f9a417492a74bd49b40d79588da0559bb91bb14294",
+      "size": 2006935,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-27",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-sketch.png",
+      "sha256": "0493393f7936162572bdcb0936ef42d6dab5741b5af424652d5ecec385a474bd",
+      "size": 2647363,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-23",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "demo/portable-lamp-variant.png",
+      "sha256": "1b147efad7e2e6573fe73ed52d13a622abaa698a94a42c315d49e49b72420717",
+      "size": 1688736,
+      "role": "demo",
+      "origin": "documented-built-in-AI-imagery",
+      "provenanceDocument": "docs/demo-visuals.md",
+      "documentedCreationDate": "2026-09-23",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-1024.png",
+      "sha256": "c56fcacc3b101bb311dd4662fc9dda59c2fc494f9bcf7eff57034083e9ca012f",
+      "size": 221919,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-128.png",
+      "sha256": "bfa73be32164090140d22e632155b75e14f9f8a3056740a3ee17eda2ab4c4410",
+      "size": 6736,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-16.png",
+      "sha256": "055256ee7d5966033b324018c65a73141d5ed86b0266801fa49d75f6091166cb",
+      "size": 478,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-256.png",
+      "sha256": "11898490285b532c3104ff95c956e06504968d5f8fa86c7a12dd4deeeb1813fd",
+      "size": 19746,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-32.png",
+      "sha256": "2f53faeaa402a5bb8c9f69f49d93d71d368df49fd5985667e74f7a61ad33ea15",
+      "size": 1079,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-48.png",
+      "sha256": "6b0eb1c5906fc995630feff71e542d4b32a2ba95b0d934b2962e6bb71d3733b8",
+      "size": 1804,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-512.png",
+      "sha256": "8f0746adc5033a8482236d7f8b56598ebdb1213f11903376cc89eb21c349a073",
+      "size": 64936,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "icon/open-industrial-design-icon-64.png",
+      "sha256": "6a24ac22db4ab2e2d9ef79e7444b78b7267301b85f726f806dd9e49f9ff317a8",
+      "size": 2636,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "logo/open-industrial-design-logo-black.png",
+      "sha256": "8ae7a99c67843f08b83ad7cd7c58182db3f3362d12d59591eb3f53e9e679334f",
+      "size": 336039,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "logo/open-industrial-design-logo-dark.png",
+      "sha256": "589230ac75819bdf137fa7c886b6631201ace305f0c90bc3753bb56681d0258d",
+      "size": 325644,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "logo/open-industrial-design-logo-primary.png",
+      "sha256": "435dd7e1d61c3071f3c0abe2ae431f99aa49d261090393cf53141e3ed1d3ecae",
+      "size": 441126,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "logo/open-industrial-design-logo-white.png",
+      "sha256": "7278e46336c6d65d179fb955fd5006bef8a8eb2a6db579b6a55edf29df68bce5",
+      "size": 335961,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "social/open-industrial-design-brand-guide-board.png",
+      "sha256": "027402efc92c0004dfefc866750c8d7b7aadd01e233c665f0bfb35355130c5c4",
+      "size": 1459956,
+      "role": "reference-only",
+      "origin": "supplied-raster-origin-unverified",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "social/open-industrial-design-brand-kit-board.png",
+      "sha256": "6cd80011bcb4d38b69dad3be5fd292a91728d19bbae946b7994a1bb6e32200ef",
+      "size": 681967,
+      "role": "reference-only",
+      "origin": "supplied-raster-origin-unverified",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    },
+    {
+      "file": "social/open-industrial-design-github-avatar.png",
+      "sha256": "8f0746adc5033a8482236d7f8b56598ebdb1213f11903376cc89eb21c349a073",
+      "size": 64936,
+      "role": "brand",
+      "origin": "owner-confirmed-self-created-AI-imagery",
+      "provenanceDocument": "docs/brand-assets.md",
+      "releaseAuthorization": "pending"
+    }
+  ],
+  "runtimeAssets": [
+    {
+      "id": "excalidraw-sketch-fonts",
+      "packageVersion": "@excalidraw/excalidraw@0.18.1",
+      "urlPrefix": "https://esm.sh/@excalidraw/excalidraw@0.18.1/dist/prod/",
+      "condition": "Historical dependency CDN fallback retained as provenance. The application now sets EXCALIDRAW_ASSET_PATH to its own runtime/excalidraw/ directory and packages all 234 fixed font files.",
+      "applicationPath": "runtime/excalidraw/fonts/",
+      "evidence": [
+        {
+          "packageName": "@excalidraw/excalidraw",
+          "file": "dist/dev/chunk-4FTI6OG3.js",
+          "sha256": "3cfe278cb537fde73b42bbd4697b392946517d3dc02d3f3cf8487d8476f63ba2"
+        }
+      ],
+      "localFontFamilies": [
+        {
+          "family": "Assistant",
+          "files": 4
+        },
+        {
+          "family": "Cascadia",
+          "files": 1
+        },
+        {
+          "family": "ComicShanns",
+          "files": 4
+        },
+        {
+          "family": "Excalifont",
+          "files": 7
+        },
+        {
+          "family": "Liberation",
+          "files": 1
+        },
+        {
+          "family": "Lilita",
+          "files": 2
+        },
+        {
+          "family": "Nunito",
+          "files": 5
+        },
+        {
+          "family": "Virgil",
+          "files": 1
+        },
+        {
+          "family": "Xiaolai",
+          "files": 209
+        }
+      ],
+      "reviewStatus": "pending-exact-font-notices-and-distribution-review",
+      "upstreamDocumentation": "https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation"
+    },
+    {
+      "id": "draco-remote-decoder",
+      "packageVersion": "@open-industrial-design/three-viewer@0.1.0-alpha.1",
+      "urlPrefix": "https://www.gstatic.com/draco/versioned/decoders/1.5.5/",
+      "condition": "Historical drei CDN origin retained only as provenance; drei and draco3d have been removed. Current Three GLTFLoader uses local, byte-verified Draco 1.5.5.",
+      "applicationPath": "runtime/draco/1.5.5/",
+      "evidence": [
+        {
+          "packageName": "@open-industrial-design/three-viewer",
+          "file": "src/model-loader.ts",
+          "sha256": "ffa437db95f1c6712f70e17c3b97677c17521537a2d985278fd3c6d2cd5134f4"
+        }
+      ],
+      "remoteVersion": "1.5.5",
+      "reviewStatus": "pending-source-availability-and-distribution-review",
+      "historicalEvidence": [
+        {
+          "packageName": "@react-three/drei",
+          "file": "core/Gltf.js",
+          "sha256": "2f4e4415df8d1b48c3b607682d149af655d0e6597dd8d7e76e9598fd6b26590f"
+        }
+      ],
+      "historicalPackageVersion": "@react-three/drei@10.7.8",
+      "historicalSeparatelyInstalledPackage": "draco3d@1.5.7"
+    }
+  ],
+  "boundaries": [
+    "Repository documentation is an origin statement, not a provider generation receipt or owner distribution authorization.",
+    "No remote media downloaded; local font-file counts do not mean all those fonts are fetched in one session.",
+    "User model texture/buffer URIs, external image libraries and BYOK endpoints need separate usage-specific review."
+  ]
+}

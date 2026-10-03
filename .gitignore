@@ -1,0 +1,30 @@
+node_modules/
+dist/
+coverage/
+.vite/
+.env
+.env.*
+!.env.example
+*.oidproj
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Local-only work products and credentials. Publication still requires an
+# explicit staged-file review; ignore rules do not inspect file contents.
+artifacts/
+.codex/
+.agents/
+.aws/
+.npmrc
+.pnpm-store/
+*.log
+*.pem
+*.key
+*.pfx
+*.p12
+*.sqlite
+*.sqlite3
+*.db
+credentials.json
+secrets.json

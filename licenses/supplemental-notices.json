@@ -1,0 +1,916 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-02",
+  "packages": [
+    {
+      "id": "react-remove-scroll-bar@2.3.8",
+      "manifestSha256": "e372f857ce05f266137c65293436b5380fec42ac311e6acb9378ed78b98d75d0",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/react-remove-scroll-bar/2.3.8",
+      "commit": "7301c160fda44cb8cf2b9fdfde61efad35736196",
+      "notices": [
+        {
+          "file": "texts/a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84.txt",
+          "sha256": "a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84",
+          "source": "https://raw.githubusercontent.com/theKashey/react-remove-scroll-bar/7301c160fda44cb8cf2b9fdfde61efad35736196/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@excalidraw/excalidraw@0.18.1",
+      "manifestSha256": "402f54fc7de128b25d22bd4d905fb46dbcdbe2ce6efee567d4da0fc79a29aab1",
+      "license": "MIT",
+      "versionSource": "https://api.github.com/repos/excalidraw/excalidraw/commits/v0.18.1",
+      "commit": "a2ec2889babf7d2295469c6d90ebe77fae57df84",
+      "notices": [
+        {
+          "file": "texts/1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be.txt",
+          "sha256": "1352d204fdb90d5e482c13139d848bc2c9300a9a7de358a0a558a23e72d0d8be",
+          "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/primitive@1.0.0",
+      "manifestSha256": "bc966f418aaa0c482c6ba543cee848b4492e1d009bbe9a7e02551f803717a06e",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Fprimitive/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:48:43.576Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A48%3A43.576Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "d3831d1c80fa02a919e3e5191eeec91e30dea03f07e7d6e858b279809ac2d0e8",
+        "files": [
+          {
+            "file": "packages/core/primitive/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/core/primitive/src/index.ts",
+            "equal": true,
+            "sourceSha256": "69a1e6e39aa04660607e267855e9247b105e92ed8d9a55dbd9974e2831f47c72"
+          },
+          {
+            "file": "packages/core/primitive/src/primitive.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/core/primitive/src/primitive.tsx",
+            "equal": true,
+            "sourceSha256": "9774ebe0f9b13fe044511531c06f8b43accb33ebce32e575e0cf0945f60dc759"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/primitive@1.1.1",
+      "manifestSha256": "7847a1419bf203d5aac8b33a6aea01bc50af135d0253feb69140b1afc9af1052",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Fprimitive/1.1.1",
+      "commit": "3c5e05fab070dfa68212230e85baf0879269c57d",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/3c5e05fab070dfa68212230e85baf0879269c57d/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-arrow@1.1.2",
+      "manifestSha256": "44843e87409191bceb435b01b3cf08529f5778abdb0f7bf0d0849692f18cf584",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-arrow/1.1.2",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-collection@1.0.1",
+      "manifestSha256": "dfb222ffd0c61fc9d19b4d903b0a24e2b25b2121159f39730bacba7273625f3f",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-collection/1.0.1",
+      "commit": "3ead2147159bf81a100376079b4ab04ccc381cd1",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-10-17T09:49:47.273Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-10-17T09%3A49%3A47.273Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "33c199af7f363609fc2dccc4df0bee1a3e12fa47b1bae63b25d80e22f13256cd",
+        "files": [
+          {
+            "file": "packages/react/collection/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/packages/react/collection/src/index.ts",
+            "equal": true,
+            "sourceSha256": "694ac7a0bdb1b4e8648ac8d5212d7608da470403710f2e600f9f782c839c917c"
+          },
+          {
+            "file": "packages/react/collection/src/Collection.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/packages/react/collection/src/Collection.tsx",
+            "equal": true,
+            "sourceSha256": "a88758dfc90c25329f9fdbdfe29dd7403ab2d0ee246440e548ec32a169c55e7c"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-compose-refs@1.0.0",
+      "manifestSha256": "df216eddcf706efeb930a696a9391db6a1f75366bc2f9c4cfed85f2a63476820",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-compose-refs/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:48:50.087Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A48%3A50.087Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "c7666a81a5292286d1dbb5efa32e8c793502e14903ec194cd74b28b7d912edb8",
+        "files": [
+          {
+            "file": "packages/react/compose-refs/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/compose-refs/src/index.ts",
+            "equal": true,
+            "sourceSha256": "b896f188bd369619225bd5e434d4a6963806207c67754a9baa2a6c621fbdd05a"
+          },
+          {
+            "file": "packages/react/compose-refs/src/composeRefs.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/compose-refs/src/composeRefs.tsx",
+            "equal": true,
+            "sourceSha256": "dded4c797ce4be865f7921a67dc4edf376caf16219600a6f5a3342016a74e3b3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-compose-refs@1.1.1",
+      "manifestSha256": "7a6e87d73f59d7229a46b1c949059556e223f1dd1e64332bc7947afb715f31c1",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-compose-refs/1.1.1",
+      "commit": "3c5e05fab070dfa68212230e85baf0879269c57d",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/3c5e05fab070dfa68212230e85baf0879269c57d/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-context@1.0.0",
+      "manifestSha256": "907c461ff0f9ebb10962e13900ebb3167102cb2ff065c526fda5635848e5df4a",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-context/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:48:50.721Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A48%3A50.721Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "0a41c301eb7fc7736028a85398a20d8f3da3704e4ee9111ce14726d6db0b8394",
+        "files": [
+          {
+            "file": "packages/react/context/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/context/src/index.ts",
+            "equal": true,
+            "sourceSha256": "d820b888a36768ce22c4e28a3e2707666919eea07d5528fd95f85680b8ac754b"
+          },
+          {
+            "file": "packages/react/context/src/createContext.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/context/src/createContext.tsx",
+            "equal": true,
+            "sourceSha256": "7d55561a52150359df15d2ae4dd293cdbdab8e1820723a5eef9936d4ed9f724b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-context@1.1.1",
+      "manifestSha256": "0aecb99b46788c08a6161a67d01adb07f504fc7c33a769927403d35fd04209b1",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-context/1.1.1",
+      "commit": "157415ed1f34c53b5afbf53a047895ed6a7f957f",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/157415ed1f34c53b5afbf53a047895ed6a7f957f/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-direction@1.0.0",
+      "manifestSha256": "d05e5be70db5caefd08493c0e38ebafc17a85929b5850206dbecb3ab1ff2caf2",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-direction/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:48:53.147Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A48%3A53.147Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "c49ac6de3f7cbfc25d4a6977bc4472c483bf214f7d1f01c603cc4062f1da8910",
+        "files": [
+          {
+            "file": "packages/react/direction/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/direction/src/index.ts",
+            "equal": true,
+            "sourceSha256": "948e2dd32a70e47099cdf634bf7df9e16d062b414ce014bd2e8c522e4401d71e"
+          },
+          {
+            "file": "packages/react/direction/src/Direction.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/direction/src/Direction.tsx",
+            "equal": true,
+            "sourceSha256": "342eea1d875b1c385e4a0bd35126405dde9cac6b7bdf6d0ebf4bc99a2a938974"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-dismissable-layer@1.1.5",
+      "manifestSha256": "28bc6cb4c72959d9663f2ac81e60cfcf0cfd57631375643f30d009df93f79716",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-dismissable-layer/1.1.5",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-focus-guards@1.1.1",
+      "manifestSha256": "c5a978f8471ddd6bbc1db0b841e4095ce047bf9bc8bbece521d750b81aec08a7",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-focus-guards/1.1.1",
+      "commit": "157415ed1f34c53b5afbf53a047895ed6a7f957f",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/157415ed1f34c53b5afbf53a047895ed6a7f957f/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-focus-scope@1.1.2",
+      "manifestSha256": "f65ebafb15ae674590fc937435ffab43be49b937b619fd23ddb6dc46bc212064",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-focus-scope/1.1.2",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-id@1.0.0",
+      "manifestSha256": "32a0d33bef2c721001a28c49e71b7412a0a3ffbae801dd3fa26f442194f8ce51",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-id/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:48:55.687Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A48%3A55.687Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "92dd232741f630cdae9fe89f8bb2dd67ffe3d0dcaec1e182eb93d36579ec2e5e",
+        "files": [
+          {
+            "file": "packages/react/id/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/id/src/index.ts",
+            "equal": true,
+            "sourceSha256": "9c3190cc75859464eea51969c9c02f036c0e78b7bae1c6bfde2a6e6909a1f2a9"
+          },
+          {
+            "file": "packages/react/id/src/id.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/id/src/id.tsx",
+            "equal": true,
+            "sourceSha256": "8f8f9db7f17c2b4e9b62177938f5379e1f938a4b8b1f3e76dd7a13514270cc6f"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-id@1.1.0",
+      "manifestSha256": "ee9c0fd00e573527615a9d307f38bb8d031e23a27a5deff70d56d575a78499d7",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-id/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-popover@1.1.6",
+      "manifestSha256": "a8a20238b2d32688f7cb5320d54c2e8c9256fb17c7a64ed0d3bccc405db16f18",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-popover/1.1.6",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-popper@1.2.2",
+      "manifestSha256": "8680cc2ddc03cf10a9ee5097253602cffc01e923510ba20290f7e8b570aafa5b",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-popper/1.2.2",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-portal@1.1.4",
+      "manifestSha256": "b7dd3460fa1280cf9ef09365c6e686b48e8e82a993eab171e90ac9ef82a1b5f0",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-portal/1.1.4",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-presence@1.0.0",
+      "manifestSha256": "aa4f75bd50dabd805f180365fa44aa7b9be30d34277350e96fa1fc697f434a3a",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-presence/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:49:00.070Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A49%3A00.070Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "de07657bfe025dd8e4148c68e20c38d3fab4450795a0641a4130ff2da304bcda",
+        "files": [
+          {
+            "file": "packages/react/presence/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/presence/src/index.ts",
+            "equal": true,
+            "sourceSha256": "4acaebb42f9a72cb0a8fe0ebd302f81406fb1a9bec49cde316acf976ca04e2c1"
+          },
+          {
+            "file": "packages/react/presence/src/Presence.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/presence/src/Presence.tsx",
+            "equal": true,
+            "sourceSha256": "0bd0200880d0d6df51de9e488a62cc31ff79998ffee5c97df090782e2da6a72d"
+          },
+          {
+            "file": "packages/react/presence/src/useStateMachine.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/presence/src/useStateMachine.tsx",
+            "equal": true,
+            "sourceSha256": "2da4b651d16dfe7066b4ba5850dd9789fff8c3aadace565be38d6089a1d3f4c5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-presence@1.1.2",
+      "manifestSha256": "136615daa35faff817a1878212f69a64a3ef0dca8960fcca8b8d4f9017869cf6",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-presence/1.1.2",
+      "commit": "3c5e05fab070dfa68212230e85baf0879269c57d",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/3c5e05fab070dfa68212230e85baf0879269c57d/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-primitive@1.0.1",
+      "manifestSha256": "d16a35b1d41c3164e442368287c35d1c90ebe70ce00b74c7819d43b99c9ebac9",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-primitive/1.0.1",
+      "commit": "3ead2147159bf81a100376079b4ab04ccc381cd1",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-10-17T09:49:55.585Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-10-17T09%3A49%3A55.585Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "d3dfe1aa6cf1b48ed3ff9b6ba556cf71c1aad74917d33469b42db90a728561ef",
+        "files": [
+          {
+            "file": "packages/react/primitive/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/packages/react/primitive/src/index.ts",
+            "equal": true,
+            "sourceSha256": "3225b6daa185e2ca298798bee315dc050ae8305be1e936eecb3388267dc493c7"
+          },
+          {
+            "file": "packages/react/primitive/src/Primitive.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/packages/react/primitive/src/Primitive.tsx",
+            "equal": true,
+            "sourceSha256": "2631036ec988c3ce72a000020dffeb914f23d16484d3dc38338c4fc846dd98cb"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-primitive@2.0.2",
+      "manifestSha256": "ac37d9a1b33a6ed4cf09b8942c4a4e6f17690726f3068ae02d36bcc28e50d492",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-primitive/2.0.2",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-roving-focus@1.0.2",
+      "manifestSha256": "616ed4dc3a559c8494b77877667559587e86021ef2c86ae784fe1368849c8076",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-roving-focus/1.0.2",
+      "commit": "f85d5e98d65bc05e1c05651dc728e6142e8864a5",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/f85d5e98d65bc05e1c05651dc728e6142e8864a5/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2023-01-17T13:40:43.800Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2023-01-17T13%3A40%3A43.800Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "c157b46cf6b4f4688e5950a722d6fb6de9b9d1f8a37e302998324c403844844b",
+        "files": [
+          {
+            "file": "packages/react/roving-focus/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/f85d5e98d65bc05e1c05651dc728e6142e8864a5/packages/react/roving-focus/src/index.ts",
+            "equal": true,
+            "sourceSha256": "f41b8c7f80874782362f7477d3b0b224c08b9889a2d6114908cd8fdbab645652"
+          },
+          {
+            "file": "packages/react/roving-focus/src/RovingFocusGroup.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/f85d5e98d65bc05e1c05651dc728e6142e8864a5/packages/react/roving-focus/src/RovingFocusGroup.tsx",
+            "equal": true,
+            "sourceSha256": "e369bc5d214e688b8df5e3166845a1efbc7b685ac022a568587b6c06d33a7aa5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-slot@1.0.1",
+      "manifestSha256": "1f0de1a27a57cd9092b4cc5973e0268f1d8a3210c86f9dfebc4392b0e87c2b3c",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-slot/1.0.1",
+      "commit": "3ead2147159bf81a100376079b4ab04ccc381cd1",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-10-17T09:49:59.098Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-10-17T09%3A49%3A59.098Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "dba1bed941ba7454bdcc058239157edfab3a84018326ff12d988a02d5a1e4f1e",
+        "files": [
+          {
+            "file": "packages/react/slot/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/packages/react/slot/src/index.ts",
+            "equal": true,
+            "sourceSha256": "06b74327f28ad70004e56da74e516b6e828f8fe7938fc81f146e433fdb3f2bc6"
+          },
+          {
+            "file": "packages/react/slot/src/Slot.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/3ead2147159bf81a100376079b4ab04ccc381cd1/packages/react/slot/src/Slot.tsx",
+            "equal": true,
+            "sourceSha256": "1807bf6424061707eaf4997ad4c638efec17d11d7243f9888a294dbf64c86c21"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-slot@1.1.2",
+      "manifestSha256": "b9a04af8ef3844a1e3b32b8e8528c546b3a077d26f8a810548a9c7024e15c0bc",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-slot/1.1.2",
+      "commit": "e1bdb77ea2445407b239558f2902c2e1950586fe",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/e1bdb77ea2445407b239558f2902c2e1950586fe/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-tabs@1.0.2",
+      "manifestSha256": "86564c3df77be18f84b0ebaab07f1bf2c526737e23b93ab54c9ffd5ea3d53da6",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-tabs/1.0.2",
+      "commit": "f85d5e98d65bc05e1c05651dc728e6142e8864a5",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/f85d5e98d65bc05e1c05651dc728e6142e8864a5/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2023-01-17T13:40:48.722Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2023-01-17T13%3A40%3A48.722Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "66fd5e638189b3c4ad763fcdaf0467ebbf92e394579b58064fff538ebf07f0e7",
+        "files": [
+          {
+            "file": "packages/react/tabs/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/f85d5e98d65bc05e1c05651dc728e6142e8864a5/packages/react/tabs/src/index.ts",
+            "equal": true,
+            "sourceSha256": "120711d1da3b43febf4edd43b662ed9a942cb7f62663e33081a29840e406639b"
+          },
+          {
+            "file": "packages/react/tabs/src/Tabs.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/f85d5e98d65bc05e1c05651dc728e6142e8864a5/packages/react/tabs/src/Tabs.tsx",
+            "equal": true,
+            "sourceSha256": "3c17d20356e77828dcacae8c484d87465ad6873ecc8deacfe255f11a314f1947"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-use-callback-ref@1.0.0",
+      "manifestSha256": "aacd45487ff624ee16c9c712a80c056f4c4441e7edc7398d7a067ad71fa3a7fa",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-callback-ref/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:49:10.408Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A49%3A10.408Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "e01f59db3d23f3f874d3f76f8ede6beb5c56a41302f288af910ebb0d81ce1e73",
+        "files": [
+          {
+            "file": "packages/react/use-callback-ref/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/use-callback-ref/src/index.ts",
+            "equal": true,
+            "sourceSha256": "0bfbd1976f8233d5de3ef705e655eb63696eb23c987a04af23c8aaf49d53f453"
+          },
+          {
+            "file": "packages/react/use-callback-ref/src/useCallbackRef.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/use-callback-ref/src/useCallbackRef.tsx",
+            "equal": true,
+            "sourceSha256": "e0592c6479498ba8761b26c8187efaff572febd0df0d52d89d6b350ae2684847"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-use-callback-ref@1.1.0",
+      "manifestSha256": "3782e3eed8467e9dd57d4442700f5cf6541e30e268a2034204f08e8e8c9a3f56",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-callback-ref/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-use-controllable-state@1.0.0",
+      "manifestSha256": "4a9bd70b0fb735c8f3707f74217b0b482b7847c6747be69cf89a68b010d49572",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-controllable-state/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:49:12.696Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A49%3A12.696Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "144ba9dcfe4733f9f87497599cc9aa02cf46948783ce012feea749c6c3f7c236",
+        "files": [
+          {
+            "file": "packages/react/use-controllable-state/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/use-controllable-state/src/index.ts",
+            "equal": true,
+            "sourceSha256": "f4388da03b8e3cd397102df80e5d25004cfe6fab1d640701a71c3444f2f25d6d"
+          },
+          {
+            "file": "packages/react/use-controllable-state/src/useControllableState.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/use-controllable-state/src/useControllableState.tsx",
+            "equal": true,
+            "sourceSha256": "6922a5dc08c579ea3222456a184f4d57d7799ec0dde2ddd19f74e077f1dda774"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-use-controllable-state@1.1.0",
+      "manifestSha256": "34077ec078651655e44f2495766614b8482ca69d02ee4ff91423e58adb5b6c9f",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-controllable-state/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-use-escape-keydown@1.1.0",
+      "manifestSha256": "26a923e4e59c09bef319c65ac053436f9ae0815d1640ca187d16e66a4e0e86b7",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-escape-keydown/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-use-layout-effect@1.0.0",
+      "manifestSha256": "6900814b2781ce351beeb465d6551619173d37c92eceb328d8b53ce15a910e67",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-layout-effect/1.0.0",
+      "commit": "511ca883b41f63ab99b135c6f29d0937ff0cbef0",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/LICENSE"
+        }
+      ],
+      "binding": {
+        "method": "published-sourcemap-source-match",
+        "publishedAt": "2022-07-20T18:49:13.304Z",
+        "commitSource": "https://api.github.com/repos/radix-ui/primitives/commits?until=2022-07-20T18%3A49%3A13.304Z&per_page=1",
+        "sourceMapFile": "dist/index.module.js.map",
+        "sourceMapSha256": "a29d2423571d79f0719d0f5e496d428433d725068fb532030be16821c5b34770",
+        "files": [
+          {
+            "file": "packages/react/use-layout-effect/src/index.ts",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/use-layout-effect/src/index.ts",
+            "equal": true,
+            "sourceSha256": "d3745290ccff366544347215b8ca5f06e6ae4f3d16fea5a6c0b0c88b73c08e2d"
+          },
+          {
+            "file": "packages/react/use-layout-effect/src/useLayoutEffect.tsx",
+            "source": "https://raw.githubusercontent.com/radix-ui/primitives/511ca883b41f63ab99b135c6f29d0937ff0cbef0/packages/react/use-layout-effect/src/useLayoutEffect.tsx",
+            "equal": true,
+            "sourceSha256": "aef49922a44dcb5f49873f53237a8df3ba2c859441e00fb92068d3b7bfd4a42b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "@radix-ui/react-use-layout-effect@1.1.0",
+      "manifestSha256": "f9c70b98476a7ec76dfc39ff2957c7743efaceac532eea2f440ab4dde8e50c6f",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-layout-effect/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-use-rect@1.1.0",
+      "manifestSha256": "70691f063bc44ee97e430414cd6f2440bf665684e6e24f9df939aad009836f7e",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-rect/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/react-use-size@1.1.0",
+      "manifestSha256": "f468ae68a5ec9a6f866999bd033a08af2804a9be67dd7f8337657e0117de5d2d",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Freact-use-size/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@radix-ui/rect@1.1.0",
+      "manifestSha256": "e5e41d5563341f682de3808dd817377cd18cf9fa8e22e524eacd50d092fa0d1c",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40radix-ui%2Frect/1.1.0",
+      "commit": "704069ee4c40c3b6f342c104dff5ad873ee39c43",
+      "notices": [
+        {
+          "file": "texts/0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138.txt",
+          "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+          "source": "https://raw.githubusercontent.com/radix-ui/primitives/704069ee4c40c3b6f342c104dff5ad873ee39c43/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "@react-three/fiber@9.4.0",
+      "manifestSha256": "1a0cf5424fed60eb45d7b4b9e0048ec214e225e61407a97a4fec59876b0009cb",
+      "license": "MIT",
+      "versionSource": "https://registry.npmjs.org/%40react-three%2Ffiber/9.4.0",
+      "commit": "9ca52648e9dbf595b9bf71ed1f63db55f8a20506",
+      "notices": [
+        {
+          "file": "texts/9c35b5de7b7493a707fffe4eb23bd2f7f449153c1911f7c6eefb4e591fd5349a.txt",
+          "sha256": "9c35b5de7b7493a707fffe4eb23bd2f7f449153c1911f7c6eefb4e591fd5349a",
+          "source": "https://raw.githubusercontent.com/pmndrs/react-three-fiber/9ca52648e9dbf595b9bf71ed1f63db55f8a20506/LICENSE"
+        }
+      ]
+    }
+  ],
+  "fonts": [
+    {
+      "file": "Assistant-Bold-gm-uSS1B.woff2",
+      "sha256": "e0cdd332ce039770e93ec44336b6db65f931940f42b0342aad35a06e7f991d29",
+      "family": "Assistant",
+      "version": "3.000",
+      "license": "OFL-1.1",
+      "copyright": "Copyright 2020 The Assistant Project Authors (https://github.com/hafontia/Assistant). Copyright 2010 The Source Sans Pro Authors (https://github.com/adobe-fonts/source-sans-pro), with Reserved Font Name 'Source'. Source is a trademark of Adobe Systems Incorporated in the United States and/or other countries.",
+      "notice": {
+        "file": "texts/390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161.txt",
+        "sha256": "390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161",
+        "source": "https://openfontlicense.org/documents/OFL.txt",
+        "sourceSha256": "1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e",
+        "binding": "Copyright and OFL-1.1 declaration read from the exact WOFF2 name table; official license body reproduced unchanged after its example header."
+      }
+    },
+    {
+      "file": "Assistant-Medium-DrcxCXg3.woff2",
+      "sha256": "81a9f280ce6a790f20ca8cd521183caa430f1f7fdc0752c36ef1cc6dc828ac57",
+      "family": "Assistant",
+      "version": "3.000",
+      "license": "OFL-1.1",
+      "copyright": "Copyright 2020 The Assistant Project Authors (https://github.com/hafontia/Assistant). Copyright 2010 The Source Sans Pro Authors (https://github.com/adobe-fonts/source-sans-pro), with Reserved Font Name 'Source'. Source is a trademark of Adobe Systems Incorporated in the United States and/or other countries.",
+      "notice": {
+        "file": "texts/390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161.txt",
+        "sha256": "390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161",
+        "source": "https://openfontlicense.org/documents/OFL.txt",
+        "sourceSha256": "1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e",
+        "binding": "Copyright and OFL-1.1 declaration read from the exact WOFF2 name table; official license body reproduced unchanged after its example header."
+      }
+    },
+    {
+      "file": "Assistant-Regular-DVxZuzxb.woff2",
+      "sha256": "76945f09225aae65bdbd204cb4ac40d4caa4ff67150e5074bab1a04d1b778fc3",
+      "family": "Assistant",
+      "version": "3.000",
+      "license": "OFL-1.1",
+      "copyright": "Copyright 2020 The Assistant Project Authors (https://github.com/hafontia/Assistant). Copyright 2010 The Source Sans Pro Authors (https://github.com/adobe-fonts/source-sans-pro), with Reserved Font Name 'Source'. Source is a trademark of Adobe Systems Incorporated in the United States and/or other countries.",
+      "notice": {
+        "file": "texts/390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161.txt",
+        "sha256": "390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161",
+        "source": "https://openfontlicense.org/documents/OFL.txt",
+        "sourceSha256": "1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e",
+        "binding": "Copyright and OFL-1.1 declaration read from the exact WOFF2 name table; official license body reproduced unchanged after its example header."
+      }
+    },
+    {
+      "file": "Assistant-SemiBold-SCI4bEL9.woff2",
+      "sha256": "bba47a7d1b185a4a2e0d265ec82aeac5dbc2dc9cb0f482a2ff57cbdfe4e5045d",
+      "family": "Assistant",
+      "version": "3.000",
+      "license": "OFL-1.1",
+      "copyright": "Copyright 2020 The Assistant Project Authors (https://github.com/hafontia/Assistant). Copyright 2010 The Source Sans Pro Authors (https://github.com/adobe-fonts/source-sans-pro), with Reserved Font Name 'Source'. Source is a trademark of Adobe Systems Incorporated in the United States and/or other countries.",
+      "notice": {
+        "file": "texts/390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161.txt",
+        "sha256": "390976f00c4ea8b81a3c70a9324e379f3b60a9aed06ecd35c2d84b1a4d004161",
+        "source": "https://openfontlicense.org/documents/OFL.txt",
+        "sourceSha256": "1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e",
+        "binding": "Copyright and OFL-1.1 declaration read from the exact WOFF2 name table; official license body reproduced unchanged after its example header."
+      }
+    }
+  ],
+  "historicalRemovedPackages": [
+    {
+      "id": "draco3d@1.5.7",
+      "manifestSha256": "6ef40efeb553eb7c2794228b52b22af1110b3d1ff4945ac8d5c29955df3a3c55",
+      "license": "Apache-2.0",
+      "versionSource": "https://registry.npmjs.org/draco3d/1.5.7",
+      "commit": "8786740086a9f4d83f44aa83badfbea4dce7a1b5",
+      "notices": [
+        {
+          "file": "texts/d3709b0fb4b8a94bbb1d02b8a2e484f258b0d9c5c5a01f940391f3fe662cd1a4.txt",
+          "sha256": "d3709b0fb4b8a94bbb1d02b8a2e484f258b0d9c5c5a01f940391f3fe662cd1a4",
+          "source": "https://raw.githubusercontent.com/google/draco/8786740086a9f4d83f44aa83badfbea4dce7a1b5/LICENSE"
+        }
+      ]
+    }
+  ]
+}

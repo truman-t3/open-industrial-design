@@ -1,0 +1,27 @@
+{
+  "name": "@open-industrial-design/three-viewer",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./adapter": "./src/adapter.ts"
+  },
+  "scripts": {
+    "fixture:check": "node scripts/generate-minimal-glb.mjs --check",
+    "fixture:generate": "node scripts/generate-minimal-glb.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@open-industrial-design/core": "workspace:*",
+    "@open-industrial-design/design-model": "workspace:*",
+    "@react-three/fiber": "9.4.0",
+    "react": "19.3.0",
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "react-dom": "19.3.0",
+    "@types/three": "0.186.0"
+  }
+}

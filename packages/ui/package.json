@@ -1,0 +1,25 @@
+{
+  "name": "@open-industrial-design/ui",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./design-graph": "./src/design-graph.tsx",
+    "./sketch": "./src/sketch.tsx"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
+    "@open-industrial-design/actions": "workspace:*",
+    "@open-industrial-design/ai-core": "workspace:*",
+    "@open-industrial-design/core": "workspace:*",
+    "@open-industrial-design/design-model": "workspace:*",
+    "@xyflow/react": "12.11.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}

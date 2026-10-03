@@ -1,0 +1,2135 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-02",
+  "packageVersion": "@excalidraw/excalidraw@0.18.1",
+  "commit": "a2ec2889babf7d2295469c6d90ebe77fae57df84",
+  "proofMethod": "installed-font-git-blob-match-at-fixed-upstream-commit",
+  "files": [
+    {
+      "file": "Assistant/Assistant-Bold.woff2",
+      "sha256": "e0cdd332ce039770e93ec44336b6db65f931940f42b0342aad35a06e7f991d29",
+      "size": 20380,
+      "upstreamPath": "packages/excalidraw/fonts/Assistant/Assistant-Bold.woff2",
+      "gitBlobSha1": "751ba1ceb5883ebce6c67d21c572ae2dfb78f24c"
+    },
+    {
+      "file": "Assistant/Assistant-Medium.woff2",
+      "sha256": "81a9f280ce6a790f20ca8cd521183caa430f1f7fdc0752c36ef1cc6dc828ac57",
+      "size": 20320,
+      "upstreamPath": "packages/excalidraw/fonts/Assistant/Assistant-Medium.woff2",
+      "gitBlobSha1": "d5d809abee5216c1b07421dabb43f9575c0bebe5"
+    },
+    {
+      "file": "Assistant/Assistant-Regular.woff2",
+      "sha256": "76945f09225aae65bdbd204cb4ac40d4caa4ff67150e5074bab1a04d1b778fc3",
+      "size": 20232,
+      "upstreamPath": "packages/excalidraw/fonts/Assistant/Assistant-Regular.woff2",
+      "gitBlobSha1": "e17d6eccaa7e85cb2a516565fa415ebb46d0e57a"
+    },
+    {
+      "file": "Assistant/Assistant-SemiBold.woff2",
+      "sha256": "bba47a7d1b185a4a2e0d265ec82aeac5dbc2dc9cb0f482a2ff57cbdfe4e5045d",
+      "size": 20212,
+      "upstreamPath": "packages/excalidraw/fonts/Assistant/Assistant-SemiBold.woff2",
+      "gitBlobSha1": "d17aa74bba428f3dbb386ed8fe12e1526b955f37"
+    },
+    {
+      "file": "Cascadia/CascadiaCode-Regular.woff2",
+      "sha256": "5bce041e0fcce617e35efbc335b1372d27a84acb65fb464c65ff80ab3424a885",
+      "size": 65732,
+      "upstreamPath": "packages/excalidraw/fonts/Cascadia/CascadiaCode-Regular.woff2",
+      "gitBlobSha1": "ed0335c2c1d1dbdf52330e628d33c3bbb67f4a37"
+    },
+    {
+      "file": "ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2",
+      "sha256": "fa930fceb529a4b51ba3055d590302722c27704f6a6357495873950136b1e2ea",
+      "size": 17488,
+      "upstreamPath": "packages/excalidraw/fonts/ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2",
+      "gitBlobSha1": "269b2c706f612736ccd6cf0b6790f7e004f2d826"
+    },
+    {
+      "file": "ComicShanns/ComicShanns-Regular-6e066e8de2ac57ea9283adb9c24d7f0c.woff2",
+      "sha256": "782f24081b810b8de9f04da055007ce4f1445c18abbf096c831f8888d65935c1",
+      "size": 1292,
+      "upstreamPath": "packages/excalidraw/fonts/ComicShanns/ComicShanns-Regular-6e066e8de2ac57ea9283adb9c24d7f0c.woff2",
+      "gitBlobSha1": "984ce67f564feddcc67e38f5b65952fc8dd7a028"
+    },
+    {
+      "file": "ComicShanns/ComicShanns-Regular-dc6a8806fa96795d7b3be5026f989a17.woff2",
+      "sha256": "61c376d32e1773588f6163599aed24fe0387b5a5cb622bd200455f20c2b36a87",
+      "size": 2816,
+      "upstreamPath": "packages/excalidraw/fonts/ComicShanns/ComicShanns-Regular-dc6a8806fa96795d7b3be5026f989a17.woff2",
+      "gitBlobSha1": "de0a8e978f945a8a2bb61d5a44fcce9e0a0cc9cc"
+    },
+    {
+      "file": "ComicShanns/ComicShanns-Regular-fcb0fc02dcbee4c9846b3e2508668039.woff2",
+      "sha256": "ee641c2e35730c3e6e3826855f1b6cc3b343a017c3e216e4e4a2e47010c53ad1",
+      "size": 9856,
+      "upstreamPath": "packages/excalidraw/fonts/ComicShanns/ComicShanns-Regular-fcb0fc02dcbee4c9846b3e2508668039.woff2",
+      "gitBlobSha1": "bef7d540cb39126eff39e1c9f5ac43b804501121"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-349fac6ca4700ffec595a7150a0d1e1d.woff2",
+      "sha256": "a0637cff365c7344d2f7a15905a1f74dceaf56b5ac2ff913d150358bed6921f0",
+      "size": 2656,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-349fac6ca4700ffec595a7150a0d1e1d.woff2",
+      "gitBlobSha1": "3c81f0babd0321450c6549028078928c38ed5e37"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-3f2c5db56cc93c5a6873b1361d730c16.woff2",
+      "sha256": "18ea9be1dd6b5a67b057f44eba8e34cb290f88308c272bcf35c79c1a220d0d7b",
+      "size": 2104,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-3f2c5db56cc93c5a6873b1361d730c16.woff2",
+      "gitBlobSha1": "1e9c460ba68d5a67053e89b71150e32d58ee8a01"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-41b173a47b57366892116a575a43e2b6.woff2",
+      "sha256": "c96649a5f96e2faa9143ee94e5b590b5afb08092f8d67c67f09cef332d66e4a7",
+      "size": 8712,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-41b173a47b57366892116a575a43e2b6.woff2",
+      "gitBlobSha1": "507c11df102519b4c484a748583f787224a1fac2"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-623ccf21b21ef6b3a0d87738f77eb071.woff2",
+      "sha256": "b004007be100261e58188cf8a0f7e850e997702f35d57110915995cd880e49f1",
+      "size": 824,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-623ccf21b21ef6b3a0d87738f77eb071.woff2",
+      "gitBlobSha1": "aa49c3605adc3ecd107f70d7acf39fee68500ace"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2",
+      "sha256": "e4423b318e11432aff2e6e865e300b7ca270f92321a3f56632268fede01c1b48",
+      "size": 24956,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2",
+      "gitBlobSha1": "98b9616a39025e37dcaacb5bce5a7791666bf38b"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-b9dcf9d2e50a1eaf42fc664b50a3fd0d.woff2",
+      "sha256": "b424d16da4398be3e9852857a54ff70e043c8e2ec5c4444dbf7f88d7469b9859",
+      "size": 13296,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-b9dcf9d2e50a1eaf42fc664b50a3fd0d.woff2",
+      "gitBlobSha1": "58e960cf4cc7ed064e6fb7aa8e8fd7d36b9a4208"
+    },
+    {
+      "file": "Excalifont/Excalifont-Regular-be310b9bcd4f1a43f571c46df7809174.woff2",
+      "sha256": "4fb8ad69be9aeac5664d99e5aa3a68a27ea40c98943b80387f7cd55c034fcc93",
+      "size": 12220,
+      "upstreamPath": "packages/excalidraw/fonts/Excalifont/Excalifont-Regular-be310b9bcd4f1a43f571c46df7809174.woff2",
+      "gitBlobSha1": "b413197a2122f16d42602adaf92024136686ad4b"
+    },
+    {
+      "file": "Liberation/LiberationSans-Regular.woff2",
+      "sha256": "006a2b28cbbeeaec937d1b367d0949f5f48ef4b2e7b4e1d8dc7a799d2d639be8",
+      "size": 70668,
+      "upstreamPath": "packages/excalidraw/fonts/Liberation/LiberationSans-Regular.woff2",
+      "gitBlobSha1": "86ed395a2eea183902454f8f99936dfe688965a2"
+    },
+    {
+      "file": "Lilita/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2",
+      "sha256": "2b6568c7a0f16300bc6c8d292bd426c361fcdb40699c2cbfab2bd3e9e6993dea",
+      "size": 1416,
+      "upstreamPath": "packages/excalidraw/fonts/Lilita/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2",
+      "gitBlobSha1": "51e6f53a8989c7ad2d1659fe7374ab37d3f2b405"
+    },
+    {
+      "file": "Lilita/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2",
+      "sha256": "8d6cd0f298738a92ca9bf6e13f54a9191afd06ce04ea00ebbf24499c017191b7",
+      "size": 10676,
+      "upstreamPath": "packages/excalidraw/fonts/Lilita/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2",
+      "gitBlobSha1": "1fe1443ba8a66f402d73af7ec12c307f0f5f55c1"
+    },
+    {
+      "file": "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2",
+      "sha256": "e512f2d7c9fe062b1acf8f6ea64d4bfd89a77d26728150977627e445c7b6e937",
+      "size": 8392,
+      "upstreamPath": "packages/excalidraw/fonts/Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2",
+      "gitBlobSha1": "b9b1c20c0f8087d3365db045a77c2a985c830c87"
+    },
+    {
+      "file": "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2",
+      "sha256": "6d1626aac658786e37e78e0adce3ffffddbd75abc923d72e45a7168bd80053da",
+      "size": 16476,
+      "upstreamPath": "packages/excalidraw/fonts/Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2",
+      "gitBlobSha1": "c9f8bb01755447ec5a47c6af758c80c094f083fa"
+    },
+    {
+      "file": "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2",
+      "sha256": "3e7f76fcc8798b8bba4d6bcc06bdb0d788f6e89706c1d6e64ac81d65ca683c14",
+      "size": 11104,
+      "upstreamPath": "packages/excalidraw/fonts/Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2",
+      "gitBlobSha1": "6b06971404d8ec80ce520f9306e7095bdf461b98"
+    },
+    {
+      "file": "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2",
+      "sha256": "7928f47b21192cb6fdb2f46b71a474a3bd2fd608945c5ad7d7ed6bde8b0ae24c",
+      "size": 15476,
+      "upstreamPath": "packages/excalidraw/fonts/Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2",
+      "gitBlobSha1": "c21a6ed084822b3dd76be36de8f0ee169d24c276"
+    },
+    {
+      "file": "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2",
+      "sha256": "5117398298dd0dba3c95a406ff12fbeb88289fa4e913e3a5cf482cafe7f7071a",
+      "size": 6116,
+      "upstreamPath": "packages/excalidraw/fonts/Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2",
+      "gitBlobSha1": "bd56dc50d72819f92f09344cfb50fe3180785dec"
+    },
+    {
+      "file": "Virgil/Virgil-Regular.woff2",
+      "sha256": "2279cf7daf1c42a3a53b2c1437ad72f0050efb67ac263e0245f67612fd766714",
+      "size": 56156,
+      "upstreamPath": "packages/excalidraw/fonts/Virgil/Virgil-Regular.woff2",
+      "gitBlobSha1": "bf5d08ce8ab8f55695297036d826b9d0555d9f86"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-019d66dcad46dc156b162d267f981c20.woff2",
+      "sha256": "7404ad8086cf238269c6f6aa3ecb754dac903c7b28be88d1f683b9eab7c463e6",
+      "size": 58580,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-019d66dcad46dc156b162d267f981c20.woff2",
+      "gitBlobSha1": "81b95cdbbb700e4422d1201dcfcfca28b59770c4"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-04b718e5623574919c8b0dea5f301444.woff2",
+      "sha256": "cfdf67b97d5eee43f06d4fd6c8d8a1136d66e3391c3500341cef41bf39672559",
+      "size": 65928,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-04b718e5623574919c8b0dea5f301444.woff2",
+      "gitBlobSha1": "79820b04acf1eb033b0c172d545a8fa69bfc79e9"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-069e77aac84590e2e991d0a0176d34f2.woff2",
+      "sha256": "9a8e521a24e531cbeadfbd2750108c48aef9c0f13b0c0840e2cc9fae3257aed4",
+      "size": 63964,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-069e77aac84590e2e991d0a0176d34f2.woff2",
+      "gitBlobSha1": "bd70e5a0443a80bfa3ac39296c915eb1fdadf04e"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-06c77b8c66e51ed6c63ccb502dd8b8af.woff2",
+      "sha256": "cc2e553954218cc43f5f6f7cf54136d4d0a4317b88d670ae1940797545bdec61",
+      "size": 55108,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-06c77b8c66e51ed6c63ccb502dd8b8af.woff2",
+      "gitBlobSha1": "9da21221f1bd135e21ac90b8401f512787bbfd89"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-08e0dc436ad0ad61ba5558db0674d762.woff2",
+      "sha256": "101960c709c4a146a181f002808861249fe13ede28fc2d9cff24175715191abc",
+      "size": 49736,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-08e0dc436ad0ad61ba5558db0674d762.woff2",
+      "gitBlobSha1": "80f9987f418336827c8ac81a0b70586cf754ecd6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-093b9ef39a46ceae95a1df18a0a3a326.woff2",
+      "sha256": "819bbcac2468e1b44363442bca0a7a894883c32ce5cf9b28f707d94304a8a3ed",
+      "size": 55712,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-093b9ef39a46ceae95a1df18a0a3a326.woff2",
+      "gitBlobSha1": "4e6d27c9d1507e4657b10d04fea47e4350c80885"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-095c169f3314805276f603a362766abd.woff2",
+      "sha256": "7f05badb0edb31118c69aa6f9bd20b13e737b5719f816617d342a50dc51c9506",
+      "size": 69968,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-095c169f3314805276f603a362766abd.woff2",
+      "gitBlobSha1": "5e910573f16cd140b4e39ab9e23715115c42dcec"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-09850c4077f3fffe707905872e0e2460.woff2",
+      "sha256": "4cd090f380a82950208e5ff0b83b63f82d9a998881dfa12a8b8a8e6c7fd298bf",
+      "size": 65048,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-09850c4077f3fffe707905872e0e2460.woff2",
+      "gitBlobSha1": "04f2ef56f68be341ae008f6a33779be4bda08aa2"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-0986d134c05864f5025962eef9f994a0.woff2",
+      "sha256": "76cdc801e75369e01fe0907f0e603a699dccf1fa0d880a717b8dceb0c8751806",
+      "size": 53764,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-0986d134c05864f5025962eef9f994a0.woff2",
+      "gitBlobSha1": "caad7f53c0fd92f456272174a76c53288d5c875a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-0b5d723fdc4e249c140f0909e87d03b4.woff2",
+      "sha256": "4a5ab634a6839e983344645d82d31d85a1786fd4e81d344f8544181158a86c45",
+      "size": 53672,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-0b5d723fdc4e249c140f0909e87d03b4.woff2",
+      "gitBlobSha1": "6314821277d628d49f99d86cc45204d9842f4324"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-0f626226ba1272e832aea87bafd9720e.woff2",
+      "sha256": "c261de5643a0b6fdfeb3fa6c43548dc6270f19756532c2953a4c8f74a1bb670d",
+      "size": 62820,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-0f626226ba1272e832aea87bafd9720e.woff2",
+      "gitBlobSha1": "bd521b53f726e6f82ebc57325099c1987a04b7f5"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-0f7fb1e0d5015bb1371343153ecf7ce3.woff2",
+      "sha256": "7d92022e9005636c778ebccb89ca8ab3a17c7d99e17201c422ce833e4d4e0e04",
+      "size": 75564,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-0f7fb1e0d5015bb1371343153ecf7ce3.woff2",
+      "gitBlobSha1": "95fb272fa4937134f14ce80c503c2e57fc0fc6d2"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-0fa55a080fcd0f9dc2e0b0058b793df8.woff2",
+      "sha256": "a3531eb15218eca282196405dca5e502a0b0ce14d82824ee5c3104e241f12c56",
+      "size": 65884,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-0fa55a080fcd0f9dc2e0b0058b793df8.woff2",
+      "gitBlobSha1": "34d911a1245c0447e6bf9e2faf07db8fb5782886"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-0facdf1ea213ba40261022f5d5ed4493.woff2",
+      "sha256": "4692019d3f011ff2b8c012ef4d5bcb9d649259bb3e68b8d5eded06fd5f6948ff",
+      "size": 50660,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-0facdf1ea213ba40261022f5d5ed4493.woff2",
+      "gitBlobSha1": "5bafb59504f8e0d3ba4597055332daaacb209214"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-10a7ae9a371830a80c3d844acf1c02d7.woff2",
+      "sha256": "343e81a0225cf0848a0c5c3df11589aba1386a8ea954fa549dd8749384e54c15",
+      "size": 68908,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-10a7ae9a371830a80c3d844acf1c02d7.woff2",
+      "gitBlobSha1": "777116d4677a06c5bb02a2847e5a6c5a8da42c4f"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-112c051027b2d766c19a519f6ee1f4f7.woff2",
+      "sha256": "64d5521ca4b191e41422c2a1e775aae43a831a720a96c64b42d70a2229e1bec7",
+      "size": 61160,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-112c051027b2d766c19a519f6ee1f4f7.woff2",
+      "gitBlobSha1": "dbf57e6ab53f4d633b7ff8aee7c2aaa1273aca5f"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-11c345711937f0ba4b8f7b6b919c8440.woff2",
+      "sha256": "cb5cc5380aa885e6ea2d9502f15673ffe1e96d08a8e240cadc8a9a9e727a85d2",
+      "size": 62792,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-11c345711937f0ba4b8f7b6b919c8440.woff2",
+      "gitBlobSha1": "8d5fce5187eee2c0646b1109998c8753abaac3b5"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-12b52b58eb3df36804b9a654ec9ee194.woff2",
+      "sha256": "d10137e035185e36212a9ec70ea8c2b0b10f30b175f9543f57412a6f48abfddf",
+      "size": 57152,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-12b52b58eb3df36804b9a654ec9ee194.woff2",
+      "gitBlobSha1": "4848f43d3a2960e268372cead30d47411dc3f29c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-13ae07ed2e272d26d59bc0691cd7117a.woff2",
+      "sha256": "4f0db89e7086b5eef3a83dc41d81ee3d46f9d7ae761e150e5689684e95ceb022",
+      "size": 56140,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-13ae07ed2e272d26d59bc0691cd7117a.woff2",
+      "gitBlobSha1": "5c8def8681a27b75617fedfec6b8456dc1841b61"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-13d2887ec8ee73c43acdabc52a05af7b.woff2",
+      "sha256": "b8a3f1ac2323db2a1ef228f021be3d13b1190ed7c1f4af6b0d50d0c4d454adbc",
+      "size": 64436,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-13d2887ec8ee73c43acdabc52a05af7b.woff2",
+      "gitBlobSha1": "4e40bc9a55d8c2a178381c8c8a1e9b2f3b5b3a2c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-145aa02cdd91946e67dc934e1acffe75.woff2",
+      "sha256": "96f696dd01f2534ceca68a6c9795f927c7c1dd276f7e97069cc7d76d85c9156c",
+      "size": 37412,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-145aa02cdd91946e67dc934e1acffe75.woff2",
+      "gitBlobSha1": "27cc705472efd4668df71f2e1e45ff1a8916ac03"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-15dc6d811c9cd078f9086a740d5a1038.woff2",
+      "sha256": "b62e88759e83e6898a7c7588f8587d064aba185b9e6b9b79c15c22c7b195225f",
+      "size": 53168,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-15dc6d811c9cd078f9086a740d5a1038.woff2",
+      "gitBlobSha1": "63214d80462cc509df82f34d56e8483671d3c3ad"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-173945821411c09f70c95f98d590e697.woff2",
+      "sha256": "ef5693cd230dcc67a120cf627d59d9b66acab7b8f356f9a36c3a1e2edf479f0a",
+      "size": 73576,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-173945821411c09f70c95f98d590e697.woff2",
+      "gitBlobSha1": "6531a4072982130f69532cf56f49a407564fbfd6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-1b611157cd46bb184d4fa4dae2d6a2b8.woff2",
+      "sha256": "5b79154058f247d013a6561ba070b044911b3206e872ce8a2476392245f9de27",
+      "size": 64828,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-1b611157cd46bb184d4fa4dae2d6a2b8.woff2",
+      "gitBlobSha1": "800923128e4f6088f09946bbb173c99230611042"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-1e6fd68f1f3902ce48ce8c69df385622.woff2",
+      "sha256": "7a1db91b8de7dee60467eafa390af5aa6e8ad313e6b6fb62c31e7a03ea26f385",
+      "size": 57384,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-1e6fd68f1f3902ce48ce8c69df385622.woff2",
+      "gitBlobSha1": "9e137bfd8710cddf754eea491738891c5b594d10"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-1ee544f0f1dac422545c505baa788992.woff2",
+      "sha256": "4c478c0638b0ede25838805d6f99badcc57fbf022e44562c9194c0c75118f1c1",
+      "size": 51728,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-1ee544f0f1dac422545c505baa788992.woff2",
+      "gitBlobSha1": "ff657bf2e5fcee19ed65ba2c6430386b3d28743e"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-1fdc0c67ed57263a80fd108c1f6ccf24.woff2",
+      "sha256": "cdc443c022e8300966f91ec8b3185953579979dd5bffbcc66b498fe6b71e6c39",
+      "size": 56004,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-1fdc0c67ed57263a80fd108c1f6ccf24.woff2",
+      "gitBlobSha1": "d03ae01c7c5f27cd99e1051cafaa02fa4d950134"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-203b0e569e3b14aac86a003dc3fa523e.woff2",
+      "sha256": "ddfc3cd617e83e271190a01fcfeb8625cd5ff9c105ca362c8804b7f762e595b2",
+      "size": 75216,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-203b0e569e3b14aac86a003dc3fa523e.woff2",
+      "gitBlobSha1": "b8bd9f0ad7048d3372d15130b1e8d5eaaeff97b7"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-20cc1bbf50e7efb442756cb605672c1f.woff2",
+      "sha256": "27dce6f37362f4ad1495da86e9aa9ec808237d41d69d3f2f13d54ccbfe504c83",
+      "size": 56932,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-20cc1bbf50e7efb442756cb605672c1f.woff2",
+      "gitBlobSha1": "0aa6ab3abf4ebc67fec69f2d825119172a452ac7"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-20e7bf72fa05de9adf7dbcc7bf51dde6.woff2",
+      "sha256": "d9742a018d17fea1da72556502ef20d02b5cb80ddd571e539b60ce26cd19d4df",
+      "size": 72224,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-20e7bf72fa05de9adf7dbcc7bf51dde6.woff2",
+      "gitBlobSha1": "ed51e39e54e9030ac3b4b4225a847f383bfe699a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-21430ee05a1248901da8d0de08744d47.woff2",
+      "sha256": "d7d7130ac4a5ce5cf5f0a01f408267133cde16ef2966dfb35a9fc5a37f762cf8",
+      "size": 56656,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-21430ee05a1248901da8d0de08744d47.woff2",
+      "gitBlobSha1": "2a9ec5ff9b786131a9478123c46de1fffb2feed5"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-23686f7f29da6e8008c36dd3a80c83d6.woff2",
+      "sha256": "ab60b69500468e81eb3a6796b8e23560699e2de1be596956bd1832256fae9d44",
+      "size": 68952,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-23686f7f29da6e8008c36dd3a80c83d6.woff2",
+      "gitBlobSha1": "5d7ce92b2dd2c67104707c4f9b3db6340bfa5bce"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-23ad2d71b280f00b1363b95b7bea94eb.woff2",
+      "sha256": "e8dec71d8ede1b9b9f3d7325e1ea31432474a83095719bd2149852fef4794ed5",
+      "size": 68324,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-23ad2d71b280f00b1363b95b7bea94eb.woff2",
+      "gitBlobSha1": "e3cd0037fa01b987cd0fc47600b009572793d39c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-23f228f3999c01983860012330e4be08.woff2",
+      "sha256": "20a7232989878afcad6de84b68872facaf96fb85c6827f0457d532c1cbf6bbcc",
+      "size": 54732,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-23f228f3999c01983860012330e4be08.woff2",
+      "gitBlobSha1": "c2a593a8c3758ba02c664b64be6f89198e04420a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-24476a126f129212beb33f66853ea151.woff2",
+      "sha256": "c0c147e916a32a86306f2f9864982d87fdf41b6a0c3d1ed77c2aabd2ed772a94",
+      "size": 62844,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-24476a126f129212beb33f66853ea151.woff2",
+      "gitBlobSha1": "0ca14319ec6ca6982ed2efbee4b491404e968698"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-24a21c1e4449222e8d1898d69ff3a404.woff2",
+      "sha256": "e49f1063fddb7928f50c6490912df4bce1042795bd372ce0673cc0d87beec559",
+      "size": 66072,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-24a21c1e4449222e8d1898d69ff3a404.woff2",
+      "gitBlobSha1": "5526001b4b0a4f027fcc9703b304c8d071d785fc"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-25b7f38e18f035f96cb5e547bd2bd08c.woff2",
+      "sha256": "a6ec4baa25d737b49526c152b69a98e66373e3ab2a337ca1c7a895d7a6d8b45b",
+      "size": 65836,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-25b7f38e18f035f96cb5e547bd2bd08c.woff2",
+      "gitBlobSha1": "ccc74180b89bc079a02bc59b46ffd134daa8de47"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-29cec36cd205b211da97acabaa62f055.woff2",
+      "sha256": "9ab470df6c456a0a376521f52fc8a857849ad15c640b6c8fae020fbdeb0cde0b",
+      "size": 66504,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-29cec36cd205b211da97acabaa62f055.woff2",
+      "gitBlobSha1": "0ce81174659c0267c7af2517e6942dde65845a36"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2a26d20a23b00898ce82f09d2ee47c3f.woff2",
+      "sha256": "d85471a49823e8757af9c1c7d920fbfb4ccdb9660e06f7b43ea2b2325b438d0f",
+      "size": 63388,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2a26d20a23b00898ce82f09d2ee47c3f.woff2",
+      "gitBlobSha1": "fdd99d7477f453d45480554e7277c8d8eeeb7cab"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2adbc89c11e65905393d3dfc468b9d5b.woff2",
+      "sha256": "896a9145f32c6db6eb6ccdff9986859f08e349f505628dd9eeff2139def675cc",
+      "size": 58256,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2adbc89c11e65905393d3dfc468b9d5b.woff2",
+      "gitBlobSha1": "67773507ff27e33485c883fa6ecc393eae194fd3"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2b7441d46298788ac94e610ffcc709b6.woff2",
+      "sha256": "d0493edd4b70aab6e7c4d78be1d5976d2fb0113c486f20bc2114d8d0f8256f5d",
+      "size": 46548,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2b7441d46298788ac94e610ffcc709b6.woff2",
+      "gitBlobSha1": "172776402ab2d8520358139c9cfde7782db96223"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2b77e8ebfb2367ab2662396a60e7d320.woff2",
+      "sha256": "6cba567589067e182dd06054fa24e52ce5e8ac8d07278861125e3b6f6d2d2a31",
+      "size": 52492,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2b77e8ebfb2367ab2662396a60e7d320.woff2",
+      "gitBlobSha1": "5d70854109f7eab0b771649068932f808f944165"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2cf96d082d35ea3d8106851223ad0d16.woff2",
+      "sha256": "714626f97e78b4ee72f935408a48508e9f9855399429ba23dc0c9ef0f4074368",
+      "size": 59524,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2cf96d082d35ea3d8106851223ad0d16.woff2",
+      "gitBlobSha1": "c8979350ab60db17e29dc054d9ca3f82024093c2"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2d43040e86ff03ba677f6f9c04cd0805.woff2",
+      "sha256": "cb1ac8f87c3e4c2e3dd925480e2b6c659100acd59266e957065708c5c46d7385",
+      "size": 58088,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2d43040e86ff03ba677f6f9c04cd0805.woff2",
+      "gitBlobSha1": "aa1c6a650f8493b7a2743bfd75e5d40261c87eb9"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-2e33e8dc771ef5e1d9127d60a6b73679.woff2",
+      "sha256": "13941783dc59754f2bcdcd3c54e7bb665e433fc1ffe1cafa0e273ddcd4f62dbe",
+      "size": 69776,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-2e33e8dc771ef5e1d9127d60a6b73679.woff2",
+      "gitBlobSha1": "696432ba29e1c63eba22eaf5b52c0f7e56d4c9f8"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-33432927cd87d40cfe393c7482bf221f.woff2",
+      "sha256": "9b2a6cb479d1b3d2966a5beb93ba63f30d6b05e83c2985b3f9aab447d802a4b5",
+      "size": 53216,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-33432927cd87d40cfe393c7482bf221f.woff2",
+      "gitBlobSha1": "6a97b01cf0dda5a6c36b1e2e946081fe218a367b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2",
+      "sha256": "aee4567e54a8428067774cbcc9ca8faf2d9bbb10d0a780a374c950d286e1d8d3",
+      "size": 54160,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2",
+      "gitBlobSha1": "17ada0f1c374b08a9097e5416c250f002df32617"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-36925dfe329a45086cbb7fc5c20d45ac.woff2",
+      "sha256": "542fd6f0fb2eabcd2cfd79b0cecafb376691aa74afcfbf718c8d26160d0cd9ab",
+      "size": 60896,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-36925dfe329a45086cbb7fc5c20d45ac.woff2",
+      "gitBlobSha1": "9afb6e48e2938c88a63c41abd564a6eb807aea34"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3717077e38f98d89eae729b6c14e56dc.woff2",
+      "sha256": "34718d3ab2e153ea66994f9b20475c76bcbe61c73dcef6b7d4096f0eec2eef6b",
+      "size": 54628,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3717077e38f98d89eae729b6c14e56dc.woff2",
+      "gitBlobSha1": "bc3219ddb6f10738ee2a0ef58dcdc689e0e72ec9"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3756e81d3e149cf6099163ee79944fec.woff2",
+      "sha256": "9db5961935f12cad41726aa81c08c9783b6c71ecaaf7dfea1e4b8f5768defb4d",
+      "size": 51596,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3756e81d3e149cf6099163ee79944fec.woff2",
+      "gitBlobSha1": "b6ba8099ca8e0befbe39ecaf73129ccea6bcc919"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-395c35dd584b56b0789f58a0559beaf1.woff2",
+      "sha256": "8d6bb509725a27cd4cde2daaf743be8ec74114ad3719add4c805cd1c2fdd0f13",
+      "size": 73932,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-395c35dd584b56b0789f58a0559beaf1.woff2",
+      "gitBlobSha1": "4777bb2330668e7636a5fb4bb316b77e9b296814"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3c9de2ae0ea4bc91a510942dfa4be8d2.woff2",
+      "sha256": "9c4e535e741d6a13ec36bb2909058db1321919cb14561e661c62be8f0ffda7f9",
+      "size": 58040,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3c9de2ae0ea4bc91a510942dfa4be8d2.woff2",
+      "gitBlobSha1": "135b1eb1568c210e3ba9a9bae38b6fb0943ed60e"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3cc70dbb64df5b21f1326cc24dee2195.woff2",
+      "sha256": "71a3287e8998e47016b5159ae03f636939516b4f5b251ee71f0c5a5212e4df6b",
+      "size": 64936,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3cc70dbb64df5b21f1326cc24dee2195.woff2",
+      "gitBlobSha1": "565b85d355119eaa83aa3195f015e121dda022d0"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3e1f8f654357353bf0e04ba5c34b5f7f.woff2",
+      "sha256": "8c3887fce9435759019e1ecba3ee315164d0f8a598ce24b94c8bfecebbb724a4",
+      "size": 69020,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3e1f8f654357353bf0e04ba5c34b5f7f.woff2",
+      "gitBlobSha1": "37bdf8de10f1f0862f7bbcf91e11d18723189b23"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3e63ed8162808a9e425ed80a8bc79114.woff2",
+      "sha256": "cfafe77006c4bbd7ece2231a735f8c219a3faa6831d4d5733ab14bd91779157a",
+      "size": 73700,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3e63ed8162808a9e425ed80a8bc79114.woff2",
+      "gitBlobSha1": "4cd78a7dcbb73d2ff1a0434b98008910f13cdf90"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-3eaa538115d76932653c21d8dc28f207.woff2",
+      "sha256": "04a7b1244c272a46ca740937e1a3e790e8ff142d6fcf53934be0e4a167eacdc9",
+      "size": 70944,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-3eaa538115d76932653c21d8dc28f207.woff2",
+      "gitBlobSha1": "993a4d1aa475b3c1de67bcd3348401f60981e242"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4095eb84ef3874e2600247bee0b04026.woff2",
+      "sha256": "6ab6ac356c313d98d26c9a23e9b1d5239330974b090d8aba8184ce99c24fcf16",
+      "size": 76200,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4095eb84ef3874e2600247bee0b04026.woff2",
+      "gitBlobSha1": "9690959ca552452523e544986e17546beee374bb"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-41521fade99856108931b4768b1b2648.woff2",
+      "sha256": "2c096e4a843896d2d735c8f19b8e2e8e1293202d2e0a41adfab16995e32ae07e",
+      "size": 68208,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-41521fade99856108931b4768b1b2648.woff2",
+      "gitBlobSha1": "8b965c02c99c108d7acad8c8cb8c52e1cf5b1603"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-450da755d5bcb70906e1295e559b9602.woff2",
+      "sha256": "e07fdcb886eb2f90a49b22e3d369eb1f480fdef7c509249d0437ba95af3aedc6",
+      "size": 51332,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-450da755d5bcb70906e1295e559b9602.woff2",
+      "gitBlobSha1": "7f10bdd95944a4e3a8b5665fae54065a3a385703"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-452225341522a7942f0f6aab1a5c91a3.woff2",
+      "sha256": "a432715f6fed8499a420cb44acfe8f71e600afe0aa340ff2e63b741fa05f6fae",
+      "size": 71640,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-452225341522a7942f0f6aab1a5c91a3.woff2",
+      "gitBlobSha1": "ff840707723f6fcbc18324a00fb23b405cd15f4a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4535823663ad81405188a528d8f2b1a2.woff2",
+      "sha256": "f3c72f094659af2e6fbdbb0e5dba91089c4f5990d479dd9bbe5fa5ae4f95ab41",
+      "size": 68592,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4535823663ad81405188a528d8f2b1a2.woff2",
+      "gitBlobSha1": "c261290d5e4301e3de5be852fe436684e7540c43"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4806e761d750087c2d734fc64596eaff.woff2",
+      "sha256": "29aa32e6f5a6f5cee931aed56aaedb8d974b2913c71591c605ce5729842497ba",
+      "size": 50704,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4806e761d750087c2d734fc64596eaff.woff2",
+      "gitBlobSha1": "806c4fe42910f17755d7d0fd2a49c70b0d129ab9"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4a0fdb40036e87b40aa08dd30584cb85.woff2",
+      "sha256": "9be1f8a2fd341f5058d483304063535b6ac5be04294846c89a0a946f7fb33f9d",
+      "size": 59276,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4a0fdb40036e87b40aa08dd30584cb85.woff2",
+      "gitBlobSha1": "650c4527a13ffea650a0433b181431c870406de7"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4a38cc3e9cf104e69ba246d37f8cf135.woff2",
+      "sha256": "b3aebf243c2be02360a1452ba3b0090d223faf7a76fde5f7495bf25cedfda5a1",
+      "size": 67888,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4a38cc3e9cf104e69ba246d37f8cf135.woff2",
+      "gitBlobSha1": "02f0bc4eb4a86d96cb7f6e609ca9c390984553cc"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4aca6a43e59aceee2166b0c7e4e85ef1.woff2",
+      "sha256": "cdf1f8c3ff1154762aa390d8babe5ee12450d7ad5cdc3a0b8e58a66dcb75b8ea",
+      "size": 62672,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4aca6a43e59aceee2166b0c7e4e85ef1.woff2",
+      "gitBlobSha1": "cea5c3a40aec2235ec97defe82c13c51e1447cd6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4bfaa8ffa64c5ee560aa2daba7c9cbd3.woff2",
+      "sha256": "0405baa428ee4175650f5ea85196d2e2950c3749da32c902f94381ee69b3b72c",
+      "size": 59832,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4bfaa8ffa64c5ee560aa2daba7c9cbd3.woff2",
+      "gitBlobSha1": "2aac12fad9eb653ece7aa6b9081780c87a58d465"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4dc6d5f188d5c96d44815cd1e81aa885.woff2",
+      "sha256": "a206f427ff843dbdeaddc1509a92d7b69faebc24871c3138d94baf9b1922b335",
+      "size": 68580,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4dc6d5f188d5c96d44815cd1e81aa885.woff2",
+      "gitBlobSha1": "932a1b4c662a54b05d164ad0e72c3305363a0de4"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4ddc14ed3eb0c3e46364317dfc0144a3.woff2",
+      "sha256": "033809b0d9848a6161681c8e9c5e7ee2bf10e0b639feb800eba43f87dd32a5c2",
+      "size": 66140,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4ddc14ed3eb0c3e46364317dfc0144a3.woff2",
+      "gitBlobSha1": "f6a27d337f3d5b7312f1f4e89fa7540258e94009"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4ee10ae43505e2e0bc62656ced49c0fa.woff2",
+      "sha256": "a70dd8aa91b85b3a92f4edec64307dbeba67a3e829300abf38bb9ca206c318c5",
+      "size": 68764,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4ee10ae43505e2e0bc62656ced49c0fa.woff2",
+      "gitBlobSha1": "f8e6713efb1a08c787910123daba68bcb0e1e1cb"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-4f50e5136e136527280bc902c5817561.woff2",
+      "sha256": "59f4770cf5df29b54036ca5f42e6eafdd70d2dd28acbdcea6e8275c30d2208f0",
+      "size": 56576,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-4f50e5136e136527280bc902c5817561.woff2",
+      "gitBlobSha1": "010d328f576b45e76d576815a4647671dbaaeb54"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-51502f1206be09c565f1547c406e9558.woff2",
+      "sha256": "27f0dd9bee1139710abf7ab0f51c0e37df058bef7f2e41a5f8f919dc0ce54fa7",
+      "size": 57744,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-51502f1206be09c565f1547c406e9558.woff2",
+      "gitBlobSha1": "2bf343cfcb3f9a573a8d718b48f092982abd92b6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-51a0e808bbc8361236ac521a119758a3.woff2",
+      "sha256": "6f7d20f47fee620a9b6cfac10202ee7350a21667bacd5398084d6781841e9d4c",
+      "size": 81560,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-51a0e808bbc8361236ac521a119758a3.woff2",
+      "gitBlobSha1": "1595a33f4c0d925e4b07a0372f159fd41048d107"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-52a84a22fd1369bffeaf21da2d6158dc.woff2",
+      "sha256": "bb00bece144c8b55b92445e0bcf013c64eb7250588ebcd8d33d4e972feceba1d",
+      "size": 72436,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-52a84a22fd1369bffeaf21da2d6158dc.woff2",
+      "gitBlobSha1": "c0bb9a971e2a42bd159cfbd3adce7f1ea7de4609"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5330a2119a716e4e7224ed108b085dac.woff2",
+      "sha256": "c3d926f24f41fa042951f940854f7094b394929ba2b393c1ad0f69b8ac1e18d7",
+      "size": 54600,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5330a2119a716e4e7224ed108b085dac.woff2",
+      "gitBlobSha1": "e58ed6693b1f0a5ab110479433276ecb604b2e94"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-543fa46ace099a7099dad69123399400.woff2",
+      "sha256": "dc52bcf986f21c5ecf4f95614edc3fb086008bc4589a606a5545d7be83c6aae7",
+      "size": 66364,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-543fa46ace099a7099dad69123399400.woff2",
+      "gitBlobSha1": "dec09cf4773132e92873aca89b610f8bfd2edb04"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-544fc28abe2c5c30e62383fd4dac255f.woff2",
+      "sha256": "1822913d0e7128a0d6b8affd019c551f06023368ef8608aa3a9718320d16011c",
+      "size": 59884,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-544fc28abe2c5c30e62383fd4dac255f.woff2",
+      "gitBlobSha1": "c9a327768b6e71199bb06b62bb5678d4fb59b6af"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-54acdfc2166ad7fcbd074f75fd4a56ba.woff2",
+      "sha256": "7c5ee14e16e509b359baef1bc7aed848475cf6286bd449a56e9afaaa0b5d8c5d",
+      "size": 55292,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-54acdfc2166ad7fcbd074f75fd4a56ba.woff2",
+      "gitBlobSha1": "940c2ecf6e3cc68c677945adb25661b3320fe03b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5572b3513ba8df57a3d5d7303ee6b11b.woff2",
+      "sha256": "3faaa516fc74d539ca46940b392648c9e3cc4c031e9ad52242aa8b54f7d9e2f8",
+      "size": 57016,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5572b3513ba8df57a3d5d7303ee6b11b.woff2",
+      "gitBlobSha1": "f41209f66d9ac8f6689e1b50790a33d433a6d222"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-56467a5c8840c4d23a60b2f935114848.woff2",
+      "sha256": "0535fd40943797bebaab03292f269eeb09b9844e28ee0a9b20bafcfe6d6f253c",
+      "size": 62452,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-56467a5c8840c4d23a60b2f935114848.woff2",
+      "gitBlobSha1": "6922fa733081d9a0e405baa81da1193d4bfeff5b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-56a32a7689abd0326e57c10c6c069bb4.woff2",
+      "sha256": "0861a51a85640834a936afe816dc9262712a3b5fceb9d268c3ef013131b7f1c9",
+      "size": 57704,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-56a32a7689abd0326e57c10c6c069bb4.woff2",
+      "gitBlobSha1": "471d8a74091dfcebc98544812ae184a43ad4e636"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-57862b464a55b18c7bf234ce22907d73.woff2",
+      "sha256": "2ab06e5e9dc995faad6240b1b1f6edee7e8865ecfd24aa041dad0bf71aab94f9",
+      "size": 63264,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-57862b464a55b18c7bf234ce22907d73.woff2",
+      "gitBlobSha1": "972ea00c6449140c10e222e7ad89d2459943c4f3"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-583d166e56ba0de4b77eabb47ef67839.woff2",
+      "sha256": "fbc085efd02787634c45076cfcd3f9a943919b1fd491953bd3199338d3655681",
+      "size": 70356,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-583d166e56ba0de4b77eabb47ef67839.woff2",
+      "gitBlobSha1": "e3bae155c8a10f73004512030d4a5f433a9b3e9d"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5882ffa04f32584d26109137e2da4352.woff2",
+      "sha256": "0bca2dd7bf9c581d3b9aa2485571f919272790e346a37ead6522d169b9af2d4a",
+      "size": 73288,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5882ffa04f32584d26109137e2da4352.woff2",
+      "gitBlobSha1": "30036f98d6bd4101ec01a61de69d568edb6af659"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-58fd02350d0bc52cf1ca3bb32ce9766e.woff2",
+      "sha256": "3f843a854c82af7042965ae7f00b6f8698a05e87bbce715cbe087a3ec47899ff",
+      "size": 58968,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-58fd02350d0bc52cf1ca3bb32ce9766e.woff2",
+      "gitBlobSha1": "528f95d57ad3609ebaf86c60b1e39070a288779a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5935a5775af3d5c6307ac667bd9ae74e.woff2",
+      "sha256": "c54f2d93aa1b89e19903c4abc3008742613dcc52b45055a058ec13de99d3a91f",
+      "size": 69344,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5935a5775af3d5c6307ac667bd9ae74e.woff2",
+      "gitBlobSha1": "bdb0148ca769014e6d5339725e35f04d973f464f"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-59e9ff77b0efaf684bc09274fb6908c9.woff2",
+      "sha256": "57426b72fb5d6a406df24e2b60c9b3f8d09c095aade40ae55c23972e5b7d9e1c",
+      "size": 26052,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-59e9ff77b0efaf684bc09274fb6908c9.woff2",
+      "gitBlobSha1": "f1a62b14cf6f7f75daf6d73d2477588d4e72cb68"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5a1ce3117cfe90c48e8fb4a9a00f694d.woff2",
+      "sha256": "164d468fbdee79c04b3898c7e62959de3ff43729c407ba60f0f8f27974352292",
+      "size": 50220,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5a1ce3117cfe90c48e8fb4a9a00f694d.woff2",
+      "gitBlobSha1": "8a7fb3fc6b1a4362fd63638def602854c5ef3aee"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5a45d991244d4c7140217e1e5f5ca4f4.woff2",
+      "sha256": "b7bc4c809953df9d0ed98cf11a9542ba959ed3c66a94d3090bb466395f945184",
+      "size": 73116,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5a45d991244d4c7140217e1e5f5ca4f4.woff2",
+      "gitBlobSha1": "e0f8553a3f778d34e0aa1b05e56f13d94fce5943"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5a7fac4b8b23a6e4e5ba0c9bf1756c91.woff2",
+      "sha256": "2802ab8038ff5266fe6303d79665f0b6cf370361aa67b22639e10e1f4634726b",
+      "size": 58396,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5a7fac4b8b23a6e4e5ba0c9bf1756c91.woff2",
+      "gitBlobSha1": "77baffa4efb42257a7bde514edc109369237fa33"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5b0ed6971aaab9c8ad563230bd5471a7.woff2",
+      "sha256": "ec7e47923ed16e54d1a25bf22ad0638846be78be6e8f46009649d9cf7727e58b",
+      "size": 58980,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5b0ed6971aaab9c8ad563230bd5471a7.woff2",
+      "gitBlobSha1": "fc7ecf3ff637f5e2e1f0c9add6edbeda66a08d56"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-5d2898fbc097a7e24c6f38d80587621e.woff2",
+      "sha256": "9473d9ba649a6a614fb877bc6051590cb19da98e54ef6104d25f31f1ff52ed55",
+      "size": 56348,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-5d2898fbc097a7e24c6f38d80587621e.woff2",
+      "gitBlobSha1": "8185dc65cac8be15c187f61fa305bedeb4769968"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-603aefd23e350ba7eb124273e3c9bcf1.woff2",
+      "sha256": "cdd0e13364c932bb3cb2c9ae58369716ce47c8d55cbabe86585bf742e710fb5e",
+      "size": 61512,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-603aefd23e350ba7eb124273e3c9bcf1.woff2",
+      "gitBlobSha1": "85321b98f8f946cca4e41665c79cd4d404b1d3bd"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-60a3089806700d379f11827ee9843b6b.woff2",
+      "sha256": "d964d94147e46e90fd06f0e271a19aacde808acfffb23e66b896be7fcb359544",
+      "size": 73984,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-60a3089806700d379f11827ee9843b6b.woff2",
+      "gitBlobSha1": "4a1c38ec46fd3f2634811f1d28d3c8f2e4247a4c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-60a41c7e1c68f22424e6d22df544bc82.woff2",
+      "sha256": "0534b52a8dbb84d43b13773bba5cd15bb6d256aa4fb96c58a435ebe391904f66",
+      "size": 59584,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-60a41c7e1c68f22424e6d22df544bc82.woff2",
+      "gitBlobSha1": "3fab5f5d7f1db8ac5341c2f9a4e96c6904b58882"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-642b26e2e5f5fb780b51b593dbc8c851.woff2",
+      "sha256": "961bf60030e7c8b4f5395cd8b748c6979d967b7629e6c582d68e5c11b5d2dfc8",
+      "size": 54540,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-642b26e2e5f5fb780b51b593dbc8c851.woff2",
+      "gitBlobSha1": "4b3039e3d35458b77a477a788d0e5b91c18c2753"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-66493ba5a8367f2928812f446f47b56a.woff2",
+      "sha256": "3b759c89aca9110eddc48220362b6e1113bf8e390f40ddeaccade9bec603028e",
+      "size": 64588,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-66493ba5a8367f2928812f446f47b56a.woff2",
+      "gitBlobSha1": "8a73852bd95232e2292d5b5cecbd4bcc0f842f41"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-670ba603758d94268e8606f240a42e12.woff2",
+      "sha256": "1c0d75c27b530030e64e77d99967230f71d4ea9db40ecdc2e10a6f1eaf1f150d",
+      "size": 53524,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-670ba603758d94268e8606f240a42e12.woff2",
+      "gitBlobSha1": "1851d267ca1c4bdec81ced4b18b59aca70806e34"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-671a2c20b1eb9e4ef8a192833940e319.woff2",
+      "sha256": "3dd77c6fa69a4f80de93433e2868e457b7d04d68662d8d042e6348e7b6ffaf15",
+      "size": 64872,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-671a2c20b1eb9e4ef8a192833940e319.woff2",
+      "gitBlobSha1": "2b128b121585409517d824c5d4ae684a265df388"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-684d65f1793cac449dde5d59cb3c47fb.woff2",
+      "sha256": "079d03e554628ed20a18018875b1bb5681ae892dd56604074969619ebd9f36f2",
+      "size": 56992,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-684d65f1793cac449dde5d59cb3c47fb.woff2",
+      "gitBlobSha1": "f71f25db41e02f8374a00b18e3bd5bec86c47d60"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-69c09cc5fa3e55c74fc4821f76909cc3.woff2",
+      "sha256": "dde445e5fe69c7ab363f034df157c89750b421f31e52757f7a642be3c5644f2a",
+      "size": 65168,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-69c09cc5fa3e55c74fc4821f76909cc3.woff2",
+      "gitBlobSha1": "5895c1f613048bdf44424f9804d1768d60abd7b5"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-6ae5b42180ad70b971c91e7eefb8eba2.woff2",
+      "sha256": "dc1eea8f0592ee505adb539566a9cebefa81ece39c3e70624afd06af0e323729",
+      "size": 64304,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-6ae5b42180ad70b971c91e7eefb8eba2.woff2",
+      "gitBlobSha1": "327774e455bbe6075466fe508b7a81cb9b27d327"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-6e092f71c1e634059ada0e52abadce67.woff2",
+      "sha256": "9b771d7ec93aab9efc47096f33c16c724d57a462b99d54735080759cc56e749d",
+      "size": 72236,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-6e092f71c1e634059ada0e52abadce67.woff2",
+      "gitBlobSha1": "5dfdd7d3ac1e755c6908c3741bb6dd3550a59a53"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-6f3256af8454371776bc46670d33cc65.woff2",
+      "sha256": "4d1cd583547d080c6b94552d1473685c60e6a96340c74a659616e16cdde6bbae",
+      "size": 56504,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-6f3256af8454371776bc46670d33cc65.woff2",
+      "gitBlobSha1": "90cb1a098faff7816a67ab765999fc459092f4bf"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-6fe5c5973cc06f74b2387a631ea36b88.woff2",
+      "sha256": "7142a02b00a992b9a57b75c05ddfaa28956c11f554fb9f1e3fe0333285dd6791",
+      "size": 55696,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-6fe5c5973cc06f74b2387a631ea36b88.woff2",
+      "gitBlobSha1": "de01131833de1a9b0ca3bb96eaa4048e9b600e01"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-70c2eb8d64e71a42a834eb857ea9df51.woff2",
+      "sha256": "89474028dcdfc03b27f45d5adc112d9d53a4d810c7e8f0ebf95f599b50ae84ed",
+      "size": 63524,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-70c2eb8d64e71a42a834eb857ea9df51.woff2",
+      "gitBlobSha1": "a5c6c403b8b849bc82e8aa6b0fa696a57ed02c3d"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-70e811fd7994e61f408c923de6ddd078.woff2",
+      "sha256": "e6818bb44f7d47d16cd8935ed9f5b29b8f10ac0e80043f85957b80501f85bcd9",
+      "size": 57028,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-70e811fd7994e61f408c923de6ddd078.woff2",
+      "gitBlobSha1": "9e5151a0e793aaba54b605ed0f59994a0dfcf024"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7197d6fda6cba7c3874c53d6381ca239.woff2",
+      "sha256": "66b77ead39e2479ee3bf4911920fb5cf39217c6b60e3cd84080c7fe429432430",
+      "size": 59464,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7197d6fda6cba7c3874c53d6381ca239.woff2",
+      "gitBlobSha1": "6bbf82baba837e9801e64cfa4f47884452018a87"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-72252d73220fa3cd856677888cee1635.woff2",
+      "sha256": "1e34a49b238d61c6a723e79c2957f309687bcca89eeaebe99221883f302b80a2",
+      "size": 49972,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-72252d73220fa3cd856677888cee1635.woff2",
+      "gitBlobSha1": "978dbb1b8010432895bd0ad9f927593cbe88360c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-72536a3d71b694a0d53dd90ddceae41e.woff2",
+      "sha256": "4058683136a7bf8ebaadc59aaba8644044eff3b91776f6b0206954bf805a3132",
+      "size": 67268,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-72536a3d71b694a0d53dd90ddceae41e.woff2",
+      "gitBlobSha1": "084c6ce802bed62851cd356cdeeecb9761060c98"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-726303e0774b4e678bff8c2deb6ca603.woff2",
+      "sha256": "1ad344f682254b66d56187f673f817fe1ac8117d59cb26614796ebba9f2494aa",
+      "size": 62376,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-726303e0774b4e678bff8c2deb6ca603.woff2",
+      "gitBlobSha1": "0ae886906cceb0475685dbdb7c05f4fc87dc4efe"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-733171b4ffcd17ea1fe1c0ba627173bf.woff2",
+      "sha256": "af32f1c4a193d9866655c866d4067b190b121fdc538b380cd45e99f172b4355b",
+      "size": 52596,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-733171b4ffcd17ea1fe1c0ba627173bf.woff2",
+      "gitBlobSha1": "b9a227f956ae9bb3339649518e82b52dcd35f7f8"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-739bc1a567439c7cffcd1614644593d2.woff2",
+      "sha256": "9bbdcb718fa1010f13c0a6058cca89d75774371e766eb1edf319ac25dc057f0b",
+      "size": 49492,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-739bc1a567439c7cffcd1614644593d2.woff2",
+      "gitBlobSha1": "7a64e6ebf7a5a911d1a17bc2ce74a54f9c03cc6f"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-73e309718fd16cea44b4d54a33581811.woff2",
+      "sha256": "6507fb8092efc309d9fdcc301fab6c90330b89931e7007fe7ed7fd1e722a738b",
+      "size": 61808,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-73e309718fd16cea44b4d54a33581811.woff2",
+      "gitBlobSha1": "bf9be6dc60d4f32b06588edef41f806e739c38dc"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7494dc504ae00ee9cd0505f990f88c5d.woff2",
+      "sha256": "df7f6131e265282b00981c86f4c8d0fbae08c8fa3b3464909609abdafebe5d03",
+      "size": 65456,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7494dc504ae00ee9cd0505f990f88c5d.woff2",
+      "gitBlobSha1": "b480792537ff563c36530b16668addace3a32a74"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-74e2263a91439c25b91d5132ce9f4d62.woff2",
+      "sha256": "322645e0e2737aed64e43e45e97276930f67ce5aa1bfe845eb6090b27b0acc29",
+      "size": 47540,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-74e2263a91439c25b91d5132ce9f4d62.woff2",
+      "gitBlobSha1": "08677cba9aec97bc17556a820533bda5771c9d1e"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-761d05e3cd968cf574166867998ef06a.woff2",
+      "sha256": "5da4dd830dbcb73f6228469f49b12a1cc3db1edf00e5875e3f530ba62c907538",
+      "size": 57276,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-761d05e3cd968cf574166867998ef06a.woff2",
+      "gitBlobSha1": "18babd98ede010a26a44917c3f7adc67180a3c10"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7718fe60986d8b42b1be9c5ace5ccf25.woff2",
+      "sha256": "ed029431ebadd93a1ffae89347ced2b6835ed92703613d10f3dcd3d37c3ce19b",
+      "size": 54872,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7718fe60986d8b42b1be9c5ace5ccf25.woff2",
+      "gitBlobSha1": "9c003a4dfb609901433fa2fff25763bf7364139d"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-774d4f764a1299da5d28ec2f2ffe0d69.woff2",
+      "sha256": "6238cf7ea6f5e88177688f281f55c8d427f0110ca56a0786d8577ab748fb5f8e",
+      "size": 57500,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-774d4f764a1299da5d28ec2f2ffe0d69.woff2",
+      "gitBlobSha1": "2b31eac663376ecfc0bb4581836aced7fa9bc68a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-79d494361ae093b69e74ee9dbe65bfd4.woff2",
+      "sha256": "6f78f52b32b85a686bae2602b6f4bd9197e508140a87c23eb38ced0fa501808e",
+      "size": 48736,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-79d494361ae093b69e74ee9dbe65bfd4.woff2",
+      "gitBlobSha1": "a6349c8b3e3a94f514577157856f809d631efa89"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-79f007c1c6d07557120982951ea67998.woff2",
+      "sha256": "ecd5160dfe937d1e8271e2c7efe45569c2d3f53c94f5d7acaf600434c758a423",
+      "size": 64324,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-79f007c1c6d07557120982951ea67998.woff2",
+      "gitBlobSha1": "82ef29c6382c5fd84547633607e8d3012e8f0574"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7a07ddc0f0c0f5f4a9bad6ee3dda66b5.woff2",
+      "sha256": "e1443444d7865b4650e51da424a02e2b58a75ce1d3b5d125b9d4424c0cc5cff7",
+      "size": 54716,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7a07ddc0f0c0f5f4a9bad6ee3dda66b5.woff2",
+      "gitBlobSha1": "7ab780e4bf7e83bebdae57f228d2c7877637ad0b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7ab2bed91166a9dca83a5ebfbe2a7f38.woff2",
+      "sha256": "3d692c33792626f84eaf48e73fb2c9dfd237ffd3a5b8a882d0f1e4a7301949c7",
+      "size": 56228,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7ab2bed91166a9dca83a5ebfbe2a7f38.woff2",
+      "gitBlobSha1": "f13acc7fa765c41341d0c74210036a158ded8b61"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7ccce86603f80a099ddb0cb21d4ae3e3.woff2",
+      "sha256": "ba4c2f8e126245571624eb841623e3a13a394fba39fc215c60786e786d4e4f35",
+      "size": 54436,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7ccce86603f80a099ddb0cb21d4ae3e3.woff2",
+      "gitBlobSha1": "b7e74d3932e9bbef3ed1a0f2ee6a01830d8445eb"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7e4bde7e9c7f84cd34d8a845e384c746.woff2",
+      "sha256": "934ad4e8abe120c1dba1ff0427a04bfa431ecf61e8402d93965fdfc000198e66",
+      "size": 65004,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7e4bde7e9c7f84cd34d8a845e384c746.woff2",
+      "gitBlobSha1": "7584a37660aff5dcc55ef439881aaf7a71202801"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7e929f262f30c8ee78bf398150b1a7cd.woff2",
+      "sha256": "03de58036f102830f522035221d660524c01ff4ad4240d6273d6cb0aa8ccbccc",
+      "size": 59984,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7e929f262f30c8ee78bf398150b1a7cd.woff2",
+      "gitBlobSha1": "0a7b15509640dc0f648bf5410ca90fcaad117518"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7eb9fffd1aa890d07d0f88cc82e6cfe4.woff2",
+      "sha256": "ccf132ae51caa20dd14896b26c829b3e45f676d933bcf91f8068bf658a4f2860",
+      "size": 17252,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7eb9fffd1aa890d07d0f88cc82e6cfe4.woff2",
+      "gitBlobSha1": "1e987276e903e2b1e60b4b50a157e8b580652b76"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-7f855356ab893b0d2b9c1c83b8116f0e.woff2",
+      "sha256": "1060f535a62ceaa15c3709cc71d5ba65aa7b25ca9f175b039b692a2f36427c3a",
+      "size": 77420,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-7f855356ab893b0d2b9c1c83b8116f0e.woff2",
+      "gitBlobSha1": "aeeb35e5d249780d8e853a409d61d1b51f429cbd"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-829615148e6357d826b9242eb7fbbd1e.woff2",
+      "sha256": "4252a1dcca7da24ba065620e30429e9a2de3ee8b5ec7cbfb672c8a008779fefc",
+      "size": 80184,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-829615148e6357d826b9242eb7fbbd1e.woff2",
+      "gitBlobSha1": "79fcbacf4860d9af8575f995d916ae55e41f1463"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-866fa7613df6b3fd272bcfd4530c0bb9.woff2",
+      "sha256": "a4a710432761544ce376c443375cd3c30212a7eac28fe3e02c38fb6a51b30808",
+      "size": 72996,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-866fa7613df6b3fd272bcfd4530c0bb9.woff2",
+      "gitBlobSha1": "e5a6626076262594888f9ce890ba8c53661eae78"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-87599f94b6cc129d505b375798d0d751.woff2",
+      "sha256": "3cb8e87a420ef7412eac2b1e7acd90557e3133f5926ab23b307cdd35d3293f7c",
+      "size": 56752,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-87599f94b6cc129d505b375798d0d751.woff2",
+      "gitBlobSha1": "44075a14683b2f50db08d20e0ebc6f9f792c9c36"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-8c2f33cee3993174f7e87c28e4bf42ee.woff2",
+      "sha256": "6b01fcbbd25e0588b009efee8aa02c56315c13b071e42f27b3a1b9ded83b9f4b",
+      "size": 64164,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-8c2f33cee3993174f7e87c28e4bf42ee.woff2",
+      "gitBlobSha1": "9d20c3548dbaa04ff07abfeedffbe7d12efc9469"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-8d3bcabb847b56243b16afe62adaaf21.woff2",
+      "sha256": "5a27b08a7634da4e22ef40981ff0b4376a5c667fe6d315013c8283660bb3c175",
+      "size": 50356,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-8d3bcabb847b56243b16afe62adaaf21.woff2",
+      "gitBlobSha1": "80dc156a3cd96f6e5cd54b3ed6980097499b4352"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-8de5b863cb50dfefdd07cb11c774d579.woff2",
+      "sha256": "8dc7c9aa8d7932d8a62b0d7e556cb7a94c1bb1728a84d50a7952d75b9f159ae0",
+      "size": 70716,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-8de5b863cb50dfefdd07cb11c774d579.woff2",
+      "gitBlobSha1": "c0ac1534025078b43c505658c0781d3bd36c4dd4"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-8e9f97f01034820170065b2921b4fb5e.woff2",
+      "sha256": "e053872045b6e69fa2b374386a30985985700925ea09831eb411299d61cc48a5",
+      "size": 67728,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-8e9f97f01034820170065b2921b4fb5e.woff2",
+      "gitBlobSha1": "844692ac2211763cf85c3689f0fb73b879ed75b0"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-8f476c4c99813d57cbe6eca4727388ad.woff2",
+      "sha256": "018d866b5eef3c096a75a56f53df14e4f3ed2b69fc546178b61095736a0cf92e",
+      "size": 65080,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-8f476c4c99813d57cbe6eca4727388ad.woff2",
+      "gitBlobSha1": "0e6dfa5779421554185a86ae2f95d3aa0bfa03e9"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-903bb6865f3452e2fda42e3a25547bc5.woff2",
+      "sha256": "4f9d77b306f63f69dc23f187858c688f20590a582f4d614f8934b8fcb31cc01b",
+      "size": 61532,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-903bb6865f3452e2fda42e3a25547bc5.woff2",
+      "gitBlobSha1": "17d183e31a433c34fc8cadce7f559f065a0edcdb"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-91ddb2969bf2d31ba02ad82998d1314c.woff2",
+      "sha256": "b1c7f6ba934a56bb9ef3c85602de346d594654798004ebfed86cb68fdec23a9f",
+      "size": 56276,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-91ddb2969bf2d31ba02ad82998d1314c.woff2",
+      "gitBlobSha1": "d5d738754259a9f553ec46acc13420dcca3e2ce9"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-938d90c10ff8c20386af7f242c05d6b0.woff2",
+      "sha256": "3d4cb06a72e43dcee4114ca345cfbb93c3a037cc27164cad3ecd979b0affc62c",
+      "size": 52636,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-938d90c10ff8c20386af7f242c05d6b0.woff2",
+      "gitBlobSha1": "203cbafe5305ec139ece786b0b2035d528d10f97"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-93fc8f28a33234bcadf1527cafabd502.woff2",
+      "sha256": "950ff7a9d636ca4b7684833ff898ca7b4c3d21072c322dd6ca482825aaf6f06d",
+      "size": 64544,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-93fc8f28a33234bcadf1527cafabd502.woff2",
+      "gitBlobSha1": "1e092eb327b5a3bcedc53aa3bf42d01153b403b5"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-95429962233afd82db1c27df1500a28c.woff2",
+      "sha256": "63474c129283d98a4426f2af09ce89e7e0fc0a8bf897a5423c3230d513a2816d",
+      "size": 58352,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-95429962233afd82db1c27df1500a28c.woff2",
+      "gitBlobSha1": "6270a1ec5a160a88e8b6b85692e0ac14dadb9847"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-9544732d2e62d1a429674f8ee41b5d3a.woff2",
+      "sha256": "b67f74ffa8e1b8ea3b4617c3fa4c68408ec54e34cc532ec71031adc8b15c3343",
+      "size": 55048,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-9544732d2e62d1a429674f8ee41b5d3a.woff2",
+      "gitBlobSha1": "43d12c42fc4be18c44c57005d02d6dbc0f4eea0b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-9592bfc861f07bcb8d75c196b370e548.woff2",
+      "sha256": "aae1aaab500a71b28d1ec96380b49ccaf7550d06b57db71e75737d17715f5261",
+      "size": 51572,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-9592bfc861f07bcb8d75c196b370e548.woff2",
+      "gitBlobSha1": "215485d3d2b2cbad6812215fc2910a9f2d67ac6b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-95bfd249da4902577b4b7d76ebdd0b44.woff2",
+      "sha256": "ce77aebaeee894d03a85f1d9ccecdb3447ab27f77eb8e3f685c961464119c5ef",
+      "size": 70936,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-95bfd249da4902577b4b7d76ebdd0b44.woff2",
+      "gitBlobSha1": "67e19fd711234ad8b90bb86797657317e61db34e"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-968cffdc8ee679da094e77ebf50f58ef.woff2",
+      "sha256": "7af27211f5491341d85b051445a7ddbc9e28bec438b8124a18783708fef68667",
+      "size": 54956,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-968cffdc8ee679da094e77ebf50f58ef.woff2",
+      "gitBlobSha1": "edd85e0ebe16282c9f8dd6589235d8438fa7824a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-97f7f48ce90c9429bf32ae51469db74d.woff2",
+      "sha256": "b61251e62c3ecd8d556201f75e5d46e48f1e7619e67ecad2c36690e8d5a9ed4f",
+      "size": 65024,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-97f7f48ce90c9429bf32ae51469db74d.woff2",
+      "gitBlobSha1": "8a420370729a03f5b58dcdee5804d6f3c1c014a3"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-982b630266d87db93d2539affb1275c6.woff2",
+      "sha256": "64ffc06d05e0eb263f161fc3ab45747bc09c916c92195450600576b0867a43cf",
+      "size": 62288,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-982b630266d87db93d2539affb1275c6.woff2",
+      "gitBlobSha1": "879b7ebf567f761da7110ebd8477e24ba942bcf8"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-98f2ad84457de7f3740d9920b8fa8667.woff2",
+      "sha256": "20e0422c76332e759d6daabb96bfa9ccdc02be80b17e9928e3873683ae5b9995",
+      "size": 57784,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-98f2ad84457de7f3740d9920b8fa8667.woff2",
+      "gitBlobSha1": "9298d3e607643424d32d4884e3b94ab0b48653bc"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-99a16ef6a64934d5781933dbd9c46b2e.woff2",
+      "sha256": "8bdc8f9731f8730a61043729f403e06e6b9bcfed2fb65e71f7fc421ae51b37b7",
+      "size": 56296,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-99a16ef6a64934d5781933dbd9c46b2e.woff2",
+      "gitBlobSha1": "b9c45b303cf63f782ab683ca8869eddad481c02c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-9cfb2a77a4e45025105ad29a1748b90d.woff2",
+      "sha256": "8a83a1c27c1dc42db2653f37bb39fb95e3bb8180e99ea372766366c995248cee",
+      "size": 54720,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-9cfb2a77a4e45025105ad29a1748b90d.woff2",
+      "gitBlobSha1": "7f61f3b066deb4ad55cf541bff7842c45e3ba0b6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-9d81066dd2b337c938df6e90380a00dc.woff2",
+      "sha256": "3e7444c5704402da829c61e1cdeee82c1867939590d9b25290793c58de548867",
+      "size": 50168,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-9d81066dd2b337c938df6e90380a00dc.woff2",
+      "gitBlobSha1": "ca3a60d3fd1254fbd4a49298609680e4140d5ca7"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-9eb5a99df4e76ac3363453ac9ca288b1.woff2",
+      "sha256": "c464198e0903b1025c20e23e6df719933adbcea5f5e3b68fa67bd388e66dc738",
+      "size": 60796,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-9eb5a99df4e76ac3363453ac9ca288b1.woff2",
+      "gitBlobSha1": "6da852f68fb237d31664fb981605cb599c37bd56"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a004ddfcb26e67bd6e678c8ed19e25ce.woff2",
+      "sha256": "429f417980fd11df51d1b7c6e2481e65e2f1a2bf3f16531b3d189556b22be20d",
+      "size": 66012,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a004ddfcb26e67bd6e678c8ed19e25ce.woff2",
+      "gitBlobSha1": "93e11e3b240503e4fde9218a64230c2fe194a4a4"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a0ca5df4258213d7fc9fce80f65ce760.woff2",
+      "sha256": "4577ce8d2f2161ddcbb02f1154a9899bc55a77d3a715a3650261c56839153ee6",
+      "size": 56840,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a0ca5df4258213d7fc9fce80f65ce760.woff2",
+      "gitBlobSha1": "1e78feef3aabd9bcdf24f58c3105e0af097968fd"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a1f916d6039285c4ffb900cd654e418f.woff2",
+      "sha256": "355bbd7b9ccfe3501325f51a8b14fcbac0a784b72b5629f7e54d28ab00060ea9",
+      "size": 52880,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a1f916d6039285c4ffb900cd654e418f.woff2",
+      "gitBlobSha1": "10f3c5ed4919ea68b857822ec349b796a15b29b8"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a203b91dad570bf05a58c3c3ddb529bf.woff2",
+      "sha256": "664f032ffd3d67ac08c988cb9df5ed9e14ef1bd29b599085aae5ce019535b8f4",
+      "size": 65680,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a203b91dad570bf05a58c3c3ddb529bf.woff2",
+      "gitBlobSha1": "a5122e75ccf737d9cf67ac5955509782250e27e4"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a365e82ed54697a52f27adcea1315fe8.woff2",
+      "sha256": "7431d7c929b66ddef73132026c17ba2bdd1c749a2733b12b15a2bd53da10cee9",
+      "size": 62772,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a365e82ed54697a52f27adcea1315fe8.woff2",
+      "gitBlobSha1": "27a0f150b87eb54a217e6ee840b448d6d094d867"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a4c34be6d42152e64b0df90bc4607f64.woff2",
+      "sha256": "85c4fb4d97312f0260a0db861ddcd8e1f14cc031db4c0fa8bfff098114eed1a1",
+      "size": 62916,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a4c34be6d42152e64b0df90bc4607f64.woff2",
+      "gitBlobSha1": "350d64cf2301263811d50b86fad4c133f4450561"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-a7accba310e821da5505f71c03b76bdb.woff2",
+      "sha256": "a630539dbb8b53eeef26d3c14c65e8aa65056e6ee70ed55d02bad8c6e2cc34b1",
+      "size": 66148,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-a7accba310e821da5505f71c03b76bdb.woff2",
+      "gitBlobSha1": "88a558e61b1c923a2f1cb80d610a7229a527b2ef"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-aa0d470430e6391eca720c7cfa44446f.woff2",
+      "sha256": "9e7d4e67d3026e623581bbb8ffb9767e5cc8ae4208ea1ad9589e1c877a396ae0",
+      "size": 56532,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-aa0d470430e6391eca720c7cfa44446f.woff2",
+      "gitBlobSha1": "6b1df7d0af2fa1c863c0c4efa77a4a7057d83442"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-aa5c9ca6cf4fba00433b7aa3fa10671a.woff2",
+      "sha256": "a612a4deee08c188d304a75acfaa1a5f606ec0e959ee36572585a21d63a05767",
+      "size": 54892,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-aa5c9ca6cf4fba00433b7aa3fa10671a.woff2",
+      "gitBlobSha1": "2d44fa2f50c0d60cec19b6e1a22e028d43ee8fa5"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-ac9ceb44437becc3e9c4dbfebab7fc2d.woff2",
+      "sha256": "88cdb98b8b47719cb34de6d927db93102845979729309ed7c9d81c2eca267d18",
+      "size": 55988,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-ac9ceb44437becc3e9c4dbfebab7fc2d.woff2",
+      "gitBlobSha1": "c23b637a45bc203e252d2c26acc343dbe76b66a7"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b1220a3c61f85cc0408deedb4c5f57a2.woff2",
+      "sha256": "0c5b4365bec5a439a325347b8e373ce2d733e69a31227d9be1a6bfb1a81f8339",
+      "size": 58924,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b1220a3c61f85cc0408deedb4c5f57a2.woff2",
+      "gitBlobSha1": "f4b1c13f8d3815fff9e82b936f7e9e5493180cc1"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b358f7a51ece39a3247942b1feabdb29.woff2",
+      "sha256": "da427d935e5286ddb7bc67bbddb53f19f21b1b22a08eb18b81202d6a0d7104ff",
+      "size": 67924,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b358f7a51ece39a3247942b1feabdb29.woff2",
+      "gitBlobSha1": "eb2f860fa312b2eb4281dd884e19937cf2f19fb8"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b57aaedfd8ebdf3931f25119dc6a5eb2.woff2",
+      "sha256": "489368f841681abe8c4a10d8c04eb1f3dd7ca0431866ee6d998738cb5d953e94",
+      "size": 71976,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b57aaedfd8ebdf3931f25119dc6a5eb2.woff2",
+      "gitBlobSha1": "36cfc89d578baee6ed84410fedd1d30f361a2018"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b5c1596551c256e0e9cf02028595b092.woff2",
+      "sha256": "53ddc8aec903cc6923e7bea4290f8c22748d8a9d3fef9310c8db45144b8602f5",
+      "size": 60132,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b5c1596551c256e0e9cf02028595b092.woff2",
+      "gitBlobSha1": "41352d115e5f002ebed0f44fbe49739cb87f3c5b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b6d128682ee29e471486354d486a1b90.woff2",
+      "sha256": "6fec9175d81ae947476b6e3d23d8a952b3f6f2abf3a236a16d3b2030aec8ee2f",
+      "size": 61376,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b6d128682ee29e471486354d486a1b90.woff2",
+      "gitBlobSha1": "e83bcf72f07ca520e2e3ef8de9bd39da9f0551db"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b6fd38ca30869792244804b04bc058da.woff2",
+      "sha256": "729394216762fa8e54dcf7d8a6623812c68ee868fa423cb150eb730fa142d5fe",
+      "size": 77468,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b6fd38ca30869792244804b04bc058da.woff2",
+      "gitBlobSha1": "f8c1fa89439caa00eadb5dd2b70a07ec8e27d475"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b7d203b051eff504ff59ddca7576b6a9.woff2",
+      "sha256": "012348fc81bad86733c10d93edc49b31fa98d161162a7b9c7cbe2d02f184e684",
+      "size": 48148,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b7d203b051eff504ff59ddca7576b6a9.woff2",
+      "gitBlobSha1": "fe9dd6918567f2e721269afa009e670d83e7196a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-b96d9226ce77ec94ceca043d712182e6.woff2",
+      "sha256": "55f3829b501cf10b929c86d8703be025941489012ae3a237a0f7d4bde532e316",
+      "size": 66240,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-b96d9226ce77ec94ceca043d712182e6.woff2",
+      "gitBlobSha1": "a0ae6ad6dead1ce674ac1ca57da8d9566f98f094"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-ba3de316d63c7e339987b16f41a0b879.woff2",
+      "sha256": "204c98c6d957da9076afe9318003ced09bd3b44a4ce8365b555337fdd574a04b",
+      "size": 58728,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-ba3de316d63c7e339987b16f41a0b879.woff2",
+      "gitBlobSha1": "b9e6e2edf80cf775b37036db5ac12cc4f2eaa6ed"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-bafff7a14c27403dcc6cf1432e8ea836.woff2",
+      "sha256": "16a0b6a3f5462fc87a5043bb89dfaeab6070f9b15bf7bb33d74c6f1f0e945d7e",
+      "size": 64204,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-bafff7a14c27403dcc6cf1432e8ea836.woff2",
+      "gitBlobSha1": "0c09d389d316bc6bc53b99b073cebb685a8bc4cc"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-bd77e3c7f9e0b072d96af37f73d1aa32.woff2",
+      "sha256": "762f6b930564a70639a89c41e38b55e4fe93753fe30063aee0577ee6a57b14ed",
+      "size": 71260,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-bd77e3c7f9e0b072d96af37f73d1aa32.woff2",
+      "gitBlobSha1": "1bd3938741123287c2de7544703bf96e58c4cf3f"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-be549ab72f0719d606a5c01e2c0219b6.woff2",
+      "sha256": "51f88e333f2a5b2ed3b6670c7b7ff122d16e6b0a09d0297ae4dec70de721bcf3",
+      "size": 54436,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-be549ab72f0719d606a5c01e2c0219b6.woff2",
+      "gitBlobSha1": "8074897f4ac05ecb87ee2b284328ca4f84773697"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c16ed9740b85badf16e86ea782a3062f.woff2",
+      "sha256": "2650a650f03c1d5736cc0f1d774f778639d4df2eee805766ec69410108996344",
+      "size": 56800,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c16ed9740b85badf16e86ea782a3062f.woff2",
+      "gitBlobSha1": "349abfc45f9842788d7376bc8d01c3eeef53f545"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c1f94158256bb1f3bf665b053d895af9.woff2",
+      "sha256": "0d5a4da13c00111ae6e921de8a5d3e7e407773ceb415771997a9e08d490fc603",
+      "size": 62244,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c1f94158256bb1f3bf665b053d895af9.woff2",
+      "gitBlobSha1": "1850c3551b228fce796c43b415d5e5fa073b348e"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c40533fdf4cc57177b12803598af7e59.woff2",
+      "sha256": "bf57ac6c74823d2193e4fd637e0fef9f3cf65867dc573bf287cab541eee2862e",
+      "size": 56692,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c40533fdf4cc57177b12803598af7e59.woff2",
+      "gitBlobSha1": "86f3d6fad87aad90a599129c50a26ffeafaf58af"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c4a687ac4f0c2766eefc9f77ed99cddf.woff2",
+      "sha256": "fbd978baf163d2cf637804b525e7df206e0657d217d3d4339aa204ec584460a0",
+      "size": 38416,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c4a687ac4f0c2766eefc9f77ed99cddf.woff2",
+      "gitBlobSha1": "9eb9006993dbaf801633b1b6e880d852390eeb23"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c69f61a4ab18d0488c8d1fc12e7028e8.woff2",
+      "sha256": "1d7f8daeee505d3f7830d0c0c74af7af68abc2a0b01b2e92147a85239b72249f",
+      "size": 64316,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c69f61a4ab18d0488c8d1fc12e7028e8.woff2",
+      "gitBlobSha1": "66e98a1b5b0101fb700f3ded270aee068c7f7397"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c8b71798409ccc126ee264a00aadcf21.woff2",
+      "sha256": "5e78c653a12851d95e2754fd01052e65c952fa2cc603e6e40a7c1a104fe366e8",
+      "size": 63208,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c8b71798409ccc126ee264a00aadcf21.woff2",
+      "gitBlobSha1": "1fbdcb12a8a10007cf3e2ccb4a84370b7c376f0b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-c99eda15fc26a2941579560f76c3a5cf.woff2",
+      "sha256": "234ca0a3ee22640185863709a91ed8574ee10cdc97103c74913ef9e7aae8b399",
+      "size": 76564,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-c99eda15fc26a2941579560f76c3a5cf.woff2",
+      "gitBlobSha1": "3a9379e12e930160150aea3981cc57750000e050"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cb17fc3db95f6d139afc9d31a8e93293.woff2",
+      "sha256": "366d1d64220e84149380d851590fa86decac06ab04af7b5d6b84b1593fbc03a7",
+      "size": 74180,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cb17fc3db95f6d139afc9d31a8e93293.woff2",
+      "gitBlobSha1": "5c92148f89d261aea9abe7b3ed8999b5b754c9a7"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cbaaefaaf326668277aa24dfa93c4d28.woff2",
+      "sha256": "d912c56af1eb36e3cf58ee3fd05a54cfaa2474d721bf6ebbeafde0163c10d6b3",
+      "size": 63468,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cbaaefaaf326668277aa24dfa93c4d28.woff2",
+      "gitBlobSha1": "372bb8a097f8d0060215164fe48c1ac46394877d"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cd145ce4a0ea18469358df53c207bc1b.woff2",
+      "sha256": "3ef057732d62da9572e373f78d282b218e0f5cb8e003d275adaef15abd2d2cbf",
+      "size": 55960,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cd145ce4a0ea18469358df53c207bc1b.woff2",
+      "gitBlobSha1": "162ec032a3a9563d7114c87032caf678a6e338c3"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cdbce89e82cc1ab53a2decbf5819278f.woff2",
+      "sha256": "fc2ac910be82739b996e39063360efcccc5b82f4c99a048d8655885afc3ef933",
+      "size": 51420,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cdbce89e82cc1ab53a2decbf5819278f.woff2",
+      "gitBlobSha1": "98029c09a9ab42d73a616938691ee138af8f2ab2"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-ce4884f96f11589608b76b726a755803.woff2",
+      "sha256": "ea1d4e3f3fa68c9193a72d5df249986350e892091e3edac9025baf7e1759cdee",
+      "size": 65548,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-ce4884f96f11589608b76b726a755803.woff2",
+      "gitBlobSha1": "10ff3af6026963f4b083d7f85e490cb66f51b8a3"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cf2cc71752631e579e35b0e423bf2638.woff2",
+      "sha256": "ce5a8058ed21535db620e89a942f8d4fe33968cbb4557c26c4521c536d5e8c66",
+      "size": 57424,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cf2cc71752631e579e35b0e423bf2638.woff2",
+      "gitBlobSha1": "f8be55b4a6adba261e4bdd6c21b58743ef9dde05"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cf6ff4e0f491ca0cf3038187a997b9b4.woff2",
+      "sha256": "996fd1d3fe4f0783b30ffec0912ea858cadf71a077eef41bcbb6f488aa1853ed",
+      "size": 50608,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cf6ff4e0f491ca0cf3038187a997b9b4.woff2",
+      "gitBlobSha1": "225731bbf6409e1847736a7d28218f0bcc496fdb"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-cfb211578629b7e8153b37240de6a9d5.woff2",
+      "sha256": "d07bdf1bc149ae52b05fff010bf5a5c97da67d7bd612cd7975939102446da207",
+      "size": 44464,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-cfb211578629b7e8153b37240de6a9d5.woff2",
+      "gitBlobSha1": "34257ea9adc4bf9161700b7dcc3d7d14f4b893e6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-d0cf73942fea1c74edbdf0b3011f4656.woff2",
+      "sha256": "e802ce5eb6306d4272a9188ba65c41423894ccaa71e679d1b8f53df3acf7298f",
+      "size": 73392,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-d0cf73942fea1c74edbdf0b3011f4656.woff2",
+      "gitBlobSha1": "66f76a65d19a9fdff3d90f7cf6479d8b33e6dd5d"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-d2666cbed13462c5dc36fa2f15c202ca.woff2",
+      "sha256": "6d157af83341041b1110824b12bcad95a1267c6088aadb7cfebc1fee77c81a27",
+      "size": 56820,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-d2666cbed13462c5dc36fa2f15c202ca.woff2",
+      "gitBlobSha1": "c27100ad46c8d477fede4151c17454c9e2728ef2"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-d3716376641d615e2995605b29bca7b6.woff2",
+      "sha256": "9b9fa9f96d1ed9160912efab73c4883324225fe1096e6aa6c6f5a534fcac292b",
+      "size": 61636,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-d3716376641d615e2995605b29bca7b6.woff2",
+      "gitBlobSha1": "19b8f2f7cc8b1de20b586a12fb43116fb1438d6a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-dac48066b5883d8b4551fc584f0c2a3e.woff2",
+      "sha256": "50fd052c2e0b0ebf8f304eae64965486d1721da85fbbce115683055f05785bf0",
+      "size": 50232,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-dac48066b5883d8b4551fc584f0c2a3e.woff2",
+      "gitBlobSha1": "1784616c126e811fdc1d03ed8e6254d3a0bb5320"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-dbea1af6dcd9860be40c3d18254338f5.woff2",
+      "sha256": "4bb0a8345e803f659aca813aadca25703c16bfddf5d89b82ddcec2a50e338471",
+      "size": 54472,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-dbea1af6dcd9860be40c3d18254338f5.woff2",
+      "gitBlobSha1": "0dd8aed95d1c44f449b855db3049542e85ae69e6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e11567fd2accf9957cd0d3c2be937d87.woff2",
+      "sha256": "dc6a09381a42ce3aa802d029bc61ed01b4302f0303a1defa8234f130dafa5428",
+      "size": 56440,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e11567fd2accf9957cd0d3c2be937d87.woff2",
+      "gitBlobSha1": "09743453157d6f15115f9af49971e6ff57df4ce4"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e2ead7ea7da0437f085f42ffc05f8d13.woff2",
+      "sha256": "b4648f5ae511c1d0d4b2aa75a72a547e8436aaa5f1ca15c042e722a9fa8c77f4",
+      "size": 58972,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e2ead7ea7da0437f085f42ffc05f8d13.woff2",
+      "gitBlobSha1": "6bc4fe730aff0ac378355356f76723612b836cec"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e3fcf5180fd466c8915c4e8069491054.woff2",
+      "sha256": "29a56eb3d183f71ddb753f000c8bd902d1b9a35ca08ff2d403c6af19934661fa",
+      "size": 60612,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e3fcf5180fd466c8915c4e8069491054.woff2",
+      "gitBlobSha1": "73d1e49dd487c026d467236f8a5985ab0cc5d081"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e480d9c614742d05f0e78f274f1e69e6.woff2",
+      "sha256": "0ceef1123d1f46d7c9434f5d7f1d3896ba4d1f1b0fe0076383d920ea8da94ec5",
+      "size": 58960,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e480d9c614742d05f0e78f274f1e69e6.woff2",
+      "gitBlobSha1": "9d465dc7292e0ce06afdb0235419f593e57e1038"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e4bca6cfa53e499cae0a6be4894a90e9.woff2",
+      "sha256": "3cc764666e9c2c6483c73c911b3823d74ee680bae209fb3ddee6b976c599f9f1",
+      "size": 59352,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e4bca6cfa53e499cae0a6be4894a90e9.woff2",
+      "gitBlobSha1": "5914fe11089335a2f63e39b3e5a1b68f8b6a977c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e51ef413167c6e14e0c0fdcc585f2fc9.woff2",
+      "sha256": "931c27e602508ea6d712803d5647dabb164438140e309fd0be4f15917943f480",
+      "size": 73904,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e51ef413167c6e14e0c0fdcc585f2fc9.woff2",
+      "gitBlobSha1": "3374a633cb0e7b4e9dae3531efd52e051b962c91"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e5f453bb04da18eed01675eeebd88bf8.woff2",
+      "sha256": "ab6c969a6b7c481d03f26f68e77eec932b55232608c9b86d710c48f5c200f259",
+      "size": 55832,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e5f453bb04da18eed01675eeebd88bf8.woff2",
+      "gitBlobSha1": "584cdbd2307dc19a7a1bd7a12fa6513f0624aef1"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-e656f091b9dc4709722c9f4b84d3c797.woff2",
+      "sha256": "b90cfb35e64c7f9f5b7e1fb48d0c396c44f757349e5669e64a25d98806d642fc",
+      "size": 53564,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-e656f091b9dc4709722c9f4b84d3c797.woff2",
+      "gitBlobSha1": "ab7c72a332ffb60a2e8de8d0254883c450bfe166"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-ec181b795ac1fb5a50d700b6e996d745.woff2",
+      "sha256": "6b18e2adafaad34cf0544c53915d65af94806ab621f5de6a60f718ef60c9cb1e",
+      "size": 39516,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-ec181b795ac1fb5a50d700b6e996d745.woff2",
+      "gitBlobSha1": "97d75530a7a06fc52f1cd52311c64e90649b89cb"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-ee8bae97908d5147b423f77ad0d3c1bb.woff2",
+      "sha256": "6ccb9581b563074b1e101d2f5ed1efe5c1c53e2406f23139543a139f81a4ae5f",
+      "size": 61720,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-ee8bae97908d5147b423f77ad0d3c1bb.woff2",
+      "gitBlobSha1": "aea85463b81a8ba1de2026f64ddf677cccfec8cd"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-f0f13b5c60e0af5553bd359f5513be1b.woff2",
+      "sha256": "75eac42c2d875a86029c0a684b728abb0dc8baa56e503aaaacb1c457f0a01aa6",
+      "size": 58780,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-f0f13b5c60e0af5553bd359f5513be1b.woff2",
+      "gitBlobSha1": "4155260527f97d99b4048c884d9a250b1c7eeea6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-f2b54d4e7be0eaefe1c2c56836fa5368.woff2",
+      "sha256": "da1a8fde33ea6a56d70b5c87b1a4030c3fe663772effcbe45019fde0b336d3dc",
+      "size": 55180,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-f2b54d4e7be0eaefe1c2c56836fa5368.woff2",
+      "gitBlobSha1": "d990ae9bcfa7602513bd24039676b320da80011c"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-f56414bf9bced67990def8660e306759.woff2",
+      "sha256": "ffb6a7253b90f6f82b90619935ab41e063db09686921f6dace943f5ec183b16b",
+      "size": 69364,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-f56414bf9bced67990def8660e306759.woff2",
+      "gitBlobSha1": "b5e5ff5f7b91137f8b226a9c8a8fe73405e70e5a"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-f5d079153c99a25b9be5b8583c4cc8a7.woff2",
+      "sha256": "b8ec5b4516ddc269a99f306b9d63ff0bdecd37a800736cd0eab28f254291b15e",
+      "size": 67660,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-f5d079153c99a25b9be5b8583c4cc8a7.woff2",
+      "gitBlobSha1": "f6b625a39ab5e713ec6ccb5b35265b18d50491a6"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-f6032fc06eb20480f096199713f70885.woff2",
+      "sha256": "937b4d5222bb42c0e190a3f40a1aa9f984edcaa9e8d275e9d4bf1d88ef74754c",
+      "size": 84024,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-f6032fc06eb20480f096199713f70885.woff2",
+      "gitBlobSha1": "2e034d9a69ba225a8ac9902038759ff72e38d84b"
+    },
+    {
+      "file": "Xiaolai/Xiaolai-Regular-f8ee5d36068a42b51d0e4a1116cfcec1.woff2",
+      "sha256": "ae083037bfb691cf96205e109a287255f87a45a90848fe2a63cb0b3e7af3e904",
+      "size": 47276,
+      "upstreamPath": "packages/excalidraw/fonts/Xiaolai/Xiaolai-Regular-f8ee5d36068a42b51d0e4a1116cfcec1.woff2",
+      "gitBlobSha1": "94b67510f615945dec4abe9a6a79c7f99a060870"
+    }
+  ],
+  "notices": [
+    {
+      "family": "Cascadia",
+      "method": "embedded-name-table",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Cascadia/CascadiaCode-Regular.woff2",
+      "sourceSha256": "5bce041e0fcce617e35efbc335b1372d27a84acb65fb464c65ff80ab3424a885",
+      "textSha256": "f1bf738a12748fe1328677683ec8c23284750b7141e770a09ac3f21fafe0eca7",
+      "text": "© 2020 Microsoft Corporation. All Rights Reserved.\n\nMicrosoft supplied font. You may use this font to create, display, and print content as permitted by the license terms or terms of use, of the Microsoft product, service, or content in which this font was included. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content. Any other use is prohibited.\n \nThe following license, based on the SIL Open Font license (https://scripts.sil.org/OFL), applies to this font. Additional license terms may be found on the GitHub repository for this font (https://github.com/microsoft/cascadia-code/blob/master/LICENSE).\n \nPermission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:\n \n1) Neither the Font Software nor any of its individual components, in Original or Modified Versions, may be sold by itself.\n \n2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.\n \n3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.\n \n4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.\n \n5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed under any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.\n \nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.",
+      "files": ["Cascadia/CascadiaCode-Regular.woff2"]
+    },
+    {
+      "family": "ComicShanns",
+      "method": "embedded-name-table",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2",
+      "sourceSha256": "fa930fceb529a4b51ba3055d590302722c27704f6a6357495873950136b1e2ea",
+      "textSha256": "e001cdb75c49d99c5f4f35381e71fe2a60c88d5afe49da5cbd8fd1c7a34cc432",
+      "text": "MIT License\n\nCopyright (c) 2018 Shannon Miwa\nCopyright (c) 2023 Jesus Gonzalez\nCopyright (c) 2023 Rodrigo Batista de Moraes\nCopyright (c) 2024 Fini Jastrow\nCopyright (c) 2024 Kyle Beechly\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.",
+      "files": [
+        "ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2",
+        "ComicShanns/ComicShanns-Regular-6e066e8de2ac57ea9283adb9c24d7f0c.woff2",
+        "ComicShanns/ComicShanns-Regular-dc6a8806fa96795d7b3be5026f989a17.woff2",
+        "ComicShanns/ComicShanns-Regular-fcb0fc02dcbee4c9846b3e2508668039.woff2"
+      ]
+    },
+    {
+      "family": "Excalifont",
+      "method": "pinned-font-registration-original-comment",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Excalifont/index.ts",
+      "sourceSha256": "db994e57791014204ba89e7ff902f2409b46ace3cd53907c3b4ac0e88d8e18c9",
+      "textSha256": "7015b0ca8cf5fc6a41008ce4cbcfbb93e1544b46678234f4ee688cf578464b61",
+      "text": "/* Generated By cn-font-split@5.2.2 https://www.npmjs.com/package/cn-font-split\nCreateTime: Mon, 14 Oct 2024 18:59:19 GMT;\nOrigin File Name Table:\ncopyright: Copyright (c) 2024 by Excalidraw. All rights reserved.\nfontFamily: Excalifont\nfontSubfamily: Regular\nuniqueID: 1.000;DSGN;Excalifont\nfullName: Excalifont Regular\nversion: Version 1.000;Glyphs 3.2 (3227)\npostScriptName: Excalifont-Regular\ntrademark: Excalifont is a trademark of Excalidraw.\nmanufacturer: Your Own Font Foundry (Virgil); Ján Filípek / DizajnDesign (Excalifont, modifications)\ndesigner: Your Own Font Foundry (Virgil); Ján Filípek / DizajnDesign (Excalifont, modifications)\nmanufacturerURL: https://dizajndesign.sk\ndesignerURL: https://dizajndesign.sk\nlicense: This Font Software is licensed under the SIL Open Font License, Version 1.1.\nThis license is copied below, and is also available with a FAQ at:\nhttp://scripts.sil.org/OFL\n\n\n-----------------------------------------------------------\nSIL OPEN FONT LICENSE Version 1.1 - 26 February 2007\n-----------------------------------------------------------\n\nPREAMBLE\nThe goals of the Open Font License (OFL) are to stimulate worldwide\ndevelopment of collaborative font projects, to support the font creation\nefforts of academic and linguistic communities, and to provide a free and\nopen framework in which fonts may be shared and improved in partnership\nwith others.\n\nThe OFL allows the licensed fonts to be used, studied, modified and\nredistributed freely as long as they are not sold by themselves. The\nfonts, including any derivative works, can be bundled, embedded, \nredistributed and/or sold with any software provided that any reserved\nnames are not used by derivative works. The fonts and derivatives,\nhowever, cannot be released under any other type of license. The\nrequirement for fonts to remain under this license does not apply\nto any document created using the fonts or their derivatives.\n\nDEFINITIONS\n\"Font Software\" refers to the set of files released by the Copyright\nHolder(s) under this license and clearly marked as such. This may\ninclude source files, build scripts and documentation.\n\n\"Reserved Font Name\" refers to any names specified as such after the\ncopyright statement(s).\n\n\"Original Version\" refers to the collection of Font Software components as\ndistributed by the Copyright Holder(s).\n\n\"Modified Version\" refers to any derivative made by adding to, deleting,\nor substituting -- in part or in whole -- any of the components of the\nOriginal Version, by changing formats or by porting the Font Software to a\nnew environment.\n\n\"Author\" refers to any designer, engineer, programmer, technical\nwriter or other person who contributed to the Font Software.\n\nPERMISSION & CONDITIONS\nPermission is hereby granted, free of charge, to any person obtaining\na copy of the Font Software, to use, study, copy, merge, embed, modify,\nredistribute, and sell modified and unmodified copies of the Font\nSoftware, subject to the following conditions:\n\n1) Neither the Font Software nor any of its individual components,\nin Original or Modified Versions, may be sold by itself.\n\n2) Original or Modified Versions of the Font Software may be bundled,\nredistributed and/or sold with any software, provided that each copy\ncontains the above copyright notice and this license. These can be\nincluded either as stand-alone text files, human-readable headers or\nin the appropriate machine-readable metadata fields within text or\nbinary files as long as those fields can be easily viewed by the user.\n\n3) No Modified Version of the Font Software may use the Reserved Font\nName(s) unless explicit written permission is granted by the corresponding\nCopyright Holder. This restriction only applies to the primary font name as\npresented to the users.\n\n4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font\nSoftware shall not be used to promote, endorse or advertise any\nModified Version, except to acknowledge the contribution(s) of the\nCopyright Holder(s) and the Author(s) or with their explicit written\npermission.\n\n5) The Font Software, modified or unmodified, in part or in whole,\nmust be distributed entirely under this license, and must not be\ndistributed under any other license. The requirement for fonts to\nremain under this license does not apply to any document created\nusing the Font Software.\n\nTERMINATION\nThis license becomes null and void if any of the above conditions are\nnot met.\n\nDISCLAIMER\nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT\nOF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE\nCOPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\nINCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL\nDAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM\nOTHER DEALINGS IN THE FONT SOFTWARE.\nlicenseURL: http://scripts.sil.org/OFL\npreferredFamily: Excalifont\npreferredSubfamily: Regular\n */",
+      "files": [
+        "Excalifont/Excalifont-Regular-349fac6ca4700ffec595a7150a0d1e1d.woff2",
+        "Excalifont/Excalifont-Regular-3f2c5db56cc93c5a6873b1361d730c16.woff2",
+        "Excalifont/Excalifont-Regular-41b173a47b57366892116a575a43e2b6.woff2",
+        "Excalifont/Excalifont-Regular-623ccf21b21ef6b3a0d87738f77eb071.woff2",
+        "Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2",
+        "Excalifont/Excalifont-Regular-b9dcf9d2e50a1eaf42fc664b50a3fd0d.woff2",
+        "Excalifont/Excalifont-Regular-be310b9bcd4f1a43f571c46df7809174.woff2"
+      ]
+    },
+    {
+      "family": "Virgil",
+      "method": "embedded-name-table",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Virgil/Virgil-Regular.woff2",
+      "sourceSha256": "2279cf7daf1c42a3a53b2c1437ad72f0050efb67ac263e0245f67612fd766714",
+      "textSha256": "6d80ff90bfadf27291068c127bc4460ce64557fb450ca5059fb768de0ed92f05",
+      "text": "Copyright (c) 2011 by Your Own Font Foundry. All rights reserved.\n\nThis Font Software is licensed under the SIL Open Font License, Version 1.1.\nThis license is copied below, and is also available with a FAQ at:\nhttp://scripts.sil.org/OFL\n\n\n-----------------------------------------------------------\nSIL OPEN FONT LICENSE Version 1.1 - 26 February 2007\n-----------------------------------------------------------\n\nPREAMBLE\nThe goals of the Open Font License (OFL) are to stimulate worldwide\ndevelopment of collaborative font projects, to support the font creation\nefforts of academic and linguistic communities, and to provide a free and\nopen framework in which fonts may be shared and improved in partnership\nwith others.\n\nThe OFL allows the licensed fonts to be used, studied, modified and\nredistributed freely as long as they are not sold by themselves. The\nfonts, including any derivative works, can be bundled, embedded, \nredistributed and/or sold with any software provided that any reserved\nnames are not used by derivative works. The fonts and derivatives,\nhowever, cannot be released under any other type of license. The\nrequirement for fonts to remain under this license does not apply\nto any document created using the fonts or their derivatives.\n\nDEFINITIONS\n\"Font Software\" refers to the set of files released by the Copyright\nHolder(s) under this license and clearly marked as such. This may\ninclude source files, build scripts and documentation.\n\n\"Reserved Font Name\" refers to any names specified as such after the\ncopyright statement(s).\n\n\"Original Version\" refers to the collection of Font Software components as\ndistributed by the Copyright Holder(s).\n\n\"Modified Version\" refers to any derivative made by adding to, deleting,\nor substituting -- in part or in whole -- any of the components of the\nOriginal Version, by changing formats or by porting the Font Software to a\nnew environment.\n\n\"Author\" refers to any designer, engineer, programmer, technical\nwriter or other person who contributed to the Font Software.\n\nPERMISSION & CONDITIONS\nPermission is hereby granted, free of charge, to any person obtaining\na copy of the Font Software, to use, study, copy, merge, embed, modify,\nredistribute, and sell modified and unmodified copies of the Font\nSoftware, subject to the following conditions:\n\n1) Neither the Font Software nor any of its individual components,\nin Original or Modified Versions, may be sold by itself.\n\n2) Original or Modified Versions of the Font Software may be bundled,\nredistributed and/or sold with any software, provided that each copy\ncontains the above copyright notice and this license. These can be\nincluded either as stand-alone text files, human-readable headers or\nin the appropriate machine-readable metadata fields within text or\nbinary files as long as those fields can be easily viewed by the user.\n\n3) No Modified Version of the Font Software may use the Reserved Font\nName(s) unless explicit written permission is granted by the corresponding\nCopyright Holder. This restriction only applies to the primary font name as\npresented to the users.\n\n4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font\nSoftware shall not be used to promote, endorse or advertise any\nModified Version, except to acknowledge the contribution(s) of the\nCopyright Holder(s) and the Author(s) or with their explicit written\npermission.\n\n5) The Font Software, modified or unmodified, in part or in whole,\nmust be distributed entirely under this license, and must not be\ndistributed under any other license. The requirement for fonts to\nremain under this license does not apply to any document created\nusing the Font Software.\n\nTERMINATION\nThis license becomes null and void if any of the above conditions are\nnot met.\n\nDISCLAIMER\nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT\nOF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE\nCOPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\nINCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL\nDAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM\nOTHER DEALINGS IN THE FONT SOFTWARE.",
+      "files": ["Virgil/Virgil-Regular.woff2"]
+    },
+    {
+      "family": "Lilita",
+      "method": "pinned-family-ofl-with-font-metadata",
+      "source": "https://raw.githubusercontent.com/google/fonts/90abd17b4f97671435798b6147b698aa9087612f/ofl/lilitaone/OFL.txt",
+      "sourceCommit": "90abd17b4f97671435798b6147b698aa9087612f",
+      "sourceSha256": "255d5debbb80eb2ea762644311f266a279e8778f00156655a516e2b7781a63e1",
+      "textSha256": "255d5debbb80eb2ea762644311f266a279e8778f00156655a516e2b7781a63e1",
+      "text": "Copyright (c) 2011 Juan Montoreano (juan@remolacha.biz), \nwith Reserved Font Name Lilita\n\nThis Font Software is licensed under the SIL Open Font License, Version 1.1.\nThis license is copied below, and is also available with a FAQ at:\nhttp://scripts.sil.org/OFL\n\n\n-----------------------------------------------------------\nSIL OPEN FONT LICENSE Version 1.1 - 26 February 2007\n-----------------------------------------------------------\n\nPREAMBLE\nThe goals of the Open Font License (OFL) are to stimulate worldwide\ndevelopment of collaborative font projects, to support the font creation\nefforts of academic and linguistic communities, and to provide a free and\nopen framework in which fonts may be shared and improved in partnership\nwith others.\n\nThe OFL allows the licensed fonts to be used, studied, modified and\nredistributed freely as long as they are not sold by themselves. The\nfonts, including any derivative works, can be bundled, embedded, \nredistributed and/or sold with any software provided that any reserved\nnames are not used by derivative works. The fonts and derivatives,\nhowever, cannot be released under any other type of license. The\nrequirement for fonts to remain under this license does not apply\nto any document created using the fonts or their derivatives.\n\nDEFINITIONS\n\"Font Software\" refers to the set of files released by the Copyright\nHolder(s) under this license and clearly marked as such. This may\ninclude source files, build scripts and documentation.\n\n\"Reserved Font Name\" refers to any names specified as such after the\ncopyright statement(s).\n\n\"Original Version\" refers to the collection of Font Software components as\ndistributed by the Copyright Holder(s).\n\n\"Modified Version\" refers to any derivative made by adding to, deleting,\nor substituting -- in part or in whole -- any of the components of the\nOriginal Version, by changing formats or by porting the Font Software to a\nnew environment.\n\n\"Author\" refers to any designer, engineer, programmer, technical\nwriter or other person who contributed to the Font Software.\n\nPERMISSION & CONDITIONS\nPermission is hereby granted, free of charge, to any person obtaining\na copy of the Font Software, to use, study, copy, merge, embed, modify,\nredistribute, and sell modified and unmodified copies of the Font\nSoftware, subject to the following conditions:\n\n1) Neither the Font Software nor any of its individual components,\nin Original or Modified Versions, may be sold by itself.\n\n2) Original or Modified Versions of the Font Software may be bundled,\nredistributed and/or sold with any software, provided that each copy\ncontains the above copyright notice and this license. These can be\nincluded either as stand-alone text files, human-readable headers or\nin the appropriate machine-readable metadata fields within text or\nbinary files as long as those fields can be easily viewed by the user.\n\n3) No Modified Version of the Font Software may use the Reserved Font\nName(s) unless explicit written permission is granted by the corresponding\nCopyright Holder. This restriction only applies to the primary font name as\npresented to the users.\n\n4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font\nSoftware shall not be used to promote, endorse or advertise any\nModified Version, except to acknowledge the contribution(s) of the\nCopyright Holder(s) and the Author(s) or with their explicit written\npermission.\n\n5) The Font Software, modified or unmodified, in part or in whole,\nmust be distributed entirely under this license, and must not be\ndistributed under any other license. The requirement for fonts to\nremain under this license does not apply to any document created\nusing the Font Software.\n\nTERMINATION\nThis license becomes null and void if any of the above conditions are\nnot met.\n\nDISCLAIMER\nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT\nOF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE\nCOPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\nINCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL\nDAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM\nOTHER DEALINGS IN THE FONT SOFTWARE.\n",
+      "fontMetadata": {
+        "names": [
+          {
+            "id": 0,
+            "text": "Copyright (c) 2011 Juan Montoreano (juan@remolacha.biz), with Reserved Font Names \"Lilita One\""
+          },
+          {
+            "id": 1,
+            "text": "Lilita One"
+          },
+          {
+            "id": 5,
+            "text": "Version 1.002"
+          },
+          {
+            "id": 14,
+            "text": "http://scripts.sil.org/OFL"
+          }
+        ],
+        "sha256": "608f63553feb378b8af7ee5d54dfb881306cb8e1d28ef2508fa62ae2ede4b5b1"
+      },
+      "bindingScope": "family-license-text-not-release-byte-match",
+      "files": [
+        "Lilita/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2",
+        "Lilita/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2"
+      ]
+    },
+    {
+      "family": "Nunito",
+      "method": "pinned-family-ofl-with-font-metadata",
+      "source": "https://raw.githubusercontent.com/google/fonts/a5bd0ea86b2576f86672aab557a6024d272187a5/ofl/nunito/OFL.txt",
+      "sourceCommit": "a5bd0ea86b2576f86672aab557a6024d272187a5",
+      "sourceSha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+      "textSha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+      "text": "Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)\n\nThis Font Software is licensed under the SIL Open Font License, Version 1.1.\nThis license is copied below, and is also available with a FAQ at:\nhttp://scripts.sil.org/OFL\n\n\n-----------------------------------------------------------\nSIL OPEN FONT LICENSE Version 1.1 - 26 February 2007\n-----------------------------------------------------------\n\nPREAMBLE\nThe goals of the Open Font License (OFL) are to stimulate worldwide\ndevelopment of collaborative font projects, to support the font creation\nefforts of academic and linguistic communities, and to provide a free and\nopen framework in which fonts may be shared and improved in partnership\nwith others.\n\nThe OFL allows the licensed fonts to be used, studied, modified and\nredistributed freely as long as they are not sold by themselves. The\nfonts, including any derivative works, can be bundled, embedded, \nredistributed and/or sold with any software provided that any reserved\nnames are not used by derivative works. The fonts and derivatives,\nhowever, cannot be released under any other type of license. The\nrequirement for fonts to remain under this license does not apply\nto any document created using the fonts or their derivatives.\n\nDEFINITIONS\n\"Font Software\" refers to the set of files released by the Copyright\nHolder(s) under this license and clearly marked as such. This may\ninclude source files, build scripts and documentation.\n\n\"Reserved Font Name\" refers to any names specified as such after the\ncopyright statement(s).\n\n\"Original Version\" refers to the collection of Font Software components as\ndistributed by the Copyright Holder(s).\n\n\"Modified Version\" refers to any derivative made by adding to, deleting,\nor substituting -- in part or in whole -- any of the components of the\nOriginal Version, by changing formats or by porting the Font Software to a\nnew environment.\n\n\"Author\" refers to any designer, engineer, programmer, technical\nwriter or other person who contributed to the Font Software.\n\nPERMISSION & CONDITIONS\nPermission is hereby granted, free of charge, to any person obtaining\na copy of the Font Software, to use, study, copy, merge, embed, modify,\nredistribute, and sell modified and unmodified copies of the Font\nSoftware, subject to the following conditions:\n\n1) Neither the Font Software nor any of its individual components,\nin Original or Modified Versions, may be sold by itself.\n\n2) Original or Modified Versions of the Font Software may be bundled,\nredistributed and/or sold with any software, provided that each copy\ncontains the above copyright notice and this license. These can be\nincluded either as stand-alone text files, human-readable headers or\nin the appropriate machine-readable metadata fields within text or\nbinary files as long as those fields can be easily viewed by the user.\n\n3) No Modified Version of the Font Software may use the Reserved Font\nName(s) unless explicit written permission is granted by the corresponding\nCopyright Holder. This restriction only applies to the primary font name as\npresented to the users.\n\n4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font\nSoftware shall not be used to promote, endorse or advertise any\nModified Version, except to acknowledge the contribution(s) of the\nCopyright Holder(s) and the Author(s) or with their explicit written\npermission.\n\n5) The Font Software, modified or unmodified, in part or in whole,\nmust be distributed entirely under this license, and must not be\ndistributed under any other license. The requirement for fonts to\nremain under this license does not apply to any document created\nusing the Font Software.\n\nTERMINATION\nThis license becomes null and void if any of the above conditions are\nnot met.\n\nDISCLAIMER\nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT\nOF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE\nCOPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\nINCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL\nDAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM\nOTHER DEALINGS IN THE FONT SOFTWARE.\n",
+      "fontMetadata": {
+        "names": [
+          {
+            "id": 0,
+            "text": "Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)"
+          },
+          {
+            "id": 1,
+            "text": "Nunito ExtraLight Medium"
+          },
+          {
+            "id": 5,
+            "text": "Version 3.602"
+          },
+          {
+            "id": 14,
+            "text": "https://scripts.sil.org/OFL"
+          }
+        ],
+        "sha256": "bba0bd5ad5dd4d1c8969cb6f377bdae3968f4b0f41904377d7f1bdc54893258d"
+      },
+      "bindingScope": "family-license-text-not-release-byte-match",
+      "files": [
+        "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2",
+        "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2",
+        "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2",
+        "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2",
+        "Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2"
+      ]
+    },
+    {
+      "family": "Xiaolai",
+      "method": "pinned-declaration-with-official-ofl-body",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Xiaolai/index.ts",
+      "sourceSha256": "c2cbbbfa669404795527e06cf596ab4b1b851f9bb993c608c8ab9c3c2aabe9d3",
+      "declarationSha256": "63d432365e01385b4e290369e31ff33e1ac1fc00205d74f688808c444ddd2b3f",
+      "licenseBody": {
+        "source": "https://openfontlicense.org/documents/OFL.txt",
+        "sourceSha256": "1d361a8f8e8ce6e68457dcd93fb56e162e6baa3bbb7e7573a290d44399f6b57e",
+        "textSha256": "ebc109078c06f79af74cf2b27454c262830d12a65749f0e2bf25d1ac1db7a02a",
+        "reusedFrom": "reviewed-Assistant-official-body-without-example-copyright"
+      },
+      "bindingScope": "pinned-font-declaration-plus-unchanged-official-license-body",
+      "textSha256": "9d39f22fb4f8ae6837355e2378597a936dc1360688aa71fd7dfc1b30033df452",
+      "text": "/* Generated By cn-font-split@5.2.2 https://www.npmjs.com/package/cn-font-split\nCreateTime: Tue, 08 Oct 2024 18:34:44 GMT;\nOrigin File Name Table:\nfontFamily: Xiaolai SC\nfontSubfamily: Regular\npreferredFamily: 小賴字體 SC\npostScriptFindFontName: \ncopyright: Copyright © 2020 LXGW\nuniqueID: Xiaolai SC:Version 3.11\nfullName: Xiaolai SC\nversion: Version 3.11;December 4, 2020;FontCreator 13.0.0.2613 64-bit\npostScriptName: XiaolaiSC\ntrademark: 小赖字体 SC\ndesigner: Nozomi Seto 瀬戸のぞみ\ndescription: This font was created using FontCreator  from High-Logic.com\nlicense: This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.\nlicenseURL: http://scripts.sil.org/OFL\n */\n\n-----------------------------------------------------------\nSIL OPEN FONT LICENSE Version 1.1 - 26 February 2007\n-----------------------------------------------------------\n\nPREAMBLE\nThe goals of the Open Font License (OFL) are to stimulate worldwide\ndevelopment of collaborative font projects, to support the font creation\nefforts of academic and linguistic communities, and to provide a free and\nopen framework in which fonts may be shared and improved in partnership\nwith others.\n\nThe OFL allows the licensed fonts to be used, studied, modified and\nredistributed freely as long as they are not sold by themselves. The\nfonts, including any derivative works, can be bundled, embedded,\nredistributed and/or sold with any software provided that any reserved\nnames are not used by derivative works. The fonts and derivatives,\nhowever, cannot be released under any other type of license. The\nrequirement for fonts to remain under this license does not apply\nto any document created using the fonts or their derivatives.\n\nDEFINITIONS\n\"Font Software\" refers to the set of files released by the Copyright\nHolder(s) under this license and clearly marked as such. This may\ninclude source files, build scripts and documentation.\n\n\"Reserved Font Name\" refers to any names specified as such after the\ncopyright statement(s).\n\n\"Original Version\" refers to the collection of Font Software components as\ndistributed by the Copyright Holder(s).\n\n\"Modified Version\" refers to any derivative made by adding to, deleting,\nor substituting -- in part or in whole -- any of the components of the\nOriginal Version, by changing formats or by porting the Font Software to a\nnew environment.\n\n\"Author\" refers to any designer, engineer, programmer, technical\nwriter or other person who contributed to the Font Software.\n\nPERMISSION & CONDITIONS\nPermission is hereby granted, free of charge, to any person obtaining\na copy of the Font Software, to use, study, copy, merge, embed, modify,\nredistribute, and sell modified and unmodified copies of the Font\nSoftware, subject to the following conditions:\n\n1) Neither the Font Software nor any of its individual components,\nin Original or Modified Versions, may be sold by itself.\n\n2) Original or Modified Versions of the Font Software may be bundled,\nredistributed and/or sold with any software, provided that each copy\ncontains the above copyright notice and this license. These can be\nincluded either as stand-alone text files, human-readable headers or\nin the appropriate machine-readable metadata fields within text or\nbinary files as long as those fields can be easily viewed by the user.\n\n3) No Modified Version of the Font Software may use the Reserved Font\nName(s) unless explicit written permission is granted by the corresponding\nCopyright Holder. This restriction only applies to the primary font name as\npresented to the users.\n\n4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font\nSoftware shall not be used to promote, endorse or advertise any\nModified Version, except to acknowledge the contribution(s) of the\nCopyright Holder(s) and the Author(s) or with their explicit written\npermission.\n\n5) The Font Software, modified or unmodified, in part or in whole,\nmust be distributed entirely under this license, and must not be\ndistributed under any other license. The requirement for fonts to\nremain under this license does not apply to any document created\nusing the Font Software.\n\nTERMINATION\nThis license becomes null and void if any of the above conditions are\nnot met.\n\nDISCLAIMER\nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT\nOF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE\nCOPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\nINCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL\nDAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM\nOTHER DEALINGS IN THE FONT SOFTWARE.\n",
+      "files": [
+        "Xiaolai/Xiaolai-Regular-019d66dcad46dc156b162d267f981c20.woff2",
+        "Xiaolai/Xiaolai-Regular-04b718e5623574919c8b0dea5f301444.woff2",
+        "Xiaolai/Xiaolai-Regular-069e77aac84590e2e991d0a0176d34f2.woff2",
+        "Xiaolai/Xiaolai-Regular-06c77b8c66e51ed6c63ccb502dd8b8af.woff2",
+        "Xiaolai/Xiaolai-Regular-08e0dc436ad0ad61ba5558db0674d762.woff2",
+        "Xiaolai/Xiaolai-Regular-093b9ef39a46ceae95a1df18a0a3a326.woff2",
+        "Xiaolai/Xiaolai-Regular-095c169f3314805276f603a362766abd.woff2",
+        "Xiaolai/Xiaolai-Regular-09850c4077f3fffe707905872e0e2460.woff2",
+        "Xiaolai/Xiaolai-Regular-0986d134c05864f5025962eef9f994a0.woff2",
+        "Xiaolai/Xiaolai-Regular-0b5d723fdc4e249c140f0909e87d03b4.woff2",
+        "Xiaolai/Xiaolai-Regular-0f626226ba1272e832aea87bafd9720e.woff2",
+        "Xiaolai/Xiaolai-Regular-0f7fb1e0d5015bb1371343153ecf7ce3.woff2",
+        "Xiaolai/Xiaolai-Regular-0fa55a080fcd0f9dc2e0b0058b793df8.woff2",
+        "Xiaolai/Xiaolai-Regular-0facdf1ea213ba40261022f5d5ed4493.woff2",
+        "Xiaolai/Xiaolai-Regular-10a7ae9a371830a80c3d844acf1c02d7.woff2",
+        "Xiaolai/Xiaolai-Regular-112c051027b2d766c19a519f6ee1f4f7.woff2",
+        "Xiaolai/Xiaolai-Regular-11c345711937f0ba4b8f7b6b919c8440.woff2",
+        "Xiaolai/Xiaolai-Regular-12b52b58eb3df36804b9a654ec9ee194.woff2",
+        "Xiaolai/Xiaolai-Regular-13ae07ed2e272d26d59bc0691cd7117a.woff2",
+        "Xiaolai/Xiaolai-Regular-13d2887ec8ee73c43acdabc52a05af7b.woff2",
+        "Xiaolai/Xiaolai-Regular-145aa02cdd91946e67dc934e1acffe75.woff2",
+        "Xiaolai/Xiaolai-Regular-15dc6d811c9cd078f9086a740d5a1038.woff2",
+        "Xiaolai/Xiaolai-Regular-173945821411c09f70c95f98d590e697.woff2",
+        "Xiaolai/Xiaolai-Regular-1b611157cd46bb184d4fa4dae2d6a2b8.woff2",
+        "Xiaolai/Xiaolai-Regular-1e6fd68f1f3902ce48ce8c69df385622.woff2",
+        "Xiaolai/Xiaolai-Regular-1ee544f0f1dac422545c505baa788992.woff2",
+        "Xiaolai/Xiaolai-Regular-1fdc0c67ed57263a80fd108c1f6ccf24.woff2",
+        "Xiaolai/Xiaolai-Regular-203b0e569e3b14aac86a003dc3fa523e.woff2",
+        "Xiaolai/Xiaolai-Regular-20cc1bbf50e7efb442756cb605672c1f.woff2",
+        "Xiaolai/Xiaolai-Regular-20e7bf72fa05de9adf7dbcc7bf51dde6.woff2",
+        "Xiaolai/Xiaolai-Regular-21430ee05a1248901da8d0de08744d47.woff2",
+        "Xiaolai/Xiaolai-Regular-23686f7f29da6e8008c36dd3a80c83d6.woff2",
+        "Xiaolai/Xiaolai-Regular-23ad2d71b280f00b1363b95b7bea94eb.woff2",
+        "Xiaolai/Xiaolai-Regular-23f228f3999c01983860012330e4be08.woff2",
+        "Xiaolai/Xiaolai-Regular-24476a126f129212beb33f66853ea151.woff2",
+        "Xiaolai/Xiaolai-Regular-24a21c1e4449222e8d1898d69ff3a404.woff2",
+        "Xiaolai/Xiaolai-Regular-25b7f38e18f035f96cb5e547bd2bd08c.woff2",
+        "Xiaolai/Xiaolai-Regular-29cec36cd205b211da97acabaa62f055.woff2",
+        "Xiaolai/Xiaolai-Regular-2a26d20a23b00898ce82f09d2ee47c3f.woff2",
+        "Xiaolai/Xiaolai-Regular-2adbc89c11e65905393d3dfc468b9d5b.woff2",
+        "Xiaolai/Xiaolai-Regular-2b7441d46298788ac94e610ffcc709b6.woff2",
+        "Xiaolai/Xiaolai-Regular-2b77e8ebfb2367ab2662396a60e7d320.woff2",
+        "Xiaolai/Xiaolai-Regular-2cf96d082d35ea3d8106851223ad0d16.woff2",
+        "Xiaolai/Xiaolai-Regular-2d43040e86ff03ba677f6f9c04cd0805.woff2",
+        "Xiaolai/Xiaolai-Regular-2e33e8dc771ef5e1d9127d60a6b73679.woff2",
+        "Xiaolai/Xiaolai-Regular-33432927cd87d40cfe393c7482bf221f.woff2",
+        "Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2",
+        "Xiaolai/Xiaolai-Regular-36925dfe329a45086cbb7fc5c20d45ac.woff2",
+        "Xiaolai/Xiaolai-Regular-3717077e38f98d89eae729b6c14e56dc.woff2",
+        "Xiaolai/Xiaolai-Regular-3756e81d3e149cf6099163ee79944fec.woff2",
+        "Xiaolai/Xiaolai-Regular-395c35dd584b56b0789f58a0559beaf1.woff2",
+        "Xiaolai/Xiaolai-Regular-3c9de2ae0ea4bc91a510942dfa4be8d2.woff2",
+        "Xiaolai/Xiaolai-Regular-3cc70dbb64df5b21f1326cc24dee2195.woff2",
+        "Xiaolai/Xiaolai-Regular-3e1f8f654357353bf0e04ba5c34b5f7f.woff2",
+        "Xiaolai/Xiaolai-Regular-3e63ed8162808a9e425ed80a8bc79114.woff2",
+        "Xiaolai/Xiaolai-Regular-3eaa538115d76932653c21d8dc28f207.woff2",
+        "Xiaolai/Xiaolai-Regular-4095eb84ef3874e2600247bee0b04026.woff2",
+        "Xiaolai/Xiaolai-Regular-41521fade99856108931b4768b1b2648.woff2",
+        "Xiaolai/Xiaolai-Regular-450da755d5bcb70906e1295e559b9602.woff2",
+        "Xiaolai/Xiaolai-Regular-452225341522a7942f0f6aab1a5c91a3.woff2",
+        "Xiaolai/Xiaolai-Regular-4535823663ad81405188a528d8f2b1a2.woff2",
+        "Xiaolai/Xiaolai-Regular-4806e761d750087c2d734fc64596eaff.woff2",
+        "Xiaolai/Xiaolai-Regular-4a0fdb40036e87b40aa08dd30584cb85.woff2",
+        "Xiaolai/Xiaolai-Regular-4a38cc3e9cf104e69ba246d37f8cf135.woff2",
+        "Xiaolai/Xiaolai-Regular-4aca6a43e59aceee2166b0c7e4e85ef1.woff2",
+        "Xiaolai/Xiaolai-Regular-4bfaa8ffa64c5ee560aa2daba7c9cbd3.woff2",
+        "Xiaolai/Xiaolai-Regular-4dc6d5f188d5c96d44815cd1e81aa885.woff2",
+        "Xiaolai/Xiaolai-Regular-4ddc14ed3eb0c3e46364317dfc0144a3.woff2",
+        "Xiaolai/Xiaolai-Regular-4ee10ae43505e2e0bc62656ced49c0fa.woff2",
+        "Xiaolai/Xiaolai-Regular-4f50e5136e136527280bc902c5817561.woff2",
+        "Xiaolai/Xiaolai-Regular-51502f1206be09c565f1547c406e9558.woff2",
+        "Xiaolai/Xiaolai-Regular-51a0e808bbc8361236ac521a119758a3.woff2",
+        "Xiaolai/Xiaolai-Regular-52a84a22fd1369bffeaf21da2d6158dc.woff2",
+        "Xiaolai/Xiaolai-Regular-5330a2119a716e4e7224ed108b085dac.woff2",
+        "Xiaolai/Xiaolai-Regular-543fa46ace099a7099dad69123399400.woff2",
+        "Xiaolai/Xiaolai-Regular-544fc28abe2c5c30e62383fd4dac255f.woff2",
+        "Xiaolai/Xiaolai-Regular-54acdfc2166ad7fcbd074f75fd4a56ba.woff2",
+        "Xiaolai/Xiaolai-Regular-5572b3513ba8df57a3d5d7303ee6b11b.woff2",
+        "Xiaolai/Xiaolai-Regular-56467a5c8840c4d23a60b2f935114848.woff2",
+        "Xiaolai/Xiaolai-Regular-56a32a7689abd0326e57c10c6c069bb4.woff2",
+        "Xiaolai/Xiaolai-Regular-57862b464a55b18c7bf234ce22907d73.woff2",
+        "Xiaolai/Xiaolai-Regular-583d166e56ba0de4b77eabb47ef67839.woff2",
+        "Xiaolai/Xiaolai-Regular-5882ffa04f32584d26109137e2da4352.woff2",
+        "Xiaolai/Xiaolai-Regular-58fd02350d0bc52cf1ca3bb32ce9766e.woff2",
+        "Xiaolai/Xiaolai-Regular-5935a5775af3d5c6307ac667bd9ae74e.woff2",
+        "Xiaolai/Xiaolai-Regular-59e9ff77b0efaf684bc09274fb6908c9.woff2",
+        "Xiaolai/Xiaolai-Regular-5a1ce3117cfe90c48e8fb4a9a00f694d.woff2",
+        "Xiaolai/Xiaolai-Regular-5a45d991244d4c7140217e1e5f5ca4f4.woff2",
+        "Xiaolai/Xiaolai-Regular-5a7fac4b8b23a6e4e5ba0c9bf1756c91.woff2",
+        "Xiaolai/Xiaolai-Regular-5b0ed6971aaab9c8ad563230bd5471a7.woff2",
+        "Xiaolai/Xiaolai-Regular-5d2898fbc097a7e24c6f38d80587621e.woff2",
+        "Xiaolai/Xiaolai-Regular-603aefd23e350ba7eb124273e3c9bcf1.woff2",
+        "Xiaolai/Xiaolai-Regular-60a3089806700d379f11827ee9843b6b.woff2",
+        "Xiaolai/Xiaolai-Regular-60a41c7e1c68f22424e6d22df544bc82.woff2",
+        "Xiaolai/Xiaolai-Regular-642b26e2e5f5fb780b51b593dbc8c851.woff2",
+        "Xiaolai/Xiaolai-Regular-66493ba5a8367f2928812f446f47b56a.woff2",
+        "Xiaolai/Xiaolai-Regular-670ba603758d94268e8606f240a42e12.woff2",
+        "Xiaolai/Xiaolai-Regular-671a2c20b1eb9e4ef8a192833940e319.woff2",
+        "Xiaolai/Xiaolai-Regular-684d65f1793cac449dde5d59cb3c47fb.woff2",
+        "Xiaolai/Xiaolai-Regular-69c09cc5fa3e55c74fc4821f76909cc3.woff2",
+        "Xiaolai/Xiaolai-Regular-6ae5b42180ad70b971c91e7eefb8eba2.woff2",
+        "Xiaolai/Xiaolai-Regular-6e092f71c1e634059ada0e52abadce67.woff2",
+        "Xiaolai/Xiaolai-Regular-6f3256af8454371776bc46670d33cc65.woff2",
+        "Xiaolai/Xiaolai-Regular-6fe5c5973cc06f74b2387a631ea36b88.woff2",
+        "Xiaolai/Xiaolai-Regular-70c2eb8d64e71a42a834eb857ea9df51.woff2",
+        "Xiaolai/Xiaolai-Regular-70e811fd7994e61f408c923de6ddd078.woff2",
+        "Xiaolai/Xiaolai-Regular-7197d6fda6cba7c3874c53d6381ca239.woff2",
+        "Xiaolai/Xiaolai-Regular-72252d73220fa3cd856677888cee1635.woff2",
+        "Xiaolai/Xiaolai-Regular-72536a3d71b694a0d53dd90ddceae41e.woff2",
+        "Xiaolai/Xiaolai-Regular-726303e0774b4e678bff8c2deb6ca603.woff2",
+        "Xiaolai/Xiaolai-Regular-733171b4ffcd17ea1fe1c0ba627173bf.woff2",
+        "Xiaolai/Xiaolai-Regular-739bc1a567439c7cffcd1614644593d2.woff2",
+        "Xiaolai/Xiaolai-Regular-73e309718fd16cea44b4d54a33581811.woff2",
+        "Xiaolai/Xiaolai-Regular-7494dc504ae00ee9cd0505f990f88c5d.woff2",
+        "Xiaolai/Xiaolai-Regular-74e2263a91439c25b91d5132ce9f4d62.woff2",
+        "Xiaolai/Xiaolai-Regular-761d05e3cd968cf574166867998ef06a.woff2",
+        "Xiaolai/Xiaolai-Regular-7718fe60986d8b42b1be9c5ace5ccf25.woff2",
+        "Xiaolai/Xiaolai-Regular-774d4f764a1299da5d28ec2f2ffe0d69.woff2",
+        "Xiaolai/Xiaolai-Regular-79d494361ae093b69e74ee9dbe65bfd4.woff2",
+        "Xiaolai/Xiaolai-Regular-79f007c1c6d07557120982951ea67998.woff2",
+        "Xiaolai/Xiaolai-Regular-7a07ddc0f0c0f5f4a9bad6ee3dda66b5.woff2",
+        "Xiaolai/Xiaolai-Regular-7ab2bed91166a9dca83a5ebfbe2a7f38.woff2",
+        "Xiaolai/Xiaolai-Regular-7ccce86603f80a099ddb0cb21d4ae3e3.woff2",
+        "Xiaolai/Xiaolai-Regular-7e4bde7e9c7f84cd34d8a845e384c746.woff2",
+        "Xiaolai/Xiaolai-Regular-7e929f262f30c8ee78bf398150b1a7cd.woff2",
+        "Xiaolai/Xiaolai-Regular-7eb9fffd1aa890d07d0f88cc82e6cfe4.woff2",
+        "Xiaolai/Xiaolai-Regular-7f855356ab893b0d2b9c1c83b8116f0e.woff2",
+        "Xiaolai/Xiaolai-Regular-829615148e6357d826b9242eb7fbbd1e.woff2",
+        "Xiaolai/Xiaolai-Regular-866fa7613df6b3fd272bcfd4530c0bb9.woff2",
+        "Xiaolai/Xiaolai-Regular-87599f94b6cc129d505b375798d0d751.woff2",
+        "Xiaolai/Xiaolai-Regular-8c2f33cee3993174f7e87c28e4bf42ee.woff2",
+        "Xiaolai/Xiaolai-Regular-8d3bcabb847b56243b16afe62adaaf21.woff2",
+        "Xiaolai/Xiaolai-Regular-8de5b863cb50dfefdd07cb11c774d579.woff2",
+        "Xiaolai/Xiaolai-Regular-8e9f97f01034820170065b2921b4fb5e.woff2",
+        "Xiaolai/Xiaolai-Regular-8f476c4c99813d57cbe6eca4727388ad.woff2",
+        "Xiaolai/Xiaolai-Regular-903bb6865f3452e2fda42e3a25547bc5.woff2",
+        "Xiaolai/Xiaolai-Regular-91ddb2969bf2d31ba02ad82998d1314c.woff2",
+        "Xiaolai/Xiaolai-Regular-938d90c10ff8c20386af7f242c05d6b0.woff2",
+        "Xiaolai/Xiaolai-Regular-93fc8f28a33234bcadf1527cafabd502.woff2",
+        "Xiaolai/Xiaolai-Regular-95429962233afd82db1c27df1500a28c.woff2",
+        "Xiaolai/Xiaolai-Regular-9544732d2e62d1a429674f8ee41b5d3a.woff2",
+        "Xiaolai/Xiaolai-Regular-9592bfc861f07bcb8d75c196b370e548.woff2",
+        "Xiaolai/Xiaolai-Regular-95bfd249da4902577b4b7d76ebdd0b44.woff2",
+        "Xiaolai/Xiaolai-Regular-968cffdc8ee679da094e77ebf50f58ef.woff2",
+        "Xiaolai/Xiaolai-Regular-97f7f48ce90c9429bf32ae51469db74d.woff2",
+        "Xiaolai/Xiaolai-Regular-982b630266d87db93d2539affb1275c6.woff2",
+        "Xiaolai/Xiaolai-Regular-98f2ad84457de7f3740d9920b8fa8667.woff2",
+        "Xiaolai/Xiaolai-Regular-99a16ef6a64934d5781933dbd9c46b2e.woff2",
+        "Xiaolai/Xiaolai-Regular-9cfb2a77a4e45025105ad29a1748b90d.woff2",
+        "Xiaolai/Xiaolai-Regular-9d81066dd2b337c938df6e90380a00dc.woff2",
+        "Xiaolai/Xiaolai-Regular-9eb5a99df4e76ac3363453ac9ca288b1.woff2",
+        "Xiaolai/Xiaolai-Regular-a004ddfcb26e67bd6e678c8ed19e25ce.woff2",
+        "Xiaolai/Xiaolai-Regular-a0ca5df4258213d7fc9fce80f65ce760.woff2",
+        "Xiaolai/Xiaolai-Regular-a1f916d6039285c4ffb900cd654e418f.woff2",
+        "Xiaolai/Xiaolai-Regular-a203b91dad570bf05a58c3c3ddb529bf.woff2",
+        "Xiaolai/Xiaolai-Regular-a365e82ed54697a52f27adcea1315fe8.woff2",
+        "Xiaolai/Xiaolai-Regular-a4c34be6d42152e64b0df90bc4607f64.woff2",
+        "Xiaolai/Xiaolai-Regular-a7accba310e821da5505f71c03b76bdb.woff2",
+        "Xiaolai/Xiaolai-Regular-aa0d470430e6391eca720c7cfa44446f.woff2",
+        "Xiaolai/Xiaolai-Regular-aa5c9ca6cf4fba00433b7aa3fa10671a.woff2",
+        "Xiaolai/Xiaolai-Regular-ac9ceb44437becc3e9c4dbfebab7fc2d.woff2",
+        "Xiaolai/Xiaolai-Regular-b1220a3c61f85cc0408deedb4c5f57a2.woff2",
+        "Xiaolai/Xiaolai-Regular-b358f7a51ece39a3247942b1feabdb29.woff2",
+        "Xiaolai/Xiaolai-Regular-b57aaedfd8ebdf3931f25119dc6a5eb2.woff2",
+        "Xiaolai/Xiaolai-Regular-b5c1596551c256e0e9cf02028595b092.woff2",
+        "Xiaolai/Xiaolai-Regular-b6d128682ee29e471486354d486a1b90.woff2",
+        "Xiaolai/Xiaolai-Regular-b6fd38ca30869792244804b04bc058da.woff2",
+        "Xiaolai/Xiaolai-Regular-b7d203b051eff504ff59ddca7576b6a9.woff2",
+        "Xiaolai/Xiaolai-Regular-b96d9226ce77ec94ceca043d712182e6.woff2",
+        "Xiaolai/Xiaolai-Regular-ba3de316d63c7e339987b16f41a0b879.woff2",
+        "Xiaolai/Xiaolai-Regular-bafff7a14c27403dcc6cf1432e8ea836.woff2",
+        "Xiaolai/Xiaolai-Regular-bd77e3c7f9e0b072d96af37f73d1aa32.woff2",
+        "Xiaolai/Xiaolai-Regular-be549ab72f0719d606a5c01e2c0219b6.woff2",
+        "Xiaolai/Xiaolai-Regular-c16ed9740b85badf16e86ea782a3062f.woff2",
+        "Xiaolai/Xiaolai-Regular-c1f94158256bb1f3bf665b053d895af9.woff2",
+        "Xiaolai/Xiaolai-Regular-c40533fdf4cc57177b12803598af7e59.woff2",
+        "Xiaolai/Xiaolai-Regular-c4a687ac4f0c2766eefc9f77ed99cddf.woff2",
+        "Xiaolai/Xiaolai-Regular-c69f61a4ab18d0488c8d1fc12e7028e8.woff2",
+        "Xiaolai/Xiaolai-Regular-c8b71798409ccc126ee264a00aadcf21.woff2",
+        "Xiaolai/Xiaolai-Regular-c99eda15fc26a2941579560f76c3a5cf.woff2",
+        "Xiaolai/Xiaolai-Regular-cb17fc3db95f6d139afc9d31a8e93293.woff2",
+        "Xiaolai/Xiaolai-Regular-cbaaefaaf326668277aa24dfa93c4d28.woff2",
+        "Xiaolai/Xiaolai-Regular-cd145ce4a0ea18469358df53c207bc1b.woff2",
+        "Xiaolai/Xiaolai-Regular-cdbce89e82cc1ab53a2decbf5819278f.woff2",
+        "Xiaolai/Xiaolai-Regular-ce4884f96f11589608b76b726a755803.woff2",
+        "Xiaolai/Xiaolai-Regular-cf2cc71752631e579e35b0e423bf2638.woff2",
+        "Xiaolai/Xiaolai-Regular-cf6ff4e0f491ca0cf3038187a997b9b4.woff2",
+        "Xiaolai/Xiaolai-Regular-cfb211578629b7e8153b37240de6a9d5.woff2",
+        "Xiaolai/Xiaolai-Regular-d0cf73942fea1c74edbdf0b3011f4656.woff2",
+        "Xiaolai/Xiaolai-Regular-d2666cbed13462c5dc36fa2f15c202ca.woff2",
+        "Xiaolai/Xiaolai-Regular-d3716376641d615e2995605b29bca7b6.woff2",
+        "Xiaolai/Xiaolai-Regular-dac48066b5883d8b4551fc584f0c2a3e.woff2",
+        "Xiaolai/Xiaolai-Regular-dbea1af6dcd9860be40c3d18254338f5.woff2",
+        "Xiaolai/Xiaolai-Regular-e11567fd2accf9957cd0d3c2be937d87.woff2",
+        "Xiaolai/Xiaolai-Regular-e2ead7ea7da0437f085f42ffc05f8d13.woff2",
+        "Xiaolai/Xiaolai-Regular-e3fcf5180fd466c8915c4e8069491054.woff2",
+        "Xiaolai/Xiaolai-Regular-e480d9c614742d05f0e78f274f1e69e6.woff2",
+        "Xiaolai/Xiaolai-Regular-e4bca6cfa53e499cae0a6be4894a90e9.woff2",
+        "Xiaolai/Xiaolai-Regular-e51ef413167c6e14e0c0fdcc585f2fc9.woff2",
+        "Xiaolai/Xiaolai-Regular-e5f453bb04da18eed01675eeebd88bf8.woff2",
+        "Xiaolai/Xiaolai-Regular-e656f091b9dc4709722c9f4b84d3c797.woff2",
+        "Xiaolai/Xiaolai-Regular-ec181b795ac1fb5a50d700b6e996d745.woff2",
+        "Xiaolai/Xiaolai-Regular-ee8bae97908d5147b423f77ad0d3c1bb.woff2",
+        "Xiaolai/Xiaolai-Regular-f0f13b5c60e0af5553bd359f5513be1b.woff2",
+        "Xiaolai/Xiaolai-Regular-f2b54d4e7be0eaefe1c2c56836fa5368.woff2",
+        "Xiaolai/Xiaolai-Regular-f56414bf9bced67990def8660e306759.woff2",
+        "Xiaolai/Xiaolai-Regular-f5d079153c99a25b9be5b8583c4cc8a7.woff2",
+        "Xiaolai/Xiaolai-Regular-f6032fc06eb20480f096199713f70885.woff2",
+        "Xiaolai/Xiaolai-Regular-f8ee5d36068a42b51d0e4a1116cfcec1.woff2"
+      ]
+    }
+  ],
+  "pendingFontFamilies": ["Liberation"],
+  "incompleteSourceComments": [
+    {
+      "family": "Lilita",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Lilita/index.ts",
+      "sourceSha256": "812b532e303a10bc1a33a6cba241d39d71d7905feecdc84d00bed360ff3216f4",
+      "comment": null,
+      "status": "full-license-not-in-registration-comment"
+    },
+    {
+      "family": "Nunito",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Nunito/index.ts",
+      "sourceSha256": "c94f269e5747d376137019b3dc32af42ac6511bd1fea9c70a7e0ffbe2956907c",
+      "comment": null,
+      "status": "full-license-not-in-registration-comment"
+    },
+    {
+      "family": "Xiaolai",
+      "source": "https://raw.githubusercontent.com/excalidraw/excalidraw/a2ec2889babf7d2295469c6d90ebe77fae57df84/packages/excalidraw/fonts/Xiaolai/index.ts",
+      "sourceSha256": "c2cbbbfa669404795527e06cf596ab4b1b851f9bb993c608c8ab9c3c2aabe9d3",
+      "comment": "/* Generated By cn-font-split@5.2.2 https://www.npmjs.com/package/cn-font-split\nCreateTime: Tue, 08 Oct 2024 18:34:44 GMT;\nOrigin File Name Table:\nfontFamily: Xiaolai SC\nfontSubfamily: Regular\npreferredFamily: 小賴字體 SC\npostScriptFindFontName: \ncopyright: Copyright © 2020 LXGW\nuniqueID: Xiaolai SC:Version 3.11\nfullName: Xiaolai SC\nversion: Version 3.11;December 4, 2020;FontCreator 13.0.0.2613 64-bit\npostScriptName: XiaolaiSC\ntrademark: 小赖字体 SC\ndesigner: Nozomi Seto 瀬戸のぞみ\ndescription: This font was created using FontCreator  from High-Logic.com\nlicense: This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.\nlicenseURL: http://scripts.sil.org/OFL\n */",
+      "status": "full-license-not-in-registration-comment"
+    }
+  ],
+  "assistantBoundary": "Four Assistant UI font notices remain bound by supplemental-notices.json; not duplicated here.",
+  "draco": {
+    "version": "1.5.5",
+    "commit": "a5b31570c3204326e80c0d0d9d4434f0a10dc71b",
+    "source": "https://raw.githubusercontent.com/google/draco/a5b31570c3204326e80c0d0d9d4434f0a10dc71b/LICENSE",
+    "sha256": "d3709b0fb4b8a94bbb1d02b8a2e484f258b0d9c5c5a01f940391f3fe662cd1a4",
+    "text": "                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n\n   Copyright [yyyy] [name of copyright owner]\n\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n\n       http://www.apache.org/licenses/LICENSE-2.0\n\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.\n\n--------------------------------------------------------------------------------\nFiles: docs/assets/js/ASCIIMathML.js\n\nCopyright (c) 2014 Peter Jipsen and other ASCIIMathML.js contributors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n\n--------------------------------------------------------------------------------\nFiles: docs/assets/css/pygments/*\n\nThis is free and unencumbered software released into the public domain.\n\nAnyone is free to copy, modify, publish, use, compile, sell, or\ndistribute this software, either in source code form or as a compiled\nbinary, for any purpose, commercial or non-commercial, and by any\nmeans.\n\nIn jurisdictions that recognize copyright laws, the author or authors\nof this software dedicate any and all copyright interest in the\nsoftware to the public domain. We make this dedication for the benefit\nof the public at large and to the detriment of our heirs and\nsuccessors. We intend this dedication to be an overt act of\nrelinquishment in perpetuity of all present and future rights to this\nsoftware under copyright law.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR\nOTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,\nARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\nOTHER DEALINGS IN THE SOFTWARE.\n\nFor more information, please refer to <http://unlicense.org>\n",
+    "bindingStatus": "upstream-original-and-cdn-bytes-verified-offline-pending",
+    "cdnByteVerification": {
+      "checkedAt": "2026-10-02",
+      "method": "cdn-bytes-git-blob-match-at-fixed-upstream-commit",
+      "commit": "a5b31570c3204326e80c0d0d9d4434f0a10dc71b",
+      "status": "point-in-time-matched-offline-and-distribution-review-pending",
+      "files": [
+        {
+          "file": "draco_decoder.js",
+          "url": "https://www.gstatic.com/draco/versioned/decoders/1.5.5/draco_decoder.js",
+          "size": 709590,
+          "sha256": "6604be0104930049a96f5b30e2c17928fb13daca25c1f088349730eb0c6db3c8",
+          "gitBlobSha1": "b9961e8b578e36575ca66fb737314f976130f686",
+          "upstreamPath": "javascript/draco_decoder.js"
+        },
+        {
+          "file": "draco_wasm_wrapper.js",
+          "url": "https://www.gstatic.com/draco/versioned/decoders/1.5.5/draco_wasm_wrapper.js",
+          "size": 58916,
+          "sha256": "b93f6384147828f857456c84845f4dbceada5b7a8455991109c853e236a1f018",
+          "gitBlobSha1": "2676a48ae02f9a7b2e5ba36dbf70a6bdc5810896",
+          "upstreamPath": "javascript/draco_wasm_wrapper.js"
+        },
+        {
+          "file": "draco_decoder.wasm",
+          "url": "https://www.gstatic.com/draco/versioned/decoders/1.5.5/draco_decoder.wasm",
+          "size": 283091,
+          "sha256": "0103c8bff79532c2f1a496dd9ea0764ac692ed8585d9136596ef9f043873a61f",
+          "gitBlobSha1": "ef332a6a7a9c5e0c86c198ef5de530b871d2bc6c",
+          "upstreamPath": "javascript/draco_decoder.wasm"
+        }
+      ]
+    }
+  },
+  "boundary": "Installed font provenance and original texts, plus a point-in-time Draco CDN byte match. No remote font requests, decoder execution or vendoring, offline browser acceptance or release authorization.",
+  "legacyFontResearch": {
+    "family": "Liberation",
+    "status": "historical-original-collected-version-binding-pending",
+    "bindingScope": "historical-family-license-candidate-not-installed-release-proof",
+    "file": "Liberation/LiberationSans-Regular.woff2",
+    "fontSha256": "006a2b28cbbeeaec937d1b367d0949f5f48ef4b2e7b4e1d8dc7a799d2d639be8",
+    "installedMetadata": [
+      {
+        "id": 0,
+        "text": "Digitized data `2007 Ascender Corporation. All rights reserved."
+      },
+      {
+        "id": 1,
+        "text": "Liberation Sans"
+      },
+      {
+        "id": 5,
+        "text": "Version 1.05 "
+      },
+      {
+        "id": 13,
+        "text": "Use of this Liberation font software is subject to the license agreement under which you accepted the Liberation font software."
+      },
+      {
+        "id": 14,
+        "text": "http://www.ascendercorp.com/liberation.html"
+      }
+    ],
+    "sourceCommit": "cf3040c146097d6b7361e2823d5c6b5c309a456a",
+    "sourceFont": {
+      "path": "master/src/LiberationSans-Regular.sfd",
+      "url": "https://raw.githubusercontent.com/liberationfonts/liberation-fonts/cf3040c146097d6b7361e2823d5c6b5c309a456a/master/src/LiberationSans-Regular.sfd",
+      "commit": "cf3040c146097d6b7361e2823d5c6b5c309a456a",
+      "sha256": "e1da4437862a8f221d1b07943cc250667a591c4cbeed33977232b9b78f9a4ec2",
+      "gitBlobSha1": "6ffd4e6f53638cf87ec81720e83d5d634d4eb670",
+      "metadata": [
+        "FontName: LiberationSans",
+        "FullName: Liberation Sans",
+        "FamilyName: Liberation Sans",
+        "Copyright: Digitized data © 2007 Ascender Corporation. All rights reserved.",
+        "Version: 1.02",
+        "LangName: 1033 \"\" \"\" \"Regular\" \"Ascender - Liberation Sans\" \"\" \"Version 1.02\" \"\" \"Liberation is a trademark of Red Hat, Inc. registered in U.S. Patent and Trademark Office and certain other jurisdictions.\" \"Ascender Corporation\" \"Steve Matteson\" \"\" \"http://www.ascendercorp.com/\" \"http://www.ascendercorp.com/typedesigners.html\" \"Use of this Liberation font software is subject to the license agreement under which you accepted the Liberation font software.\" \"http://www.ascendercorp.com/liberation.html\" "
+      ]
+    },
+    "sourceTexts": [
+      {
+        "path": "master/License.txt",
+        "url": "https://raw.githubusercontent.com/liberationfonts/liberation-fonts/cf3040c146097d6b7361e2823d5c6b5c309a456a/master/License.txt",
+        "commit": "cf3040c146097d6b7361e2823d5c6b5c309a456a",
+        "sha256": "696c8257e24fbc158549191ab3e0ef2c5edc4582a3c3f0dd096e1efd281195bf",
+        "gitBlobSha1": "f1787287c3e0c10689834032c07a1e5b719f5cc3",
+        "text": "LICENSE AGREEMENT AND LIMITED PRODUCT WARRANTY\nLIBERATION FONT SOFTWARE\n\nThis agreement governs the use of the Software and any updates to the Software, regardless of the delivery mechanism. Subject to the following terms, Red Hat, Inc. (\"Red Hat\") grants to the user (\"Client\") a license to this work pursuant to the GNU General Public License v.2 with the exceptions set forth below and such other terms as are set forth in this End User License Agreement.\n\n 1. The Software and License Exception. LIBERATION font software  (the \"Software\") consists of TrueType-OpenType formatted font software for rendering LIBERATION typefaces in sans-serif, serif, and monospaced character styles. You are licensed to use, modify, copy, and distribute the Software pursuant to the GNU General Public License v.2 with the following exceptions:  \n\n  (a) As a special exception, if you create a document which uses this font, and embed this font or unaltered portions of this font into the document, this font does not by itself cause the resulting document to be covered by the GNU General Public License. This exception does not however invalidate any other reasons why the document might be covered by the GNU General Public License. If you modify this font, you may extend this exception to your version of the font, but you are not obligated to do so. If you do not wish to do so, delete this exception statement from your version.\n\n  (b) As a further exception, any distribution of the object code of the Software in a physical product must provide you the right to access and modify the source code for the Software and to reinstall that modified version of the Software in object code form on the same physical product on which you received it.\n\n 2. Intellectual Property Rights. The Software and each of its components, including the source code, documentation, appearance, structure and organization are owned by Red Hat and others and are protected under copyright and other laws. Title to the Software and any component, or to any copy, modification, or merged portion shall remain with the aforementioned, subject to the applicable license. The \"LIBERATION\" trademark is a trademark of Red Hat, Inc. in the U.S. and other countries. This agreement does not permit Client to distribute modified versions of the Software using Red Hat's trademarks. If Client makes a redistribution of a modified version of the Software, then Client must modify the files names to remove any reference to the Red Hat trademarks and must not use the Red Hat trademarks in any way to reference or promote the modified Software. \n\n 3. Limited Warranty. To the maximum extent permitted under applicable law, the Software is provided and licensed \"as is\" without warranty of any kind, expressed or implied, including the implied warranties of merchantability, non-infringement or fitness for a particular purpose. Red Hat does not warrant that the functions contained in the Software will meet Client's requirements or that the operation of the Software will be entirely error free or appear precisely as described in the accompanying documentation. \n\n 4. Limitation of Remedies and Liability. To the maximum extent permitted by applicable law, Red Hat or any Red Hat authorized dealer will not be liable to Client for any incidental or consequential damages, including lost profits or lost savings arising out of the use or inability to use the Software, even if Red Hat or such dealer has been advised of the possibility of such damages. \n\n 5. General. If any provision of this agreement is held to be unenforceable, that shall not affect the enforceability of the remaining provisions. This agreement shall be governed by the laws of the State of North Carolina and of the United States, without regard to any conflict of laws provisions, except that the United Nations Convention on the International Sale of Goods shall not apply.\nCopyright Â© 2007 Red Hat, Inc. All rights reserved. LIBERATION is a trademark of Red Hat, Inc.\n"
+      },
+      {
+        "path": "master/COPYING",
+        "url": "https://raw.githubusercontent.com/liberationfonts/liberation-fonts/cf3040c146097d6b7361e2823d5c6b5c309a456a/master/COPYING",
+        "commit": "cf3040c146097d6b7361e2823d5c6b5c309a456a",
+        "sha256": "32b1062f7da84967e7019d01ab805935caa7ab7321a7ced0e30ebe75e5df1670",
+        "gitBlobSha1": "d60c31a97a544b53039088d14fe9114583c0efc3",
+        "text": "\t\t    GNU GENERAL PUBLIC LICENSE\n\t\t       Version 2, June 1991\n\n Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n     59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n\t\t\t    Preamble\n\n  The licenses for most software are designed to take away your\nfreedom to share and change it.  By contrast, the GNU General Public\nLicense is intended to guarantee your freedom to share and change free\nsoftware--to make sure the software is free for all its users.  This\nGeneral Public License applies to most of the Free Software\nFoundation's software and to any other program whose authors commit to\nusing it.  (Some other Free Software Foundation software is covered by\nthe GNU Library General Public License instead.)  You can apply it to\nyour programs, too.\n\n  When we speak of free software, we are referring to freedom, not\nprice.  Our General Public Licenses are designed to make sure that you\nhave the freedom to distribute copies of free software (and charge for\nthis service if you wish), that you receive source code or can get it\nif you want it, that you can change the software or use pieces of it\nin new free programs; and that you know you can do these things.\n\n  To protect your rights, we need to make restrictions that forbid\nanyone to deny you these rights or to ask you to surrender the rights.\nThese restrictions translate to certain responsibilities for you if you\ndistribute copies of the software, or if you modify it.\n\n  For example, if you distribute copies of such a program, whether\ngratis or for a fee, you must give the recipients all the rights that\nyou have.  You must make sure that they, too, receive or can get the\nsource code.  And you must show them these terms so they know their\nrights.\n\n  We protect your rights with two steps: (1) copyright the software, and\n(2) offer you this license which gives you legal permission to copy,\ndistribute and/or modify the software.\n\n  Also, for each author's protection and ours, we want to make certain\nthat everyone understands that there is no warranty for this free\nsoftware.  If the software is modified by someone else and passed on, we\nwant its recipients to know that what they have is not the original, so\nthat any problems introduced by others will not reflect on the original\nauthors' reputations.\n\n  Finally, any free program is threatened constantly by software\npatents.  We wish to avoid the danger that redistributors of a free\nprogram will individually obtain patent licenses, in effect making the\nprogram proprietary.  To prevent this, we have made it clear that any\npatent must be licensed for everyone's free use or not licensed at all.\n\n  The precise terms and conditions for copying, distribution and\nmodification follow.\n\f\n\t\t    GNU GENERAL PUBLIC LICENSE\n   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n\n  0. This License applies to any program or other work which contains\na notice placed by the copyright holder saying it may be distributed\nunder the terms of this General Public License.  The \"Program\", below,\nrefers to any such program or work, and a \"work based on the Program\"\nmeans either the Program or any derivative work under copyright law:\nthat is to say, a work containing the Program or a portion of it,\neither verbatim or with modifications and/or translated into another\nlanguage.  (Hereinafter, translation is included without limitation in\nthe term \"modification\".)  Each licensee is addressed as \"you\".\n\nActivities other than copying, distribution and modification are not\ncovered by this License; they are outside its scope.  The act of\nrunning the Program is not restricted, and the output from the Program\nis covered only if its contents constitute a work based on the\nProgram (independent of having been made by running the Program).\nWhether that is true depends on what the Program does.\n\n  1. You may copy and distribute verbatim copies of the Program's\nsource code as you receive it, in any medium, provided that you\nconspicuously and appropriately publish on each copy an appropriate\ncopyright notice and disclaimer of warranty; keep intact all the\nnotices that refer to this License and to the absence of any warranty;\nand give any other recipients of the Program a copy of this License\nalong with the Program.\n\nYou may charge a fee for the physical act of transferring a copy, and\nyou may at your option offer warranty protection in exchange for a fee.\n\n  2. You may modify your copy or copies of the Program or any portion\nof it, thus forming a work based on the Program, and copy and\ndistribute such modifications or work under the terms of Section 1\nabove, provided that you also meet all of these conditions:\n\n    a) You must cause the modified files to carry prominent notices\n    stating that you changed the files and the date of any change.\n\n    b) You must cause any work that you distribute or publish, that in\n    whole or in part contains or is derived from the Program or any\n    part thereof, to be licensed as a whole at no charge to all third\n    parties under the terms of this License.\n\n    c) If the modified program normally reads commands interactively\n    when run, you must cause it, when started running for such\n    interactive use in the most ordinary way, to print or display an\n    announcement including an appropriate copyright notice and a\n    notice that there is no warranty (or else, saying that you provide\n    a warranty) and that users may redistribute the program under\n    these conditions, and telling the user how to view a copy of this\n    License.  (Exception: if the Program itself is interactive but\n    does not normally print such an announcement, your work based on\n    the Program is not required to print an announcement.)\n\f\nThese requirements apply to the modified work as a whole.  If\nidentifiable sections of that work are not derived from the Program,\nand can be reasonably considered independent and separate works in\nthemselves, then this License, and its terms, do not apply to those\nsections when you distribute them as separate works.  But when you\ndistribute the same sections as part of a whole which is a work based\non the Program, the distribution of the whole must be on the terms of\nthis License, whose permissions for other licensees extend to the\nentire whole, and thus to each and every part regardless of who wrote it.\n\nThus, it is not the intent of this section to claim rights or contest\nyour rights to work written entirely by you; rather, the intent is to\nexercise the right to control the distribution of derivative or\ncollective works based on the Program.\n\nIn addition, mere aggregation of another work not based on the Program\nwith the Program (or with a work based on the Program) on a volume of\na storage or distribution medium does not bring the other work under\nthe scope of this License.\n\n  3. You may copy and distribute the Program (or a work based on it,\nunder Section 2) in object code or executable form under the terms of\nSections 1 and 2 above provided that you also do one of the following:\n\n    a) Accompany it with the complete corresponding machine-readable\n    source code, which must be distributed under the terms of Sections\n    1 and 2 above on a medium customarily used for software interchange; or,\n\n    b) Accompany it with a written offer, valid for at least three\n    years, to give any third party, for a charge no more than your\n    cost of physically performing source distribution, a complete\n    machine-readable copy of the corresponding source code, to be\n    distributed under the terms of Sections 1 and 2 above on a medium\n    customarily used for software interchange; or,\n\n    c) Accompany it with the information you received as to the offer\n    to distribute corresponding source code.  (This alternative is\n    allowed only for noncommercial distribution and only if you\n    received the program in object code or executable form with such\n    an offer, in accord with Subsection b above.)\n\nThe source code for a work means the preferred form of the work for\nmaking modifications to it.  For an executable work, complete source\ncode means all the source code for all modules it contains, plus any\nassociated interface definition files, plus the scripts used to\ncontrol compilation and installation of the executable.  However, as a\nspecial exception, the source code distributed need not include\nanything that is normally distributed (in either source or binary\nform) with the major components (compiler, kernel, and so on) of the\noperating system on which the executable runs, unless that component\nitself accompanies the executable.\n\nIf distribution of executable or object code is made by offering\naccess to copy from a designated place, then offering equivalent\naccess to copy the source code from the same place counts as\ndistribution of the source code, even though third parties are not\ncompelled to copy the source along with the object code.\n\f\n  4. You may not copy, modify, sublicense, or distribute the Program\nexcept as expressly provided under this License.  Any attempt\notherwise to copy, modify, sublicense or distribute the Program is\nvoid, and will automatically terminate your rights under this License.\nHowever, parties who have received copies, or rights, from you under\nthis License will not have their licenses terminated so long as such\nparties remain in full compliance.\n\n  5. You are not required to accept this License, since you have not\nsigned it.  However, nothing else grants you permission to modify or\ndistribute the Program or its derivative works.  These actions are\nprohibited by law if you do not accept this License.  Therefore, by\nmodifying or distributing the Program (or any work based on the\nProgram), you indicate your acceptance of this License to do so, and\nall its terms and conditions for copying, distributing or modifying\nthe Program or works based on it.\n\n  6. Each time you redistribute the Program (or any work based on the\nProgram), the recipient automatically receives a license from the\noriginal licensor to copy, distribute or modify the Program subject to\nthese terms and conditions.  You may not impose any further\nrestrictions on the recipients' exercise of the rights granted herein.\nYou are not responsible for enforcing compliance by third parties to\nthis License.\n\n  7. If, as a consequence of a court judgment or allegation of patent\ninfringement or for any other reason (not limited to patent issues),\nconditions are imposed on you (whether by court order, agreement or\notherwise) that contradict the conditions of this License, they do not\nexcuse you from the conditions of this License.  If you cannot\ndistribute so as to satisfy simultaneously your obligations under this\nLicense and any other pertinent obligations, then as a consequence you\nmay not distribute the Program at all.  For example, if a patent\nlicense would not permit royalty-free redistribution of the Program by\nall those who receive copies directly or indirectly through you, then\nthe only way you could satisfy both it and this License would be to\nrefrain entirely from distribution of the Program.\n\nIf any portion of this section is held invalid or unenforceable under\nany particular circumstance, the balance of the section is intended to\napply and the section as a whole is intended to apply in other\ncircumstances.\n\nIt is not the purpose of this section to induce you to infringe any\npatents or other property right claims or to contest validity of any\nsuch claims; this section has the sole purpose of protecting the\nintegrity of the free software distribution system, which is\nimplemented by public license practices.  Many people have made\ngenerous contributions to the wide range of software distributed\nthrough that system in reliance on consistent application of that\nsystem; it is up to the author/donor to decide if he or she is willing\nto distribute software through any other system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is believed to\nbe a consequence of the rest of this License.\n\f\n  8. If the distribution and/or use of the Program is restricted in\ncertain countries either by patents or by copyrighted interfaces, the\noriginal copyright holder who places the Program under this License\nmay add an explicit geographical distribution limitation excluding\nthose countries, so that distribution is permitted only in or among\ncountries not thus excluded.  In such case, this License incorporates\nthe limitation as if written in the body of this License.\n\n  9. The Free Software Foundation may publish revised and/or new versions\nof the General Public License from time to time.  Such new versions will\nbe similar in spirit to the present version, but may differ in detail to\naddress new problems or concerns.\n\nEach version is given a distinguishing version number.  If the Program\nspecifies a version number of this License which applies to it and \"any\nlater version\", you have the option of following the terms and conditions\neither of that version or of any later version published by the Free\nSoftware Foundation.  If the Program does not specify a version number of\nthis License, you may choose any version ever published by the Free Software\nFoundation.\n\n  10. If you wish to incorporate parts of the Program into other free\nprograms whose distribution conditions are different, write to the author\nto ask for permission.  For software which is copyrighted by the Free\nSoftware Foundation, write to the Free Software Foundation; we sometimes\nmake exceptions for this.  Our decision will be guided by the two goals\nof preserving the free status of all derivatives of our free software and\nof promoting the sharing and reuse of software generally.\n\n\t\t\t    NO WARRANTY\n\n  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\nFOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN\nOTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES\nPROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED\nOR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF\nMERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS\nTO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE\nPROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,\nREPAIR OR CORRECTION.\n\n  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING\nWILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR\nREDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,\nINCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING\nOUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED\nTO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\nYOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER\nPROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\nPOSSIBILITY OF SUCH DAMAGES.\n\n\t\t     END OF TERMS AND CONDITIONS\n\f\n\t    How to Apply These Terms to Your New Programs\n\n  If you develop a new program, and you want it to be of the greatest\npossible use to the public, the best way to achieve this is to make it\nfree software which everyone can redistribute and change under these terms.\n\n  To do so, attach the following notices to the program.  It is safest\nto attach them to the start of each source file to most effectively\nconvey the exclusion of warranty; and each file should have at least\nthe \"copyright\" line and a pointer to where the full notice is found.\n\n    <one line to give the program's name and a brief idea of what it does.>\n    Copyright (C) <year>  <name of author>\n\n    This program is free software; you can redistribute it and/or modify\n    it under the terms of the GNU General Public License as published by\n    the Free Software Foundation; either version 2 of the License, or\n    (at your option) any later version.\n\n    This program is distributed in the hope that it will be useful,\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n    GNU General Public License for more details.\n\n    You should have received a copy of the GNU General Public License\n    along with this program; if not, write to the Free Software\n    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n\n\nAlso add information on how to contact you by electronic and paper mail.\n\nIf the program is interactive, make it output a short notice like this\nwhen it starts in an interactive mode:\n\n    Gnomovision version 69, Copyright (C) year  name of author\n    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\n    This is free software, and you are welcome to redistribute it\n    under certain conditions; type `show c' for details.\n\nThe hypothetical commands `show w' and `show c' should show the appropriate\nparts of the General Public License.  Of course, the commands you use may\nbe called something other than `show w' and `show c'; they could even be\nmouse-clicks or menu items--whatever suits your program.\n\nYou should also get your employer (if you work as a programmer) or your\nschool, if any, to sign a \"copyright disclaimer\" for the program, if\nnecessary.  Here is a sample; alter the names:\n\n  Yoyodyne, Inc., hereby disclaims all copyright interest in the program\n  `Gnomovision' (which makes passes at compilers) written by James Hacker.\n\n  <signature of Ty Coon>, 1 April 1989\n  Ty Coon, President of Vice\n\nThis General Public License does not permit incorporating your program into\nproprietary programs.  If your program is a subroutine library, you may\nconsider it more useful to permit linking proprietary applications with the\nlibrary.  If this is what you want to do, use the GNU Library General\nPublic License instead of this License.\n"
+      },
+      {
+        "path": "master/README",
+        "url": "https://raw.githubusercontent.com/liberationfonts/liberation-fonts/cf3040c146097d6b7361e2823d5c6b5c309a456a/master/README",
+        "commit": "cf3040c146097d6b7361e2823d5c6b5c309a456a",
+        "sha256": "f8469f1ab6ef6d451b61f2fc14b8855d9f6eaeeae39d6ecace2032998ed17d45",
+        "gitBlobSha1": "13d1bd478c2425d58e754aa795fc2b30ca485167",
+        "text": " 1. What's this?\n=================\n\n  The Liberation Fonts is font collection which aims display compatibility to \n  document files that used Times New Roman, Arial, Courier New as fonts.\n\n\n 2. Requirements\n=================\n\n  * fontforge to be installed.\n    (http://fontforge.sourceforge.net)\n\n\n 3. Install\n============\n\n  3.1 Decompress tarball\n\n    You can extract the files by following command:\n\n      $ tar zxvf liberation-fonts-[VERSION].tar.gz\n\n  3.2 Build from the source\n\n    Change into directory liberation-fonts-[VERSION]/ and build from sources by \n    following commands:\n\n      $ cd liberation-fonts-[VERSION]\n      $ make\n\n    The built font files will be available in 'build' directory.\n\n  3.3 Install to system\n\n    You can manually install the fonts by copying the TTFs to ~/.fonts for user\n    wide usage, or to /usr/share/fonts/truetype/liberation for system-wide\n    availability.\n\n\n 4. Usage\n==========\n\n  The fonts should be installed and detected by the system after installation. \n  Simply select preferred liberation font in applications and start using.\n\n\n 5. License\n============\n\n  For redistribution information, please read the GPL license file 'COPYING'.\n\n  For EULA information, please read file 'License.txt'.\n\n\n 6. Maintainers\n================\n\n  (FIXME)\n    Before packaging a new release based on a new source tarball, you have to\n    update the version number in the Makefile:\n\n    VER = [VERSION]\n\n    Make sure that the defined version corresponds to the font software metadata\nwhich you can check with ftinfo/otfinfo or fontforge itself. It is highly recommended that file 'ChangeLog' is updated to reflect\nchanges.\n\nCreate a tarball with the following command:\n$ make dist\n\nThe new versionned tarball will be available in the dist/ folder as\n'liberation-fonts-[NEW_VERSION].tar.gz'.\n  (FIXME)\n\n 7. Credits\n============\n\nSpecial thanks to all involved to the proejct of Liberation Fonts!\n\n * Caius 'kaio' Chance <k AT kaio.me>\n   - Current project maintainer.\n\n * Mark Webbink <mwebbink AT redhat.com>\n   - Release coordinator, Red Hat Inc.\n\n * Steve Matteson\n   - Designer, Ascender Corp.\n\n * And, all other anonymous participants.\n"
+      }
+    ]
+  }
+}

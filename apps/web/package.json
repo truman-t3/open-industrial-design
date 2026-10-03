@@ -1,0 +1,30 @@
+{
+  "name": "@open-industrial-design/web",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && node ../../scripts/build-license-notices.mjs",
+    "dev": "vite",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@open-industrial-design/actions": "workspace:*",
+    "@open-industrial-design/ai-core": "workspace:*",
+    "@open-industrial-design/ai-openai-compatible": "workspace:*",
+    "@open-industrial-design/canvas": "workspace:*",
+    "@open-industrial-design/core": "workspace:*",
+    "@open-industrial-design/design-model": "workspace:*",
+    "@open-industrial-design/project-file": "workspace:*",
+    "@open-industrial-design/storage": "workspace:*",
+    "@open-industrial-design/three-viewer": "workspace:*",
+    "@open-industrial-design/ui": "workspace:*",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.1.1",
+    "vite": "8.3.0"
+  }
+}

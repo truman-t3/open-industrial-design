@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+
+overrides:
+  '@xyflow/react>zustand': 5.0.15
+  # Keep Excalidraw's Mermaid adapter on the parser generation it declares.
+  '@excalidraw/mermaid-to-excalidraw>mermaid': 11.12.1
+  'mermaid>@mermaid-js/parser': 0.6.3
+  # d3@7 requires d3-shape@3; avoid d3-sankey's older compatible range winning hoisting.
+  'd3-sankey>d3-shape': 3.2.0

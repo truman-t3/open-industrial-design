@@ -1,0 +1,47 @@
+{
+  "font": "Liberation Sans",
+  "version": "2.1.5",
+  "license": "OFL-1.1",
+  "source": "https://deb.debian.org/debian/pool/main/f/fonts-liberation/fonts-liberation_2.1.5-3_all.deb",
+  "packageSha256": "3d5c47480067b9615f6bf9b0eda6eefcab9d837af609827015445e8e759b5b8c",
+  "files": {
+    "DEBIAN-COPYRIGHT.txt": {
+      "sha256": "f32df582a2aab128c07b2f7e36e7b928dc5f6bd82657b905c04f91459f9e5cf9",
+      "size": 5756
+    },
+    "LiberationSans-Regular.ttf": {
+      "sha256": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+      "size": 410820
+    },
+    "LiberationSans-Regular.woff2": {
+      "sha256": "e94ff0707a83eb23de656105c5dd0f1cb1fb65e025b7cc08ca7a8854cd0f6041",
+      "size": 169484
+    }
+  },
+  "conversion": {
+    "fonttools": "4.60.1",
+    "brotli": "1.1.0",
+    "transformedTables": [],
+    "recalcTimestamp": false,
+    "subsetting": false,
+    "renaming": false,
+    "tableBytesEqualExceptHeadChecksumAndCompressionFlag": true
+  },
+  "metadata": {
+    "0": "Digitized data copyright (c) 2010 Google Corporation. \nCopyright (c) 2012 Red Hat, Inc.",
+    "1": "Liberation Sans",
+    "2": "Regular",
+    "5": "Version 2.1.5",
+    "13": "Licensed under the SIL Open Font License, Version 1.1",
+    "14": "http://scripts.sil.org/OFL"
+  },
+  "glyphCount": 2620,
+  "oldCodepointCount": 662,
+  "newCodepointCount": 2327,
+  "missingOldCodepoints": [
+    8209,
+    61441,
+    61442,
+    61445
+  ]
+}
