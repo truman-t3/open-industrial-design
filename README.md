@@ -48,7 +48,7 @@ STEP, IGES, BREP, NURBS editing, CAD export, Blender/Rhino/KeyShot integration, 
 Verified development environment: Node.js 24.14.0 and pnpm 11.19.0. The application version is `0.1.0-alpha.1`; the checkout directory's older version suffix is not the release version.
 
 ```bash
-pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile --ignore-scripts
 pnpm dev
 ```
 
@@ -61,6 +61,8 @@ pnpm run release:check
 On Windows PowerShell, use `pnpm.cmd` if script execution blocks `pnpm`. This gate verifies version consistency, the committed minimal GLB fixture, formatting, linting, notice-script regressions, TypeScript, unit tests, and the production build. Web builds include an explicitly incomplete `dist/licenses` draft. The separate `pnpm run notices:check` distribution-text gate currently fails on unresolved notices and source availability; quality success is not release approval. See the Chinese [usage and backup guide](./docs/community-alpha-quickstart.md), [notice preparation](./licenses/README.md) and [release gate](./docs/alpha-0.1-release.md).
 
 ## Known Alpha limitations
+
+GitHub runs the same quality gate on `main` pushes, pull requests, and manual requests. The workflow uses read-only repository permissions, fixed Action commits, and no provider keys or deployment steps. It does not run the deliberately pending distribution-approval gate or publish a release. A green workflow is a technical check, not approval to distribute assets.
 
 - AI calls require a user-provided compatible endpoint and API key; no real provider credential is included in this repository.
 - The current project's browser export/import/refresh loop has been verified locally. A complete target-browser release smoke test, including Sketch and 3D interaction, remains a separate release requirement.

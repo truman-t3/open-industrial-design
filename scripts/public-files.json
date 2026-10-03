@@ -1,4 +1,5 @@
 [
+  ".github/workflows/quality.yml",
   ".gitignore",
   ".prettierignore",
   ".prettierrc.json",
