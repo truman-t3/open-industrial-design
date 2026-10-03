@@ -4,6 +4,19 @@
 
 ## 本轮公开范围与后续成品门槛
 
+当前 main 分支已实现可选的匿名源码验证，替代只能保持待定的分发检查。该改进不回写已发布的 `v0.1.0-alpha.1` 标签。普通开发构建不联网，仍默认待验证。
+
+发布者先从完整公开提交构建并通过 `release:check`，再运行下列命令（将占位符替换为该提交的 40 位 SHA）：
+
+```bash
+node scripts/build-license-notices.mjs --check --source-commit=FULL_40_CHARACTER_COMMIT_SHA
+node scripts/build-license-notices.mjs --source-commit=FULL_40_CHARACTER_COMMIT_SHA
+```
+
+仅访问固定官方仓库的匿名下载地址，不读取 GitHub 凭据；逐文件匹配公开清单，拒绝旧提交不匹配、额外／缺失文件、路径穿越、超限归档和下载失败。第二条命令生成 `SOURCE_AVAILABILITY.txt`、`THIRD_PARTY_NOTICES.txt` 并移除同目录的旧草稿声明；普通构建则恢复草稿并移除旧的已验证声明。它只验证源码获取和分发资料，不证明旧的编译产物来自当前源码，也不代替法律判断、桌面打包或安装验收。发布者必须使用同一提交的新构建。
+
+Windows 便携版是下一阶段目标，当前没有安装包。先验证桌面壳与现有 Canvas／Sketch／3D 兼容、数据目录可选择、升级不覆盖项目、密钥不随项目分发，再进入安装／便携包发行；不扩展云协作或 AI 3D。
+
 README 已增加中英导航、版本／CI／许可／Alpha 徽章、复用现有素材的示例流程和完整克隆启动命令。SECURITY.md 按所有者批准更新私密报告入口，不改变报告范围或响应承诺。
 
 源码预发布须核对匿名下载的精确提交与本地文件一致、CI 成功后才创建 Release。构建脚本的 `pendingSourceAvailability` 仍为默认待定，因此 `notices:check` 不宣称通过，`dist/licenses` 仍是草稿；本轮不上传这些编译产物。后续成品分发需实现和核验与精确源码绑定的声明。以下较早日期的私有仓库、未发布及测试记录保留为历史，不覆盖本节范围。

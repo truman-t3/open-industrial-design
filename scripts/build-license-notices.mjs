@@ -2,13 +2,14 @@
 // Offline distribution preparation, not a legal-compliance certification.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { reviewReleaseAssets } from './release-assets.mjs';
 import { readRuntimeNoticeEvidence } from './runtime-notice-evidence.mjs';
 import { readLiberationReplacement, replacedFont } from './liberation-font.mjs';
 import { verifyScrollBarEvidence, dracoNoticeHeading } from './package-provenance.mjs';
+import { verifyPublishedSource } from './source-bundle.mjs';
 
 export const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const portable = (path) => path.replaceAll('\\', '/');
@@ -233,7 +234,7 @@ function installedPackages(repo, directories) {
   return [...records.values()].sort((a, b) => a.id.localeCompare(b.id, 'en'));
 }
 
-export function buildNotices(repo, { check = false } = {}) {
+export function buildNotices(repo, { check = false, source = null } = {}) {
   const licenses = join(repo, 'licenses');
   const registry = readJson(join(licenses, 'supplemental-notices.json'));
   const readSupplement = (file) => readFileSync(containedFile(licenses, file));
@@ -275,7 +276,8 @@ export function buildNotices(repo, { check = false } = {}) {
     applicationVersion: readJson(join(repo, 'package.json')).version,
     lockfileSha256: sha256(readFileSync(join(repo, 'pnpm-lock.yaml'))),
     status: 'DRAFT_NOT_APPROVED_FOR_DISTRIBUTION',
-    pendingSourceAvailability: true,
+    pendingSourceAvailability: !source,
+    correspondingSource: source,
     packageProvenance,
     unresolvedPackages: packages
       .filter(
@@ -321,16 +323,24 @@ export function buildNotices(repo, { check = false } = {}) {
     packages: packages.map(({ notices, ...p }) => ({ ...p, notices: notices.map(withoutText) })),
     fonts: fonts.map(withoutText),
   };
+  if (source) {
+    assertComplete(report);
+    report.status = 'DISTRIBUTION_MATERIALS_VERIFIED_NOT_LEGAL_CERTIFICATION';
+  }
   if (check) {
     assertComplete(report);
     return report;
   }
   const draft = [
-    'DRAFT — NOT APPROVED FOR DISTRIBUTION',
+    source
+      ? 'DISTRIBUTION MATERIALS VERIFIED — NOT LEGAL CERTIFICATION'
+      : 'DRAFT — NOT APPROVED FOR DISTRIBUTION',
     'Open Industrial Design Community source license: MPL-2.0.',
     'Third-party licenses below apply only to their respective components.',
     `Unresolved package notices: ${report.unresolvedPackages.join(', ')}`,
-    'Corresponding-source availability and asset provenance remain pending.',
+    source
+      ? `Corresponding source: ${source.url}`
+      : 'Corresponding-source availability remains pending.',
     `Public image authorizations pending: ${report.assetReview.pendingImageAuthorizations.length}; remote runtime asset reviews pending: ${report.assetReview.pendingRuntimeAssets.length}.`,
     '',
   ];
@@ -408,19 +418,34 @@ export function buildNotices(repo, { check = false } = {}) {
     join(destination, 'PREPUBLICATION_REVIEW.md'),
     readFileSync(join(repo, 'docs/prepublication-review.md')),
   );
-  writeFileSync(join(destination, 'THIRD_PARTY_NOTICES-DRAFT.txt'), draft.join('\n'));
   writeFileSync(join(destination, 'notice-inventory.json'), JSON.stringify(report, null, 2) + '\n');
-  writeFileSync(
-    join(destination, 'SOURCE_AVAILABILITY-PENDING.txt'),
-    'Pre-release local build. Corresponding source retrieval has not been configured. Before distribution, provide recipients with the exact covered source and how to obtain it under MPL-2.0. This file is not a fulfilled source offer.\n',
-  );
+  if (source) {
+    writeFileSync(join(destination, 'THIRD_PARTY_NOTICES.txt'), draft.join('\n'));
+    writeFileSync(
+      join(destination, 'SOURCE_AVAILABILITY.txt'),
+      `Corresponding source (MPL-2.0): ${source.url}\nDownload: ${source.archiveUrl}\nArchive SHA256: ${source.archiveSha256}\nVerified anonymously against ${source.files} local public source files. Third-party components retain their own licenses.\n`,
+    );
+    rmSync(join(destination, 'THIRD_PARTY_NOTICES-DRAFT.txt'), { force: true });
+    rmSync(join(destination, 'SOURCE_AVAILABILITY-PENDING.txt'), { force: true });
+  } else {
+    writeFileSync(join(destination, 'THIRD_PARTY_NOTICES-DRAFT.txt'), draft.join('\n'));
+    writeFileSync(
+      join(destination, 'SOURCE_AVAILABILITY-PENDING.txt'),
+      'Local build without public-source verification. Before distribution, run the opt-in --source-commit check against the exact published source. This file is not a fulfilled source offer.\n',
+    );
+    rmSync(join(destination, 'THIRD_PARTY_NOTICES.txt'), { force: true });
+    rmSync(join(destination, 'SOURCE_AVAILABILITY.txt'), { force: true });
+  }
   console.log(
-    `Notice draft included: ${packages.length} package versions, ${fonts.length} fonts; ${report.unresolvedPackages.length} package notices unresolved. Image authorizations ${report.assetReview.pendingImageAuthorizations.length}, runtime asset reviews ${report.assetReview.pendingRuntimeAssets.length} pending. Source availability pending. Not release approval.`,
+    `Notices included: ${packages.length} package versions, ${fonts.length} fonts; ${report.unresolvedPackages.length} package notices unresolved. Image authorizations ${report.assetReview.pendingImageAuthorizations.length}, runtime asset reviews ${report.assetReview.pendingRuntimeAssets.length} pending. Source availability ${source ? 'verified' : 'pending'}. Not release approval.`,
   );
   return report;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-  buildNotices(resolve(dirname(fileURLToPath(import.meta.url)), '..'), {
-    check: process.argv.includes('--check'),
-  });
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  const commit = process.argv.find((arg) => arg.startsWith('--source-commit='))?.slice(16);
+  const source = commit === undefined ? null : await verifyPublishedSource(root, commit);
+  const report = buildNotices(root, { check: process.argv.includes('--check'), source });
+  if (source) console.log(JSON.stringify({ status: report.status, correspondingSource: source }));
+}

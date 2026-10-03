@@ -5,10 +5,74 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { createRequire } from 'node:module';
-import { assertSourcePath, createSourceBundle, verifySourceBundle } from './source-bundle.mjs';
+import {
+  assertSourcePath,
+  createSourceBundle,
+  verifySourceBundle,
+  verifyPublishedArchive,
+  verifyPublishedSource,
+} from './source-bundle.mjs';
 const { unzipSync, zipSync } = createRequire(
   new URL('../packages/project-file/package.json', import.meta.url),
 )('fflate');
+
+test('published source must match every local file at an immutable commit', () => {
+  const commit = 'a'.repeat(40);
+  const prefix = `open-industrial-design-${commit}/`;
+  const data = Buffer.from('source');
+  const zip = zipSync({ [prefix + 'LICENSE']: data });
+  const result = verifyPublishedArchive(zip, commit, ['LICENSE'], () => data);
+  assert.equal(result.status, 'ANONYMOUS_SOURCE_BYTES_VERIFIED');
+  assert.equal(result.files, 1);
+  assert.throws(() => verifyPublishedArchive(zip, 'main', ['LICENSE'], () => data), /immutable/);
+  assert.throws(
+    () => verifyPublishedArchive(zip, commit, ['LICENSE'], () => Buffer.from('changed')),
+    /differs/,
+  );
+  assert.throws(
+    () => verifyPublishedArchive(zip, commit, ['LICENSE', 'README.md'], () => data),
+    /Missing/,
+  );
+  assert.throws(() => verifyPublishedArchive(zip, commit, ['README.md'], () => data), /Unexpected/);
+});
+
+test('published archive rejects traversal, wrong roots and excessive input', () => {
+  const commit = 'b'.repeat(40),
+    prefix = `open-industrial-design-${commit}/`;
+  for (const name of ['wrong/LICENSE', prefix + '../LICENSE', prefix + '.env']) {
+    assert.throws(() =>
+      verifyPublishedArchive(zipSync({ [name]: Buffer.from('x') }), commit, ['LICENSE'], () =>
+        Buffer.from('x'),
+      ),
+    );
+  }
+  assert.throws(
+    () =>
+      verifyPublishedArchive(new Uint8Array(64 * 1024 * 1024 + 1), commit, ['LICENSE'], () =>
+        Buffer.from('x'),
+      ),
+    /too large/,
+  );
+});
+
+test('anonymous source lookup rejects HTTP failure and mutable refs without auth', async () => {
+  let calls = 0;
+  const request = async (url, options) => {
+    calls++;
+    assert.match(
+      url,
+      /^https:\/\/codeload.github.com\/truman-t3\/open-industrial-design\/zip\/[a-f0-9]{40}$/,
+    );
+    assert.equal(options.credentials, 'omit');
+    assert.equal(options.redirect, 'error');
+    assert.equal(options.headers, undefined);
+    return new Response('not found', { status: 404 });
+  };
+  await assert.rejects(verifyPublishedSource('.', 'main', request), /immutable/);
+  assert.equal(calls, 0);
+  await assert.rejects(verifyPublishedSource('.', 'c'.repeat(40), request), /download failed/);
+  assert.equal(calls, 1);
+});
 
 test('source path policy rejects data, credentials and traversal', () => {
   for (const path of [

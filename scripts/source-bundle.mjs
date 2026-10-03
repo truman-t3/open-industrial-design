@@ -109,6 +109,69 @@ export function verifySourceBundle(bytes, paths) {
   return manifest;
 }
 
+/** Public source checks are opt-in; ordinary development builds remain offline. */
+export function verifyPublishedArchive(bytes, commit, paths, readLocal) {
+  if (!/^[a-f0-9]{40}$/.test(commit)) throw new Error('A full immutable commit is required');
+  if (!Array.isArray(paths) || !paths.length || new Set(paths).size !== paths.length)
+    throw new Error('Invalid public source allowlist');
+  paths.forEach(assertSourcePath);
+  if (bytes.length > 64 * 1024 * 1024) throw new Error('Source archive too large');
+  const prefix = `open-industrial-design-${commit}/`;
+  const seen = new Set();
+  let total = 0;
+  const files = unzipSync(bytes, {
+    filter(entry) {
+      if (seen.has(entry.name)) throw new Error('Duplicate source entry');
+      seen.add(entry.name);
+      total += entry.originalSize;
+      if (seen.size > 10000 || total > 256 * 1024 * 1024)
+        throw new Error('Expanded source archive too large');
+      if (!entry.name.startsWith(prefix)) throw new Error('Unexpected source archive root');
+      if (entry.name.endsWith('/')) return false;
+      const local = entry.name.slice(prefix.length);
+      assertSourcePath(local);
+      if (!paths.includes(local)) throw new Error('Unexpected public source file');
+      return true;
+    },
+  });
+  if (Object.keys(files).length !== paths.length) throw new Error('Missing public source files');
+  for (const path of paths) {
+    if (sha256(files[prefix + path]) !== sha256(readLocal(path)))
+      throw new Error(`Published source differs: ${path}`);
+  }
+  return {
+    commit,
+    url: `https://github.com/truman-t3/open-industrial-design/tree/${commit}`,
+    archiveUrl: `https://codeload.github.com/truman-t3/open-industrial-design/zip/${commit}`,
+    archiveSha256: sha256(bytes),
+    files: paths.length,
+    status: 'ANONYMOUS_SOURCE_BYTES_VERIFIED',
+  };
+}
+
+export async function verifyPublishedSource(root, commit, fetchPublic = fetch) {
+  if (!/^[a-f0-9]{40}$/.test(commit)) throw new Error('A full immutable commit is required');
+  const url = `https://codeload.github.com/truman-t3/open-industrial-design/zip/${commit}`;
+  // No credentials, configurable host or authentication headers are accepted.
+  const response = await fetchPublic(url, {
+    signal: AbortSignal.timeout(60000),
+    redirect: 'error',
+    credentials: 'omit',
+  });
+  if (!response.ok || !response.body) throw new Error('Anonymous source download failed');
+  const chunks = [];
+  let length = 0;
+  for await (const chunk of response.body) {
+    length += chunk.length;
+    if (length > 64 * 1024 * 1024) throw new Error('Source archive too large');
+    chunks.push(chunk);
+  }
+  const paths = JSON.parse(readFileSync(regularFile(root, 'scripts/public-files.json'), 'utf8'));
+  return verifyPublishedArchive(Buffer.concat(chunks), commit, paths, (path) =>
+    readFileSync(regularFile(root, path)),
+  );
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const paths = JSON.parse(readFileSync(join(repo, 'scripts/source-files.json'), 'utf8'));
   const result = createSourceBundle(repo, paths);

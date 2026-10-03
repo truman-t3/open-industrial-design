@@ -74,7 +74,7 @@ pnpm dev
 
 ### 核验与当前边界
 
-本地全量质量检查通过 254 项测试以及格式、lint、类型检查和生产构建。独立 Chromium 已验证示例、节点拖动、草图保存、GLB 导入与截图、工程导出／导入／刷新恢复；软件 WebGL 验证不等于所有真实 GPU、实体键鼠或中文输入法均已验收。GitHub CI 自动运行技术质量与文件预检，不自动发布。
+当前 main 分支本地全量质量检查通过 257 项测试以及格式、lint、类型检查和生产构建（已发布 Alpha 标签为 254 项）。独立 Chromium 已验证示例、节点拖动、草图保存、GLB 导入与截图、工程导出／导入／刷新恢复；软件 WebGL 验证不等于所有真实 GPU、实体键鼠或中文输入法均已验收。GitHub CI 自动运行技术质量与文件预检，不自动发布。
 
 ```bash
 pnpm run release:check
@@ -82,7 +82,7 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-最后一项是独立的成品分发资料检查：图片许可与当前运行时捆绑记录已收口，但构建脚本仍保留待绑定的对应源码声明，默认输出 `dist/licenses` 草稿并阻止成品分发。本轮仅发布可自行构建的源码预发布版，不附加编译成品。**源码发布不等于网页成品或安装包已通过分发验收。**
+最后一项是独立的成品分发资料检查。普通离线构建默认输出 `dist/licenses` 草稿；发布者可指定已公开的完整提交 SHA，匿名下载并逐文件核验对应源码后生成分发声明，步骤见 [发布状态](./docs/release-status.md)。当前 Release 仅提供源码，不附加编译成品。**源码发布不等于网页成品或安装包已通过分发验收。**
 
 当前不支持 CAD 编辑／导出、STEP／IGES、专用超分辨率／抠图、AI 3D 生成、云同步、账号及多人协作。模型效果与大包体积优化另行推进。
 
@@ -148,7 +148,7 @@ Open the local URL printed by Vite. Before a release candidate, run:
 pnpm run release:check
 ```
 
-On Windows PowerShell, use `pnpm.cmd` if script execution blocks `pnpm`. This gate verifies version consistency, the committed minimal GLB fixture, formatting, linting, notice-script regressions, TypeScript, unit tests, and the production build. This prerelease is source-only, with no compiled downloads or hosted deployment. Web builds still produce a `dist/licenses` draft: `pnpm run notices:check` blocks compiled distribution until its corresponding-source declaration is bound and verified. See the Chinese [usage and backup guide](./docs/community-alpha-quickstart.md), [notice preparation](./licenses/README.md) and [release gate](./docs/alpha-0.1-release.md).
+On Windows PowerShell, use `pnpm.cmd` if script execution blocks `pnpm`. This gate verifies version consistency, the committed minimal GLB fixture, formatting, linting, notice-script regressions, TypeScript, unit tests, and the production build. This prerelease is source-only, with no compiled downloads or hosted deployment. Ordinary offline builds produce a `dist/licenses` draft. Publishers must opt into the exact-commit anonymous source verification described in [release status](./docs/release-status.md) before producing distribution notices. See also the Chinese [usage and backup guide](./docs/community-alpha-quickstart.md) and [release gate](./docs/alpha-0.1-release.md).
 
 ## Known Alpha limitations
 
