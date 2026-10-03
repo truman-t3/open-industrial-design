@@ -2,6 +2,8 @@
 
 ## Current notice decision — 2026-10-03
 
+Current superseding result: the installed production inventory has 263 package versions and zero missing package notices after removing Drei and its exclusive dependencies. Eight demo images now use CC BY 4.0; thirteen brand images are reviewed only for the official project bundle under the unchanged brand policy. Both local runtime groups have an evidence-bound bundle review. See [prepublication review](../docs/prepublication-review.md). Old pending counts below are historical, not current blockers. Public corresponding-source retrieval is still pending, so the strict distribution gate remains closed.
+
 Web assets are now emitted from the reviewed runtime-only image list: 21 images, with both reference-only boards excluded. The 23-image workspace registry still preserves their original fingerprints. Originals and internal source snapshots are retained, not approved for public redistribution. Historical 23-image pending counts below refer to the earlier whole-directory copy.
 
 There are now **39 supplemented package versions and 3 unresolved package notices**: MediaPipe tasks-vision 0.10.17, maath 0.10.8 and stats-gl 2.4.2. This supersedes the earlier 38/4 inventory below.

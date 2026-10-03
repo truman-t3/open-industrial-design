@@ -5,7 +5,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { collectPublicImages, reviewPublicImages } from './release-assets.mjs';
+import {
+  collectPublicImages,
+  reviewPublicImages,
+  verifyDistributionReview,
+} from './release-assets.mjs';
 import { sha256 } from './build-license-notices.mjs';
 const image = { file: 'demo/lamp.png', size: 3, sha256: sha256('png') };
 const registry = () => ({
@@ -13,10 +17,66 @@ const registry = () => ({
   images: [{ ...image, role: 'demo', origin: 'documented-AI', releaseAuthorization: 'pending' }],
 });
 
+test('distribution decisions require complete unchanged evidence, not a status flip', () => {
+  const root = new URL('../', import.meta.url);
+  const r = JSON.parse(readFileSync(new URL('licenses/release-assets.json', root)));
+  const read = (file) => readFileSync(new URL(file, root));
+  assert.ok(verifyDistributionReview(r, read));
+  assert.throws(() => verifyDistributionReview(r, () => Buffer.from('modified')), /changed/);
+  for (const mutate of [
+    (x) => {
+      delete x.distributionReview;
+    },
+    (x) => {
+      x.distributionReview.files.pop();
+    },
+    (x) => {
+      x.distributionReview.files[0].file = '../secret';
+    },
+    (x) => {
+      x.distributionReview.files[0] = x.distributionReview.files[1];
+    },
+  ]) {
+    const altered = structuredClone(r);
+    mutate(altered);
+    assert.throws(() => verifyDistributionReview(altered, read), /evidence/);
+  }
+});
+
 test('unchanged image fingerprint tracks provenance without granting MPL or authorization', () => {
   const reviewed = reviewPublicImages([image], registry());
   assert.equal(reviewed[0].releaseAuthorization, 'pending');
   assert.equal(reviewed[0].license, undefined);
+});
+
+test('owner demo permission is limited to matching demo files and does not authorize brands', () => {
+  const r = registry();
+  r.demoAuthorization = {
+    license: 'CC-BY-4.0',
+    confirmedAt: '2026-10-03',
+    document: 'DEMO_ASSETS_LICENSE.md',
+    files: [{ file: image.file, sha256: image.sha256 }],
+  };
+  r.images[0].releaseAuthorization = 'owner-cc-by-4.0';
+  assert.equal(reviewPublicImages([image], r)[0].releaseAuthorization, 'owner-cc-by-4.0');
+  for (const change of [
+    (x) => {
+      x.images[0].role = 'brand';
+    },
+    (x) => {
+      x.demoAuthorization.files[0].sha256 = 'f'.repeat(64);
+    },
+    (x) => {
+      x.demoAuthorization.license = 'MIT';
+    },
+    (x) => {
+      delete x.demoAuthorization;
+    },
+  ]) {
+    const altered = structuredClone(r);
+    change(altered);
+    assert.throws(() => reviewPublicImages([image], altered), /requires review/);
+  }
 });
 test('new, missing or modified public images require renewed review', () => {
   for (const observed of [

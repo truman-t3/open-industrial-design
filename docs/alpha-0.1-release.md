@@ -2,6 +2,20 @@
 
 Version: `0.1.0-alpha.1`
 
+## Prepared prerelease summary (not published)
+
+Title and tag: **Open Industrial Design v0.1.0-alpha.1** / **`v0.1.0-alpha.1`**.
+
+- Local-first design exploration with Canvas, Sketch, Graph, BYOK generation and GLB/GLTF review.
+- Portable `.oidproj` backups; credentials excluded from project archives.
+- Stable demo names and collision-free placement for new sketches and imported models.
+- Chinese README introduction, Issue/PR templates and contributor/security guidance.
+- Eight demo images under CC BY 4.0; preserve attribution and modification notices. Brand policy and MPL-2.0 source licensing remain separate.
+
+Known limits: Alpha, not CAD; provider capabilities and generated results vary; native IME, physical input devices and real GPU coverage are incomplete; editor chunks remain large. Back up browser data before clearing site storage or changing origin. No new paid model calls were used for this publication-preparation pass.
+
+Publish only after verifying anonymous source retrieval at the exact release commit and enabling/testing private vulnerability reporting. Do not attach workspace QA data, private projects, credentials or reference-only boards. No Release or tag is created by this document.
+
 Latest verification (2026-10-03): 252 automated tests and the production build passed locally. A fresh GitHub source install and the first read-only Linux CI run passed. The isolated Chromium Sketch/3D/backup flow is verified; see [current status](./release-status.md) for evidence scope and remaining distribution blockers. Earlier test counts below are historical. The planned prerelease tag is `v0.1.0-alpha.1`, with title `Open Industrial Design v0.1.0-alpha.1`; no Release has been published. Keep repository visibility unchanged until the distribution gate is satisfied.
 
 Status as of 2026-10-01: the local Canvas exploration milestone has passed its scoped verification, including the current project's export/import/refresh loop. The latest recorded automated gate passed 186 tests and the production build. This is not public-release approval. The full target-browser Sketch/3D smoke path, native IME and physical input devices, distribution choice, and completed distribution notices remain separate requirements. Model-quality and bundle-size improvements are deferred.

@@ -42,7 +42,7 @@ pnpm dev
 
 ### 核验与当前边界
 
-本地全量质量检查通过 252 项测试以及格式、lint、类型检查和生产构建。独立 Chromium 已验证示例、节点拖动、草图保存、GLB 导入与截图、工程导出／导入／刷新恢复；软件 WebGL 验证不等于所有真实 GPU、实体键鼠或中文输入法均已验收。GitHub CI 自动运行技术质量与文件预检，不自动发布。
+本地全量质量检查通过 254 项测试以及格式、lint、类型检查和生产构建。独立 Chromium 已验证示例、节点拖动、草图保存、GLB 导入与截图、工程导出／导入／刷新恢复；软件 WebGL 验证不等于所有真实 GPU、实体键鼠或中文输入法均已验收。GitHub CI 自动运行技术质量与文件预检，不自动发布。
 
 ```bash
 pnpm run release:check
@@ -50,13 +50,15 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-最后一项是独立的分发资料检查，当前仍会因素材使用范围、运行时资产分发记录和公开源码渠道未收口而阻止发布。**测试通过不等于已经获准正式分发。**
+最后一项是独立的分发资料检查：图片许可与当前运行时捆绑记录已收口，公众源码渠道尚未验证，因此仍会阻止正式发布。**测试通过不等于已经获准正式分发。**
 
 当前不支持 CAD 编辑／导出、STEP／IGES、专用超分辨率／抠图、AI 3D 生成、云同步、账号及多人协作。模型效果与大包体积优化另行推进。
 
 源码采用 **MPL-2.0（不是 MIT）**，贡献采用 **DCO 1.1**；品牌和示例图片不自动沿用代码许可证。详见 [发布状态](./docs/release-status.md)、[使用与备份指南](./docs/community-alpha-quickstart.md)、[源码许可](./SOURCE_LICENSE.md) 和 [品牌规则](./TRADEMARKS.md)。
 
 ## 参与社区
+
+内置 8 张便携灯具示例图现采用 **CC BY 4.0**，允许注明来源后修改、再分发和商用，详见 [示例图片许可及署名格式](./DEMO_ASSETS_LICENSE.md)。品牌素材不适用此许可，仍遵守原品牌规则。
 
 通过 [Issues](https://github.com/truman-t3/open-industrial-design/issues) 反馈 Bug、提交功能建议或询问使用问题；通过 Pull Request 贡献修复和文档。中文或英文均可，请先阅读 [贡献指南](./CONTRIBUTING.md)。仓库仍为私有时，仅有访问权限的协作者能使用这些入口。
 

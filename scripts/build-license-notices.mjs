@@ -398,11 +398,16 @@ export function buildNotices(repo, { check = false } = {}) {
   for (const file of [
     'LICENSE',
     'SOURCE_LICENSE.md',
+    'DEMO_ASSETS_LICENSE.md',
     'DCO.txt',
     'TRADEMARKS.md',
     'THIRD_PARTY_NOTICES.md',
   ])
     writeFileSync(join(destination, file), readFileSync(join(repo, file)));
+  writeFileSync(
+    join(destination, 'PREPUBLICATION_REVIEW.md'),
+    readFileSync(join(repo, 'docs/prepublication-review.md')),
+  );
   writeFileSync(join(destination, 'THIRD_PARTY_NOTICES-DRAFT.txt'), draft.join('\n'));
   writeFileSync(join(destination, 'notice-inventory.json'), JSON.stringify(report, null, 2) + '\n');
   writeFileSync(

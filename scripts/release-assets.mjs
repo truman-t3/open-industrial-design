@@ -33,9 +33,28 @@ export function reviewPublicImages(observed, registry, { allowAbsentReferences =
       !/^(demo|logo|icon|social)\/[\w.-]+\.(png|jpe?g|webp|gif|svg|avif|ico)$/i.test(entry.file) ||
       !/^[a-f0-9]{64}$/.test(entry.sha256) ||
       !['demo', 'brand', 'reference-only'].includes(entry.role) ||
-      entry.releaseAuthorization !== 'pending'
+      !['pending', 'owner-cc-by-4.0', 'official-project-bundle'].includes(
+        entry.releaseAuthorization,
+      )
     )
       throw new Error('Release asset record requires review');
+    if (
+      entry.releaseAuthorization === 'official-project-bundle' &&
+      (entry.role !== 'brand' ||
+        registry.distributionReview?.scope !== 'official-project-bundle-only')
+    )
+      throw new Error('Brand bundle evidence requires review');
+    if (
+      entry.releaseAuthorization === 'owner-cc-by-4.0' &&
+      (entry.role !== 'demo' ||
+        registry.demoAuthorization?.license !== 'CC-BY-4.0' ||
+        registry.demoAuthorization?.confirmedAt !== '2026-10-03' ||
+        registry.demoAuthorization?.document !== 'DEMO_ASSETS_LICENSE.md' ||
+        !registry.demoAuthorization?.files?.some(
+          (file) => file.file === entry.file && file.sha256 === entry.sha256,
+        ))
+    )
+      throw new Error('Demo authorization evidence requires review');
     if (records.has(entry.file)) throw new Error('Duplicate release asset');
     records.set(entry.file, entry);
   }
@@ -54,8 +73,36 @@ export function reviewPublicImages(observed, registry, { allowAbsentReferences =
   });
 }
 
+export function verifyDistributionReview(registry, readEvidence) {
+  const review = registry.distributionReview;
+  if (review) {
+    const allowed = [
+      'docs/prepublication-review.md',
+      'DEMO_ASSETS_LICENSE.md',
+      'TRADEMARKS.md',
+      'licenses/runtime-notice-evidence.json',
+      'vendor/fonts/liberation-2.1.5/provenance.json',
+      'vendor/draco/1.5.5/LICENSE.txt',
+    ];
+    if (
+      review.scope !== 'official-project-bundle-only' ||
+      review.files?.length !== allowed.length ||
+      new Set(review.files.map((file) => file.file)).size !== allowed.length
+    )
+      throw new Error('Distribution review evidence incomplete');
+    for (const file of review.files) {
+      if (!allowed.includes(file.file) || sha256(readEvidence(file.file)) !== file.sha256)
+        throw new Error('Distribution review evidence changed');
+    }
+  }
+  if (!review && registry.images.some((image) => image.releaseAuthorization !== 'pending'))
+    throw new Error('Distribution review evidence missing');
+  return review;
+}
+
 export function reviewReleaseAssets(repo) {
   const registry = JSON.parse(readFileSync(join(repo, 'licenses/release-assets.json'), 'utf8'));
+  const review = verifyDistributionReview(registry, (file) => readFileSync(join(repo, file)));
   const images = reviewPublicImages(collectPublicImages(join(repo, 'brand')), registry, {
     allowAbsentReferences: true,
   });
@@ -75,7 +122,11 @@ export function reviewReleaseAssets(repo) {
     '@open-industrial-design/three-viewer': 'packages/three-viewer',
   };
   for (const runtime of registry.runtimeAssets) {
-    if (!runtime.reviewStatus.startsWith('pending-') || !runtime.evidence.length)
+    if (
+      (!runtime.reviewStatus.startsWith('pending-') &&
+        !(runtime.reviewStatus === 'reviewed-local-bundle' && review)) ||
+      !runtime.evidence.length
+    )
       throw new Error('Runtime asset evidence requires review');
     for (const evidence of runtime.evidence) {
       const root = packageRoots[evidence.packageName];
@@ -90,10 +141,14 @@ export function reviewReleaseAssets(repo) {
     }
   }
   return {
-    status: 'PENDING_PROVENANCE_AND_AUTHORIZATION',
+    status: review
+      ? 'LOCAL_BUNDLE_REVIEWED_NOT_PUBLIC_RELEASE_APPROVAL'
+      : 'PENDING_PROVENANCE_AND_AUTHORIZATION',
     images,
     pendingImageAuthorizations: images
-      .filter((image) => image.role !== 'reference-only')
+      .filter(
+        (image) => image.role !== 'reference-only' && image.releaseAuthorization === 'pending',
+      )
       .map((image) => image.file),
     excludedReferenceImages: registry.images
       .filter((image) => image.role === 'reference-only')
@@ -104,7 +159,9 @@ export function reviewReleaseAssets(repo) {
           registry.images.find((entry) => entry.file === image.file)?.role === 'reference-only',
       )
       .map((image) => image.file),
-    pendingRuntimeAssets: registry.runtimeAssets,
+    pendingRuntimeAssets: registry.runtimeAssets.filter(
+      (runtime) => runtime.reviewStatus !== 'reviewed-local-bundle',
+    ),
     boundary:
       'Fixed public images only; remote bytes, user content and provider settings are not collected. Source documentation and matching hashes do not grant distribution rights.',
   };
