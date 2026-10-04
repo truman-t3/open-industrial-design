@@ -1,7 +1,37 @@
 import { describe, expect, it, vi } from 'vitest';
-import { saveWorkspaceBeforeLeaving } from './workspace-save';
+import {
+  createWorkspaceSaveQueue,
+  preventUnsavedWorkspaceUnload,
+  saveWorkspaceBeforeLeaving,
+} from './workspace-save';
 
 describe('save before leaving the current workspace', () => {
+  it('requests native unload confirmation without starting an async write', () => {
+    const event = { preventDefault: vi.fn(), returnValue: undefined };
+    preventUnsavedWorkspaceUnload(event as unknown as BeforeUnloadEvent);
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+    expect(event.returnValue).toBe('');
+  });
+  it('serializes writes and continues after a failed earlier write', async () => {
+    const enqueue = createWorkspaceSaveQueue();
+    let reject!: (error: Error) => void;
+    const writes: string[] = [];
+    const first = enqueue(() => {
+      writes.push('first');
+      return new Promise((_, fail) => {
+        reject = fail;
+      });
+    });
+    const second = enqueue(async () => {
+      writes.push('second');
+    });
+    await Promise.resolve();
+    expect(writes).toEqual(['first']);
+    reject(new Error('disk failed'));
+    expect((await first).ok).toBe(false);
+    expect(await second).toEqual({ ok: true });
+    expect(writes).toEqual(['first', 'second']);
+  });
   it('does not report success while persistence is still pending', async () => {
     let finish!: () => void;
     const write = new Promise<void>((resolve) => {

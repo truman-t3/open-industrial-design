@@ -6,6 +6,7 @@ import {
   type AIProvider,
   type ImageGenerateRequest,
   type ImageEditRequest,
+  type ImageCutoutRequest,
   type ProviderConnectionResult,
   type ProviderImageInput,
   type ProviderRequestContext,
@@ -121,7 +122,14 @@ export class OpenAICompatibleProvider implements AIProvider {
   readonly descriptor = {
     type: OPENAI_COMPATIBLE_PROVIDER_TYPE,
     name: 'OpenAI-compatible',
-    capabilities: ['text.generate', 'vision.analyze', 'image.generate', 'image.edit'] as const,
+    capabilities: [
+      'text.generate',
+      'vision.analyze',
+      'image.generate',
+      'image.edit',
+      'image.erase',
+      'image.cutout',
+    ] as const,
   };
 
   constructor(
@@ -155,6 +163,35 @@ export class OpenAICompatibleProvider implements AIProvider {
         request as ImageGenerateRequest,
         context,
       )) as AICapabilityResults[C];
+    if (capability === 'image.cutout') {
+      if (context.config.supportsTransparency !== true)
+        throw new AIProviderError(
+          'unsupported',
+          'Confirm transparent output support before removing backgrounds.',
+        );
+      const cutout = request as ImageCutoutRequest;
+      return (await this.editImage(
+        {
+          images: [cutout.image],
+          count: cutout.count,
+          prompt: `Remove only the background. Keep the product exactly aligned at the same position, scale and image dimensions. Return the entire product on a truly transparent background. Do not crop, redraw or add shadows. Additional context: ${cutout.prompt ?? ''}`,
+        },
+        context,
+        true,
+      )) as AICapabilityResults[C];
+    }
+    if (capability === 'image.erase') {
+      const erase = request as ImageEditRequest;
+      if (!erase.mask)
+        throw new AIProviderError('unsupported', 'Object erasing requires a selection mask.');
+      return (await this.editImage(
+        {
+          ...erase,
+          prompt: `Remove the object or detail covered by the transparent mask region. Reconstruct the surrounding surface or background naturally. Do not add a replacement object. Preserve everything outside the mask. Additional context: ${erase.prompt}`,
+        },
+        context,
+      )) as AICapabilityResults[C];
+    }
     if (capability === 'image.edit')
       return (await this.editImage(request as ImageEditRequest, context)) as AICapabilityResults[C];
     throw new AIProviderError(
@@ -185,6 +222,13 @@ export class OpenAICompatibleProvider implements AIProvider {
   }
 
   private async analyzeVision(request: VisionAnalyzeRequest, context: ProviderRequestContext) {
+    if (
+      request.references !== undefined &&
+      (!Array.isArray(request.references) || request.references.length > 7)
+    ) {
+      throw new AIProviderError('unsupported', 'Visual analysis accepts at most eight images.');
+    }
+    const images = [request.image, ...(request.references ?? [])];
     const response = await this.request(
       '/chat/completions',
       {
@@ -196,7 +240,10 @@ export class OpenAICompatibleProvider implements AIProvider {
               role: 'user',
               content: [
                 { type: 'text', text: request.prompt },
-                { type: 'image_url', image_url: { url: imageUrl(request.image) } },
+                ...images.map((image) => ({
+                  type: 'image_url',
+                  image_url: { url: imageUrl(image) },
+                })),
               ],
             },
           ],
@@ -226,7 +273,11 @@ export class OpenAICompatibleProvider implements AIProvider {
     return this.parseImages(await response.json());
   }
 
-  private async editImage(request: ImageEditRequest, context: ProviderRequestContext) {
+  private async editImage(
+    request: ImageEditRequest,
+    context: ProviderRequestContext,
+    transparent = false,
+  ) {
     if (request.mask && context.config.supportsMask !== true)
       throw new AIProviderError(
         'unsupported',
@@ -248,7 +299,13 @@ export class OpenAICompatibleProvider implements AIProvider {
     form.set('model', modelFor(context));
     form.set('prompt', request.prompt);
     form.set('n', String(Math.max(1, Math.min(request.count ?? 1, 4))));
-    form.set('response_format', 'b64_json');
+    // Transparent-output image models return base64 by default; legacy response_format
+    // is not accepted by every such model. Never retry with weaker output semantics.
+    if (!transparent) form.set('response_format', 'b64_json');
+    if (transparent) {
+      form.set('background', 'transparent');
+      form.set('output_format', 'png');
+    }
     if (request.mask) {
       const bytes = new Uint8Array(request.mask.data);
       form.set('mask', new Blob([bytes], { type: 'image/png' }), 'mask.png');
@@ -264,9 +321,11 @@ export class OpenAICompatibleProvider implements AIProvider {
     if (response.status === 400 || response.status === 422)
       throw new AIProviderError(
         'unsupported',
-        request.mask
-          ? 'This Provider rejected masked editing. Check its model and mask support; no unmasked request was sent.'
-          : 'This Provider rejected multi-image editing. Check the model and image-edit capability.',
+        transparent
+          ? 'This Provider rejected transparent PNG editing. No opaque fallback request was sent.'
+          : request.mask
+            ? 'This Provider rejected masked editing. Check its model and mask support; no unmasked request was sent.'
+            : 'This Provider rejected multi-image editing. Check the model and image-edit capability.',
       );
     if (!response.ok) await errorFromResponse(response);
     return this.parseImages(await response.json());

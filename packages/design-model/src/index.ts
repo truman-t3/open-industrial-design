@@ -1,6 +1,13 @@
 /** Pure, portable Open Industrial Design domain contracts. */
 
-export const PROJECT_SCHEMA_VERSION = 7;
+export const PROJECT_SCHEMA_VERSION = 9;
+
+export {
+  createCanvasGroup,
+  moveCanvasNode,
+  reconcileCanvasGroups,
+  validateCanvasGroups,
+} from './groups';
 
 export type JsonPrimitive = boolean | number | string | null;
 export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
@@ -33,6 +40,134 @@ export interface Project extends EntityBase {
   boardIds: string[];
   activeBoardId?: string;
   settings: ProjectSettings;
+  researchLibrary?: ResearchLibrary;
+}
+
+/** User-curated research, independent of Canvas boards and Design lineage. */
+export interface ResearchEntry extends EntityBase {
+  title: string;
+  assetId?: string;
+  notes: string;
+  tags: string[];
+  sourceUrl: string;
+  competitor?: {
+    brand: string;
+    product: string;
+    /** User's observation date, never an inferred product release date. */
+    recordedOn: string;
+  };
+}
+
+export interface ResearchCollection extends EntityBase {
+  name: string;
+  entryIds: string[];
+}
+
+export interface ResearchLibrary {
+  entries: ResearchEntry[];
+  collections: ResearchCollection[];
+}
+
+/** Validate portable records and project-local image references before any write. */
+export function isValidResearchLibrary(
+  value: unknown,
+  assets: readonly Asset[],
+  projectId: string,
+): value is ResearchLibrary {
+  const record = (item: unknown): item is Record<string, unknown> =>
+    Boolean(item) && typeof item === 'object' && !Array.isArray(item);
+  const keys = (item: Record<string, unknown>, allowed: string[]) =>
+    Object.keys(item).every((key) => allowed.includes(key));
+  const text = (item: unknown, max: number) =>
+    typeof item === 'string' && item.length <= max && Boolean(item.trim());
+  const entity = (item: Record<string, unknown>) =>
+    text(item.id, 128) &&
+    typeof item.createdAt === 'number' &&
+    Number.isFinite(item.createdAt) &&
+    item.createdAt >= 0 &&
+    typeof item.updatedAt === 'number' &&
+    Number.isFinite(item.updatedAt) &&
+    item.updatedAt >= item.createdAt;
+  if (
+    !record(value) ||
+    !keys(value, ['entries', 'collections']) ||
+    !Array.isArray(value.entries) ||
+    value.entries.length > 2000 ||
+    !Array.isArray(value.collections) ||
+    value.collections.length > 200
+  )
+    return false;
+  const assetMap = new Map(assets.map((asset) => [asset.id, asset]));
+  const ids = new Set<string>();
+  for (const item of value.entries) {
+    if (
+      !record(item) ||
+      !keys(item, [
+        'id',
+        'createdAt',
+        'updatedAt',
+        'title',
+        'assetId',
+        'notes',
+        'tags',
+        'sourceUrl',
+        'competitor',
+      ]) ||
+      !entity(item) ||
+      !text(item.title, 200) ||
+      !isValidMaterialKnowledge({
+        notes: item.notes,
+        tags: item.tags,
+        sourceUrl: item.sourceUrl,
+      }) ||
+      ids.has(item.id as string)
+    )
+      return false;
+    ids.add(item.id as string);
+    if (item.assetId !== undefined) {
+      if (typeof item.assetId !== 'string') return false;
+      const asset = assetMap.get(item.assetId);
+      if (!asset || asset.projectId !== projectId || asset.type !== 'image') return false;
+    } else if (!(item.notes as string).trim() && !item.sourceUrl) return false;
+    if (item.competitor !== undefined) {
+      const competitor = item.competitor;
+      if (
+        !record(competitor) ||
+        !keys(competitor, ['brand', 'product', 'recordedOn']) ||
+        typeof competitor.brand !== 'string' ||
+        competitor.brand.length > 200 ||
+        typeof competitor.product !== 'string' ||
+        competitor.product.length > 200 ||
+        typeof competitor.recordedOn !== 'string'
+      )
+        return false;
+      const date = competitor.recordedOn;
+      if (
+        date &&
+        (!/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+          !Number.isFinite(Date.parse(date)) ||
+          new Date(date).toISOString().slice(0, 10) !== date)
+      )
+        return false;
+    }
+  }
+  const collectionIds = new Set<string>();
+  for (const item of value.collections) {
+    if (
+      !record(item) ||
+      !keys(item, ['id', 'createdAt', 'updatedAt', 'name', 'entryIds']) ||
+      !entity(item) ||
+      !text(item.name, 100) ||
+      collectionIds.has(item.id as string) ||
+      !Array.isArray(item.entryIds) ||
+      item.entryIds.length > 2000 ||
+      new Set(item.entryIds).size !== item.entryIds.length ||
+      item.entryIds.some((id) => typeof id !== 'string' || !ids.has(id))
+    )
+      return false;
+    collectionIds.add(item.id as string);
+  }
+  return true;
 }
 
 export interface Board extends EntityBase {
@@ -76,6 +211,13 @@ export interface TextNode extends BaseNode {
   type: 'text';
   text: string;
   fontSize?: number;
+}
+
+/** Board organization only. Members retain world coordinates and independent identities. */
+export interface GroupNode extends BaseNode {
+  type: 'group';
+  label: string;
+  childNodeIds: string[];
 }
 
 export interface ImageNode extends BaseNode {
@@ -130,19 +272,97 @@ export interface SketchNode extends BaseNode {
 }
 
 /** Board-level AI workflow parameters; credentials and results never live in this node. */
+export type PatternPlacement = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  opacity: number;
+};
+export const defaultPatternPlacement: PatternPlacement = {
+  x: 0.5,
+  y: 0.5,
+  width: 0.3,
+  height: 0.3,
+  rotation: 0,
+  opacity: 1,
+};
+export function isValidPatternPlacement(value: unknown): value is PatternPlacement {
+  if (!value || typeof value !== 'object') return false;
+  const p = value as PatternPlacement;
+  return (
+    [p.x, p.y, p.width, p.height, p.rotation, p.opacity].every(Number.isFinite) &&
+    p.x >= 0 &&
+    p.x <= 1 &&
+    p.y >= 0 &&
+    p.y <= 1 &&
+    p.width >= 0.01 &&
+    p.width <= 2 &&
+    p.height >= 0.01 &&
+    p.height <= 2 &&
+    Math.abs(p.rotation) <= 180 &&
+    p.opacity >= 0 &&
+    p.opacity <= 1
+  );
+}
+
 export interface GenerationNode extends BaseNode {
   type: 'generation';
   label: string;
   direction: string;
   notes: string;
   count: number;
+  /** Explicit text-only generation; never inferred from missing image inputs. */
+  textOnly?: boolean;
   /** One image per selected view; count is the total number of requests. */
   requestedViews?: GenerationView[];
   localEdit?: boolean;
+  localEditMode?: 'erase';
+  localCmf?: LocalCmf;
+  removeBackground?: boolean;
+  patternPlacement?: PatternPlacement;
+  patternTask?: PatternTask;
   editRegion?: EditRegion;
 }
 
-/** Normalized rectangle bound to an immutable source Asset, never editor runtime state. */
+/** AI artwork creation or product transfer; distinct from deterministic flat placement. */
+export type PatternTask =
+  | { kind: 'create'; repeat: 'single' | 'tile' }
+  | { kind: 'transfer'; placement: string; scale: 'small' | 'medium' | 'large' };
+
+export function isValidPatternTask(value: PatternTask): boolean {
+  if (!value || typeof value !== 'object') return false;
+  if (value.kind === 'create')
+    return (
+      Object.keys(value).every((key) => ['kind', 'repeat'].includes(key)) &&
+      ['single', 'tile'].includes(value.repeat)
+    );
+  return (
+    value.kind === 'transfer' &&
+    Object.keys(value).every((key) => ['kind', 'placement', 'scale'].includes(key)) &&
+    typeof value.placement === 'string' &&
+    value.placement.length <= 500 &&
+    ['small', 'medium', 'large'].includes(value.scale)
+  );
+}
+
+export type LocalCmf = { color: string; material: string; finish: string };
+export function isValidLocalCmf(value: LocalCmf): boolean {
+  return Boolean(
+    value &&
+    Object.keys(value).every((key) => ['color', 'material', 'finish'].includes(key)) &&
+    ['color', 'material', 'finish'].every(
+      (key) =>
+        typeof value[key as keyof LocalCmf] === 'string' &&
+        value[key as keyof LocalCmf].length <= 500,
+    ),
+  );
+}
+
+export type MaskPoint = [number, number];
+export type MaskStroke = { points: MaskPoint[]; radius: number };
+/** Normalized selection bound to an immutable source Asset, never editor runtime state. */
 export interface EditRegion {
   sourceNodeId: string;
   sourceAssetId: string;
@@ -150,11 +370,41 @@ export interface EditRegion {
   y: number;
   width: number;
   height: number;
+  shape?: { kind: 'polygon'; points: MaskPoint[] } | { kind: 'brush'; strokes: MaskStroke[] };
 }
 
 export function isValidEditRegion(region: EditRegion): boolean {
+  const pointsValid = (points: MaskPoint[], min: number, max: number) =>
+    Array.isArray(points) &&
+    points.length >= min &&
+    points.length <= max &&
+    points.every(
+      (point) =>
+        Array.isArray(point) &&
+        point.length === 2 &&
+        point.every((value) => Number.isFinite(value) && value >= 0 && value <= 1),
+    );
+  const shape = region?.shape;
+  const shapeValid =
+    shape === undefined ||
+    (shape?.kind === 'polygon'
+      ? pointsValid(shape.points, 3, 256)
+      : shape?.kind === 'brush' &&
+        Array.isArray(shape.strokes) &&
+        shape.strokes.length >= 1 &&
+        shape.strokes.length <= 128 &&
+        shape.strokes.every(
+          (stroke) =>
+            stroke &&
+            Number.isFinite(stroke.radius) &&
+            stroke.radius >= 0.001 &&
+            stroke.radius <= 0.25 &&
+            pointsValid(stroke.points, 1, 1024),
+        ) &&
+        shape.strokes.reduce((count, stroke) => count + stroke.points.length, 0) <= 4096);
   return Boolean(
     region &&
+    shapeValid &&
     typeof region.sourceNodeId === 'string' &&
     region.sourceNodeId &&
     typeof region.sourceAssetId === 'string' &&
@@ -222,6 +472,38 @@ export type AssetStorage =
   | { type: 'local-file'; path: string }
   | { type: 'remote'; url: string };
 
+export interface MaterialKnowledge {
+  notes: string;
+  tags: string[];
+  sourceUrl: string;
+}
+export function isValidMaterialKnowledge(value: unknown): value is MaterialKnowledge {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const item = value as Record<string, unknown>;
+  if (
+    Object.keys(item).some((key) => !['notes', 'tags', 'sourceUrl'].includes(key)) ||
+    typeof item.notes !== 'string' ||
+    item.notes.length > 4000 ||
+    typeof item.sourceUrl !== 'string' ||
+    item.sourceUrl.length > 2048 ||
+    !Array.isArray(item.tags) ||
+    item.tags.length > 12 ||
+    item.tags.some(
+      (tag) => typeof tag !== 'string' || !tag.trim() || tag !== tag.trim() || tag.length > 40,
+    ) ||
+    new Set(item.tags.map((tag) => (tag as string).toLowerCase())).size !== item.tags.length
+  )
+    return false;
+  if (item.sourceUrl) {
+    try {
+      const url = new URL(item.sourceUrl);
+      if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) return false;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
 export interface Asset extends EntityBase {
   projectId: string;
   type: AssetType;
@@ -233,6 +515,7 @@ export interface Asset extends EntityBase {
   storage: AssetStorage;
   thumbnailAssetId?: string;
   metadata?: JsonObject;
+  knowledge?: MaterialKnowledge;
 }
 
 export interface DesignDNA {
@@ -270,6 +553,26 @@ export interface DesignRelation extends EntityBase {
 }
 
 export type ViewType = 'front' | 'rear' | 'left' | 'right' | 'top' | 'bottom' | 'perspective';
+export const designViewTypes: readonly ViewType[] = [
+  'front',
+  'rear',
+  'left',
+  'right',
+  'top',
+  'bottom',
+  'perspective',
+];
+export function isValidDesignViews(value: unknown): value is ViewSet['views'] {
+  return Boolean(
+    value &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    Object.entries(value).every(
+      ([key, id]) =>
+        designViewTypes.includes(key as ViewType) && typeof id === 'string' && id.trim(),
+    ),
+  );
+}
 
 export interface ViewSet extends EntityBase {
   projectId: string;
@@ -296,6 +599,42 @@ export interface CMFSet extends EntityBase {
   variantIds: string[];
 }
 
+/** Editable local CMF values, separate from record identity and AI parameters. */
+export type CMFVariantDraft = Pick<
+  CMFVariant,
+  'name' | 'color' | 'material' | 'finish' | 'textureAssetId' | 'notes'
+> & { id?: string };
+
+export function isValidCMFVariantDraft(value: unknown): value is CMFVariantDraft {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const draft = value as Record<string, unknown>;
+  const limits: Record<string, number> = {
+    id: 200,
+    name: 200,
+    material: 500,
+    finish: 500,
+    textureAssetId: 200,
+    notes: 4000,
+  };
+  return Object.entries(draft).every(([key, field]) => {
+    if (field === undefined) return key === 'color' || Object.hasOwn(limits, key);
+    if (key === 'color') {
+      if (!field || typeof field !== 'object' || Array.isArray(field)) return false;
+      return Object.entries(field).every(([part, text]) =>
+        part === 'name'
+          ? typeof text === 'string' && text.length <= 200
+          : part === 'hex' && typeof text === 'string' && /^#[0-9a-f]{6}$/i.test(text),
+      );
+    }
+    return (
+      Object.hasOwn(limits, key) &&
+      typeof field === 'string' &&
+      field.length <= limits[key]! &&
+      (!['id', 'textureAssetId'].includes(key) || Boolean(field.trim()))
+    );
+  });
+}
+
 export type GenerationStatus = 'pending' | 'running' | 'success' | 'failed';
 
 /** Generation records source/output lineage and must not overwrite a source Design. */
@@ -303,7 +642,7 @@ export interface Generation extends EntityBase {
   /** Immutable bytes are owned by this run, not by the live source card. */
   inputSnapshots?: Array<{
     id: string;
-    sourceNodeId: string;
+    sourceNodeId?: string;
     role: GenerationInputRole | 'mask';
     mimeType: string;
     candidateId?: string;
@@ -372,6 +711,8 @@ export function validateGenerationInput(
   const target = nodes.find((node) => node.id === targetNodeId);
   if (!source || !target || target.type !== 'generation' || source.boardId !== target.boardId)
     return 'Source and generation nodes must exist on the same board.';
+  if ((target as GenerationNode).textOnly)
+    return 'Text-only generation cannot accept image connections. Choose an image task first.';
   if (!['reference', 'image', 'sketch', 'concept', 'variant', 'candidate'].includes(source.type))
     return 'Only visual source nodes can be connected to generation.';
   if (wouldCreateGenerationCycle(edges, source.boardId, sourceNodeId, targetNodeId))
@@ -624,6 +965,17 @@ const transitions: Record<DesignStatus, DesignStatus[]> = {
   rejected: ['archived', 'exploring'],
   archived: [],
 };
+export const designStatuses: readonly DesignStatus[] = [
+  'exploring',
+  'candidate',
+  'review',
+  'approved',
+  'rejected',
+  'archived',
+];
+export function nextDesignStatuses(status: DesignStatus): readonly DesignStatus[] {
+  return [...transitions[status]];
+}
 export function transitionDesignStatus(
   design: Design,
   status: DesignStatus,

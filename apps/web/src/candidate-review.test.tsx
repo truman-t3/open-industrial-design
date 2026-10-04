@@ -81,7 +81,7 @@ describe('candidate comparison', () => {
     expect(html).toContain('Candidate 1');
     expect(html).toContain('Candidate 2');
     expect(html).toContain('Actions apply to:');
-    expect(html.match(/disabled=""/g)).toHaveLength(3);
+    expect(html.split('<footer>')[1]?.match(/disabled=""/g)).toHaveLength(3);
   });
   it('does not silently target a different candidate when the selected one is removed', () => {
     const generation = {

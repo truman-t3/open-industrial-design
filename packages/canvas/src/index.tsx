@@ -14,7 +14,10 @@ import type Konva from 'konva';
 import { create } from 'zustand';
 import { GenerationCardEditor } from './generation-card-editor';
 import { connectionAppearance, connectionIsActive } from './connection-appearance';
-import { fitCanvasViewport, zoomViewport } from './viewport';
+import { fitCanvasViewport, isCanvasNodeInView, zoomViewport } from './viewport';
+import { CanvasMinimap } from './minimap';
+import { CanvasHelp } from './canvas-help';
+import { moveCanvasNode, reconcileCanvasGroups } from '@open-industrial-design/design-model';
 import {
   translate,
   translateDemoLabel,
@@ -29,6 +32,7 @@ import type {
   Design,
   Edge,
   GenerationNode,
+  GroupNode,
   GenerationInputRole,
   NodeType,
   TextNode,
@@ -36,8 +40,11 @@ import type {
 } from '@open-industrial-design/design-model';
 import {
   canvasInteractionPolicy,
+  designLineageNodes,
   connectionCurve,
   connectionTargetAt,
+  generationInputRoute,
+  forwardOutputRoute,
   layoutGenerationCandidateOutputs,
   resolveCanvasShortcut,
   verticalConnectionCurve,
@@ -46,14 +53,16 @@ import {
 } from './interaction';
 
 export type { CanvasInteractionMode } from './interaction';
-export { findFreeNodePosition } from './interaction';
+export { findFreeNodePosition, findDesignCanvasNode } from './interaction';
+export { revealCanvasNode } from './viewport';
 
 export type CanvasNode =
   | TextNode
   | GenerationNode
   | CandidateNode
+  | GroupNode
   | (Omit<BaseNode, 'type'> & {
-      type: Exclude<NodeType, 'text' | 'generation' | 'candidate'>;
+      type: Exclude<NodeType, 'text' | 'generation' | 'candidate' | 'group'>;
       label: string;
       assetId?: string;
       previewAssetId?: string;
@@ -203,6 +212,9 @@ export const useCanvasRuntimeStore = create<RuntimeState>((set, get) => ({
 }));
 
 export type CanvasWorkspaceProps = {
+  viewSets?: readonly import('@open-industrial-design/design-model').ViewSet[];
+  cmfSets?: readonly import('@open-industrial-design/design-model').CMFSet[];
+  cmfVariants?: readonly import('@open-industrial-design/design-model').CMFVariant[];
   boardId: string;
   interactionMode?: CanvasInteractionMode;
   nodes: CanvasNode[];
@@ -211,6 +223,8 @@ export type CanvasWorkspaceProps = {
   onDuplicate: () => void;
   onUndo: () => void;
   onRedo: () => void;
+  onImportReference?: () => void;
+  onCreateConcept?: () => void;
   previewUrls?: Record<string, string>;
   designs?: readonly Design[];
   edges?: readonly Edge[];
@@ -247,8 +261,13 @@ export function CanvasWorkspace({
   onDuplicate,
   onUndo,
   onRedo,
+  onImportReference,
+  onCreateConcept,
   previewUrls = {},
   designs = [],
+  viewSets = [],
+  cmfSets = [],
+  cmfVariants = [],
   edges = [],
   generationCandidates = [],
   onConnectInput,
@@ -290,12 +309,16 @@ export function CanvasWorkspace({
   );
   const positionedNodes = useMemo(
     () =>
-      nodes.map((node) => {
-        if (node.id === dragPosition?.id) return { ...node, x: dragPosition.x, y: dragPosition.y };
-        if (node.type === 'candidate' && node.candidateId === dragCandidatePosition?.id)
-          return { ...node, x: dragCandidatePosition.x, y: dragCandidatePosition.y };
-        return node;
-      }),
+      reconcileCanvasGroups(
+        (dragPosition
+          ? moveCanvasNode(nodes, dragPosition.id, dragPosition.x, dragPosition.y)
+          : nodes
+        ).map((node) => {
+          if (node.type === 'candidate' && node.candidateId === dragCandidatePosition?.id)
+            return { ...node, x: dragCandidatePosition.x, y: dragCandidatePosition.y };
+          return node;
+        }),
+      ),
     [dragPosition, dragCandidatePosition, nodes],
   );
   const visibleCandidatePositions = useMemo(
@@ -312,9 +335,7 @@ export function CanvasWorkspace({
     [candidatePositions, dragCandidatePosition],
   );
   const lineageArrows = useMemo(() => {
-    const nodesByDesignId = new Map(
-      positionedNodes.filter((node) => node.designId).map((node) => [node.designId, node]),
-    );
+    const nodesByDesignId = designLineageNodes(positionedNodes);
     return designs.flatMap((design) => {
       const source = design.parentDesignId && nodesByDesignId.get(design.parentDesignId);
       const target = nodesByDesignId.get(design.id);
@@ -347,17 +368,13 @@ export function CanvasWorkspace({
       const source = byId.get(edge.sourceNodeId);
       const target = byId.get(edge.targetNodeId);
       if (!source || !target) return [];
-      const startX = source.x + source.width - 4;
-      const endX = target.x - 4;
-      const startY = source.y + source.height / 2;
-      const endY = target.y + (edge.inputRole === 'base' ? 86 : 116);
       return [
         {
           id: edge.id,
           sourceId: source.id,
           targetId: target.id,
           candidateId: source.type === 'candidate' ? source.candidateId : undefined,
-          points: connectionCurve(startX, startY, endX, endY),
+          ...generationInputRoute(source, target, edge.inputRole ?? 'reference'),
           role: edge.inputRole,
         },
       ];
@@ -366,29 +383,20 @@ export function CanvasWorkspace({
   const outputArrows = useMemo(() => {
     const byId = new Map(positionedNodes.map((node) => [node.id, node]));
     return edges.flatMap((edge) => {
-      if (edge.type !== 'generation_output') return [];
+      if (edge.type !== 'generation_output' && edge.type !== 'references') return [];
       const source = byId.get(edge.sourceNodeId);
       const target = byId.get(edge.targetNodeId);
-      if (!source || !target || source.type !== 'generation') return [];
+      if (!source || !target || (edge.type === 'generation_output' && source.type !== 'generation'))
+        return [];
       if (target.type === 'candidate') return [];
-      const sourceIsLeft = target.x + target.width / 2 >= source.x + source.width / 2;
-      const points = sourceIsLeft
-        ? connectionCurve(
-            source.x + source.width + 4,
-            source.y + source.height / 2,
-            target.x - 4,
-            target.y + target.height / 2,
-          )
-        : connectionCurve(
-            target.x + target.width + 4,
-            target.y + target.height / 2,
-            source.x - 4,
-            source.y + source.height / 2,
-          ).reduce<number[]>((reversed, value, index, values) => {
-            if (index % 2 === 0) reversed.unshift(values[index + 1]!, value);
-            return reversed;
-          }, []);
-      return [{ id: edge.id, sourceId: source.id, targetId: target.id, points }];
+      return [
+        {
+          id: edge.id,
+          sourceId: source.id,
+          targetId: target.id,
+          ...forwardOutputRoute(source, target, positionedNodes),
+        },
+      ];
     });
   }, [edges, positionedNodes]);
   const candidateOutputCards = useMemo(
@@ -406,7 +414,13 @@ export function CanvasWorkspace({
   );
   const candidateOutputArrows = useMemo(() => {
     const byId = new Map(positionedNodes.map((node) => [node.id, node]));
-    return candidateOutputCards.flatMap((card) => {
+    const cards = candidateOutputCards.map((card) => ({
+      ...card,
+      id: `candidate:${card.candidateId}`,
+      type: 'candidate' as const,
+    }));
+    const obstacles = [...positionedNodes.filter((node) => node.type !== 'candidate'), ...cards];
+    return cards.flatMap((card) => {
       const source = byId.get(card.generationNodeId);
       if (!source) return [];
       return [
@@ -417,12 +431,7 @@ export function CanvasWorkspace({
             positionedNodes.find(
               (node) => node.type === 'candidate' && node.candidateId === card.candidateId,
             )?.id ?? '',
-          points: connectionCurve(
-            source.x + source.width + 4,
-            source.y + source.height / 2,
-            card.x - 4,
-            card.y + card.height / 2,
-          ),
+          ...forwardOutputRoute(source, card, obstacles),
         },
       ];
     });
@@ -461,7 +470,13 @@ export function CanvasWorkspace({
     const stage = stageRef.current;
     if (!transformer || !stage) return;
     transformer.nodes(
-      selectedIds.map((id) => stage.findOne(`#${id}`)).filter(Boolean) as Konva.Node[],
+      selectedIds
+        .filter(
+          (id) =>
+            !['group', 'candidate'].includes(nodes.find((node) => node.id === id)?.type ?? ''),
+        )
+        .map((id) => stage.findOne(`#${id}`))
+        .filter(Boolean) as Konva.Node[],
     );
     transformer.getLayer()?.batchDraw();
   }, [selectedIds, nodes]);
@@ -549,6 +564,15 @@ export function CanvasWorkspace({
     onNodesChange(
       nodes.map((node) => (node.id === id ? ({ ...node, ...patch } as CanvasNode) : node)),
     );
+  const selectNode = (id: string, additive: boolean) => {
+    if (additive && selectedCandidateId) {
+      const previous = nodes.find(
+        (node) => node.type === 'candidate' && node.candidateId === selectedCandidateId,
+      );
+      if (previous) select(previous.id, false);
+    }
+    select(id, additive);
+  };
   const connectionSource = connectionDraft
     ? positionedNodes.find((node) => node.id === connectionDraft.sourceNodeId)
     : undefined;
@@ -681,7 +705,9 @@ export function CanvasWorkspace({
           ))}
           {inputArrows.map((arrow) => (
             <Arrow
-              bezier
+              bezier={arrow.bezier}
+              lineCap="round"
+              lineJoin="round"
               key={arrow.id}
               listening={false}
               points={arrow.points}
@@ -701,7 +727,7 @@ export function CanvasWorkspace({
           ))}
           {outputArrows.map((arrow) => (
             <Arrow
-              bezier
+              bezier={arrow.bezier}
               key={arrow.id}
               listening={false}
               points={arrow.points}
@@ -717,7 +743,7 @@ export function CanvasWorkspace({
           ))}
           {candidateOutputArrows.map((arrow) => (
             <Arrow
-              bezier
+              bezier={arrow.bezier}
               key={`candidate-output-${arrow.id}`}
               listening={false}
               points={arrow.points}
@@ -761,8 +787,71 @@ export function CanvasWorkspace({
               dash={[6, 4]}
             />
           ) : null}
-          {nodes.map((node) => {
+          {positionedNodes
+            .filter((node): node is GroupNode => node.type === 'group')
+            .map((node) => (
+              <Group
+                key={node.id}
+                id={node.id}
+                x={node.x}
+                y={node.y}
+                draggable={
+                  interactionPolicy.nodesDraggable &&
+                  !node.locked &&
+                  !connectionDraft &&
+                  !nodes.some((member) => node.childNodeIds.includes(member.id) && member.locked)
+                }
+                onClick={(event) => {
+                  event.cancelBubble = true;
+                  selectNode(node.id, event.evt.shiftKey);
+                }}
+                onDragStart={(event) => {
+                  stageRef.current?.draggable(false);
+                  setDragPosition({ id: node.id, x: event.target.x(), y: event.target.y() });
+                }}
+                onDragMove={(event) =>
+                  setDragPosition({ id: node.id, x: event.target.x(), y: event.target.y() })
+                }
+                onDragEnd={(event) => {
+                  onNodesChange(moveCanvasNode(nodes, node.id, event.target.x(), event.target.y()));
+                  setDragPosition(null);
+                  stageRef.current?.draggable(interactionPolicy.stageDraggable);
+                }}
+              >
+                <Rect
+                  width={node.width}
+                  height={node.height}
+                  stroke={selectedIds.includes(node.id) ? '#2563ff' : '#aab5c5'}
+                  strokeWidth={1.5}
+                  dash={[6, 4]}
+                  cornerRadius={10}
+                  listening={false}
+                />
+                <Rect
+                  width={node.width}
+                  height={30}
+                  fill={selectedIds.includes(node.id) ? '#e6edff' : '#eef1f5'}
+                  cornerRadius={6}
+                />
+                <Text
+                  text={`${node.label || translate(locale, 'node.group')} · ${node.childNodeIds.length}`}
+                  x={12}
+                  y={8}
+                  width={node.width - 24}
+                  fontSize={12}
+                  fill="#526071"
+                />
+              </Group>
+            ))}
+          {positionedNodes.map((node) => {
+            if (node.type === 'group') return null;
             if (node.type === 'candidate') return null;
+            if (
+              !selectedIds.includes(node.id) &&
+              dragPosition?.id !== node.id &&
+              !isCanvasNodeInView(node, { ...viewport, ...(stageDragOffset ?? {}) }, stageSize)
+            )
+              return null;
             const appearance = nodeAppearance[node.type];
             const design = node.designId ? designsById.get(node.designId) : undefined;
             const sourceName = design?.parentDesignId
@@ -784,6 +873,22 @@ export function CanvasWorkspace({
                   ? `${translateDesignKind(locale, design.kind)} · ${translateDesignStatus(locale, design.status)}`
                   : undefined;
             const previewUrl = previewUrls[previewAssetId(node) ?? ''];
+            const viewSet =
+              node.type === 'viewset'
+                ? viewSets.find(
+                    (set) => set.id === (node as CanvasNode & { viewSetId: string }).viewSetId,
+                  )
+                : undefined;
+            const viewEntries = Object.entries(viewSet?.views ?? {});
+            const cmfSet =
+              node.type === 'cmf' && 'cmfSetId' in node
+                ? cmfSets.find((set) => set.id === node.cmfSetId)
+                : undefined;
+            const cmfEntries =
+              cmfSet?.variantIds.flatMap((id) => {
+                const variant = cmfVariants.find((item) => item.id === id);
+                return variant ? [variant] : [];
+              }) ?? [];
             const nodeCandidates =
               node.type === 'generation'
                 ? generationCandidates.filter((item) => item.generationNodeId === node.id).slice(-4)
@@ -815,7 +920,7 @@ export function CanvasWorkspace({
                 onClick={(event) => {
                   event.cancelBubble = true;
                   if (!interactionPolicy.connectionsEnabled) return;
-                  select(node.id, event.evt.shiftKey);
+                  selectNode(node.id, event.evt.shiftKey);
                 }}
                 onDragStart={(event) => {
                   stageRef.current?.draggable(false);
@@ -825,7 +930,7 @@ export function CanvasWorkspace({
                   setDragPosition({ id: node.id, x: event.target.x(), y: event.target.y() })
                 }
                 onDragEnd={(event) => {
-                  updateNode(node.id, { x: event.target.x(), y: event.target.y() });
+                  onNodesChange(moveCanvasNode(nodes, node.id, event.target.x(), event.target.y()));
                   setDragPosition(null);
                   stageRef.current?.draggable(interactionPolicy.stageDraggable);
                 }}
@@ -834,8 +939,8 @@ export function CanvasWorkspace({
                   updateNode(node.id, {
                     x: target.x(),
                     y: target.y(),
-                    width: Math.max(80, target.width() * target.scaleX()),
-                    height: Math.max(48, target.height() * target.scaleY()),
+                    width: Math.max(80, node.width * target.scaleX()),
+                    height: Math.max(48, node.height * target.scaleY()),
                     rotation: target.rotation(),
                   });
                   target.scaleX(1);
@@ -863,6 +968,7 @@ export function CanvasWorkspace({
                   }
                   cornerRadius={7}
                   shadowBlur={8}
+                  shadowEnabled={!stageDragOffset && selectedIds.includes(node.id)}
                   shadowColor="#111827"
                   shadowOffset={{ x: 0, y: 2 }}
                   shadowOpacity={selectedIds.includes(node.id) ? 0.1 : 0.035}
@@ -887,10 +993,13 @@ export function CanvasWorkspace({
                       height={30}
                       fontSize={12}
                       fill="#526071"
-                      visible={!generationRun || !selectedIds.includes(node.id)}
+                      visible={
+                        viewport.zoom < 0.8 || !generationRun || !selectedIds.includes(node.id)
+                      }
                     />
                     <Text
                       text={translate(locale, 'generation.base')}
+                      visible={!node.textOnly}
                       x={16}
                       y={82}
                       fontSize={11}
@@ -899,6 +1008,7 @@ export function CanvasWorkspace({
                     <Circle
                       x={5}
                       y={86}
+                      visible={!node.textOnly}
                       radius={7}
                       fill={
                         connectionDraft?.target?.valid &&
@@ -917,6 +1027,7 @@ export function CanvasWorkspace({
                     />
                     <Text
                       text={translate(locale, 'generation.reference')}
+                      visible={!node.textOnly}
                       x={16}
                       y={112}
                       fontSize={11}
@@ -925,6 +1036,7 @@ export function CanvasWorkspace({
                     <Circle
                       x={5}
                       y={116}
+                      visible={!node.textOnly}
                       radius={7}
                       fill={
                         connectionDraft?.target?.valid &&
@@ -988,6 +1100,88 @@ export function CanvasWorkspace({
                       </Group>
                     ) : null}
                   </>
+                ) : cmfSet ? (
+                  <Group listening={false}>
+                    {cmfEntries.slice(0, 4).map((variant, index) => {
+                      const width = (node.width - 30) / 2;
+                      const height = (node.height - headerHeight - 52) / 2;
+                      const x = 10 + (index % 2) * (width + 10);
+                      const y = headerHeight + Math.floor(index / 2) * height;
+                      return (
+                        <Group key={variant.id}>
+                          <Rect
+                            x={x}
+                            y={y + 4}
+                            width={28}
+                            height={28}
+                            cornerRadius={5}
+                            fill={
+                              /^#[0-9a-f]{6}$/i.test(variant.color?.hex ?? '')
+                                ? variant.color!.hex
+                                : '#f1f3f5'
+                            }
+                            stroke="#d5dae1"
+                          />
+                          <Text
+                            x={x + 35}
+                            y={y + 4}
+                            width={width - 35}
+                            height={29}
+                            fontSize={11}
+                            text={variant.name || variant.color?.name || `${index + 1}`}
+                            fill="#17212e"
+                          />
+                          <Text
+                            x={x}
+                            y={y + 38}
+                            width={width}
+                            height={Math.max(10, height - 40)}
+                            fontSize={10}
+                            text={[variant.material, variant.finish].filter(Boolean).join(' · ')}
+                            fill="#64748b"
+                          />
+                        </Group>
+                      );
+                    })}
+                  </Group>
+                ) : viewSet ? (
+                  <Group listening={false}>
+                    {viewEntries.map(([view, assetId], index) => {
+                      const w = (node.width - 30) / 2;
+                      const h = Math.max(
+                        20,
+                        (node.height - headerHeight - 52) /
+                          Math.max(1, Math.ceil(viewEntries.length / 2)),
+                      );
+                      const x = 10 + (index % 2) * (w + 10),
+                        y = headerHeight + Math.floor(index / 2) * h;
+                      return (
+                        <Group key={view}>
+                          {previewUrls[assetId] ? (
+                            <StaticPreview
+                              url={previewUrls[assetId]!}
+                              x={x}
+                              y={y}
+                              width={w}
+                              height={Math.max(8, h - 16)}
+                            />
+                          ) : null}
+                          <Text
+                            text={translate(
+                              locale,
+                              `views.${view}` as Parameters<typeof translate>[1],
+                            )}
+                            x={x}
+                            y={y + h - 14}
+                            width={w}
+                            fontSize={9}
+                            fill="#6b7280"
+                            align="center"
+                          />
+                        </Group>
+                      );
+                    })}
+                  </Group>
                 ) : previewUrl ? (
                   <StaticPreview
                     height={
@@ -1015,12 +1209,16 @@ export function CanvasWorkspace({
                 ) : null}
                 {node.type !== 'generation' ? (
                   <Text
-                    text={title}
+                    text={
+                      cmfSet
+                        ? `${cmfSet.name ?? 'CMF'} · ${cmfEntries.length}`
+                        : (viewSet?.name ?? title)
+                    }
                     width={node.width - 24}
-                    height={previewUrl ? 18 : node.height - headerHeight - 38}
+                    height={previewUrl || viewSet ? 18 : node.height - headerHeight - 38}
                     x={12}
                     y={
-                      previewUrl
+                      previewUrl || viewSet
                         ? node.height - (compactDesignPreview ? 39 : lineage ? 42 : 31)
                         : headerHeight + 15
                     }
@@ -1050,17 +1248,24 @@ export function CanvasWorkspace({
           {candidateOutputCards.map((card) => {
             const candidate = generationCandidates.find((item) => item.id === card.candidateId);
             if (!candidate) return null;
-            const selected = selectedCandidateId === candidate.id;
+            const resultNode = nodes.find(
+              (node) => node.type === 'candidate' && node.candidateId === candidate.id,
+            );
+            const selected =
+              selectedCandidateId === candidate.id ||
+              Boolean(resultNode && selectedIds.includes(resultNode.id));
             return (
               <Group
                 key={`candidate-output-card-${card.candidateId}`}
+                id={resultNode?.id}
                 draggable={interactionPolicy.nodesDraggable && !connectionDraft}
                 listening={interactionPolicy.connectionsEnabled}
                 x={card.x}
                 y={card.y}
                 onClick={(event) => {
                   event.cancelBubble = true;
-                  selectCandidate(candidate.id);
+                  if (event.evt.shiftKey && resultNode) selectNode(resultNode.id, true);
+                  else selectCandidate(candidate.id);
                 }}
                 onTap={(event) => {
                   event.cancelBubble = true;
@@ -1116,6 +1321,7 @@ export function CanvasWorkspace({
                   strokeWidth={selected ? 2 : 1}
                   cornerRadius={7}
                   shadowBlur={7}
+                  shadowEnabled={!stageDragOffset && selected}
                   shadowColor="#111827"
                   shadowOffset={{ x: 0, y: 2 }}
                   shadowOpacity={0.06}
@@ -1158,6 +1364,9 @@ export function CanvasWorkspace({
               ['reference', 'image', 'sketch', 'concept', 'variant', 'candidate'].includes(
                 node.type,
               ),
+            )
+            .filter((node) =>
+              isCanvasNodeInView(node, { ...viewport, ...(stageDragOffset ?? {}) }, stageSize),
             )
             .map((node) => (
               <Group
@@ -1211,7 +1420,52 @@ export function CanvasWorkspace({
           ) : null}
         </Layer>
       </Stage>
+      {nodes.length === 0 ? (
+        <section className="canvas-empty-guide" aria-label={translate(locale, 'canvas.emptyTitle')}>
+          <h2>{translate(locale, 'canvas.emptyTitle')}</h2>
+          <p>{translate(locale, 'canvas.emptyDescription')}</p>
+          <div>
+            {onImportReference ? (
+              <button type="button" className="button--primary" onClick={onImportReference}>
+                {translate(locale, 'workspace.importReference')}
+              </button>
+            ) : null}
+            {onCreateConcept ? (
+              <button type="button" className="button--secondary" onClick={onCreateConcept}>
+                {translate(locale, 'workspace.newConcept')}
+              </button>
+            ) : null}
+          </div>
+          <small>{translate(locale, 'canvas.emptyHint')}</small>
+        </section>
+      ) : null}
+      <CanvasMinimap
+        nodes={[
+          ...positionedNodes.filter((node) => node.type !== 'group'),
+          ...candidateOutputCards
+            .filter(
+              (card) =>
+                !positionedNodes.some(
+                  (node) => node.type === 'candidate' && node.candidateId === card.candidateId,
+                ),
+            )
+            .map((card) => ({ ...card, id: `output:${card.candidateId}` })),
+        ]}
+        viewport={{ ...viewport, ...(stageDragOffset ?? {}) }}
+        size={stageSize}
+        onNavigate={setViewport}
+        disabled={Boolean(
+          connectionDraft || dragPosition || dragCandidatePosition || stageDragOffset,
+        )}
+        locale={locale}
+      />
       <nav className="canvas-viewport-controls" aria-label={translate(locale, 'canvas.navigation')}>
+        <CanvasHelp
+          locale={locale}
+          disabled={Boolean(
+            connectionDraft || dragPosition || dragCandidatePosition || stageDragOffset,
+          )}
+        />
         <button
           type="button"
           aria-label={translate(locale, 'canvas.zoomOut')}
@@ -1290,8 +1544,8 @@ export function CanvasWorkspace({
                 viewport={{ ...viewport, ...(stageDragOffset ?? {}) }}
                 locale={locale}
                 busy={generationRun.busy}
-                ready={generationRun.ready}
-                providerName={generationRun.providerName}
+                ready={Boolean(node.patternPlacement) || generationRun.ready}
+                providerName={node.patternPlacement ? undefined : generationRun.providerName}
                 status={generationRun.status}
                 onCommit={(direction) => updateNode(node.id, { direction })}
                 onRun={(direction) => generationRun.onRun(node.id, direction)}

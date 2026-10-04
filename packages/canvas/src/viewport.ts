@@ -1,5 +1,48 @@
 import type { Viewport } from '@open-industrial-design/design-model';
 
+/** Render-only culling; selection, edges, layout and persistence still use all nodes. */
+export function isCanvasNodeInView(
+  node: { x: number; y: number; width: number; height: number; rotation?: number },
+  viewport: Viewport,
+  size: { width: number; height: number },
+  margin = 192,
+): boolean {
+  if (!Number.isFinite(viewport.zoom) || viewport.zoom <= 0) return true;
+  const rotated = Boolean(node.rotation);
+  const radius = rotated ? Math.hypot(node.width, node.height) : 0;
+  const left = (node.x - radius) * viewport.zoom + viewport.x;
+  const top = (node.y - radius) * viewport.zoom + viewport.y;
+  const right = (node.x + (rotated ? radius : node.width)) * viewport.zoom + viewport.x;
+  const bottom = (node.y + (rotated ? radius : node.height)) * viewport.zoom + viewport.y;
+  return (
+    right >= -margin &&
+    bottom >= -margin &&
+    left <= size.width + margin &&
+    top <= size.height + margin
+  );
+}
+
+/** Bring a newly created card into view, including cards placed above or left of the viewport. */
+export function revealCanvasNode(
+  viewport: Viewport,
+  node: { x: number; y: number; width: number; height: number },
+  size: { width: number; height: number },
+): Viewport {
+  const shift = (start: number, length: number, available: number, margin = 24) => {
+    if (start < margin || length > available - margin * 2) return margin - start;
+    return -Math.max(0, start + length - available + margin);
+  };
+  return {
+    ...viewport,
+    x:
+      viewport.x +
+      shift(node.x * viewport.zoom + viewport.x, node.width * viewport.zoom, size.width),
+    y:
+      viewport.y +
+      shift(node.y * viewport.zoom + viewport.y, node.height * viewport.zoom, size.height, 64),
+  };
+}
+
 export function zoomViewport(
   viewport: Viewport,
   zoom: number,

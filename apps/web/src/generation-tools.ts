@@ -4,6 +4,49 @@ import {
   type AppLocale,
   type MessageKey,
 } from '@open-industrial-design/core';
+import type { BaseNode, Edge, GenerationNode } from '@open-industrial-design/design-model';
+
+/** Read-only summaries derived from the same board edges used by generation. */
+export function queueInputSummaries(
+  nodes: readonly BaseNode[],
+  edges: readonly Edge[],
+  candidates: Array<{ id: string; generationNodeId: string }>,
+  locale: AppLocale,
+): Record<string, string> {
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  return Object.fromEntries(
+    nodes
+      .filter((node) => node.type === 'generation')
+      .map((node) => {
+        const inputs = edges
+          .filter((edge) => edge.type === 'generation_input' && edge.targetNodeId === node.id)
+          .sort(
+            (a, b) =>
+              Number(b.inputRole === 'base') - Number(a.inputRole === 'base') ||
+              a.id.localeCompare(b.id),
+          );
+        const summary = inputs
+          .map((edge) => {
+            const source = byId.get(edge.sourceNodeId);
+            const label = source
+              ? generationInputLabel(source, candidates, locale)
+              : translate(locale, 'generation.queue.missingInput');
+            return `${translate(locale, edge.inputRole === 'base' ? 'generation.base' : 'generation.reference')}：${label}`;
+          })
+          .join(' · ');
+        return [
+          node.id,
+          summary ||
+            translate(
+              locale,
+              (node as GenerationNode).textOnly
+                ? 'generation.queue.textInput'
+                : 'generation.queue.noInputs',
+            ),
+        ];
+      }),
+  );
+}
 
 /** Match the input summary to the independent candidate shown on the Canvas. */
 export function generationInputLabel(
@@ -24,8 +67,50 @@ export function generationInputLabel(
   return source?.label ? translateDemoLabel(locale, source.label) : translate(locale, 'node.image');
 }
 
-// These are editable task briefs, not separate provider capabilities.
+// Editable briefs; local/erase additionally select explicit masked workflows in the Action.
 export const generationTools = [
+  {
+    id: 'lineart',
+    label: 'generation.tool.lineart',
+    hint: 'generation.tool.lineartHint',
+    prompt: 'generation.prompt.lineart',
+  },
+  {
+    id: 'pattern-create',
+    label: 'generation.tool.patternCreate',
+    hint: 'generation.tool.patternCreateHint',
+    prompt: 'generation.prompt.patternCreate',
+  },
+  {
+    id: 'pattern-transfer',
+    label: 'generation.tool.patternTransfer',
+    hint: 'generation.tool.patternTransferHint',
+    prompt: 'generation.prompt.patternTransfer',
+  },
+  {
+    id: 'local-cmf',
+    label: 'generation.tool.localCmf',
+    hint: 'generation.tool.localCmfHint',
+    prompt: 'generation.prompt.localCmf',
+  },
+  {
+    id: 'text',
+    label: 'generation.tool.text',
+    hint: 'generation.tool.textHint',
+    prompt: 'generation.prompt.text',
+  },
+  {
+    id: 'pattern',
+    label: 'generation.tool.pattern',
+    hint: 'generation.tool.patternHint',
+    prompt: 'generation.prompt.pattern',
+  },
+  {
+    id: 'cutout',
+    label: 'generation.tool.cutout',
+    hint: 'generation.tool.cutoutHint',
+    prompt: 'generation.prompt.cutout',
+  },
   {
     id: 'sketch',
     label: 'generation.tool.sketch',
@@ -74,6 +159,12 @@ export const generationTools = [
     hint: 'generation.tool.localHint',
     prompt: 'generation.prompt.local',
   },
+  {
+    id: 'erase',
+    label: 'generation.tool.erase',
+    hint: 'generation.tool.eraseHint',
+    prompt: 'generation.prompt.erase',
+  },
 ] as const satisfies ReadonlyArray<{
   id: string;
   label: MessageKey;
@@ -84,6 +175,13 @@ export const generationTools = [
 export function findGenerationTool(id: string) {
   return generationTools.find((tool) => tool.id === id);
 }
+
+// Image continuations preserve the selected source; text-only creation is separate.
+const secondaryContinuationIds = new Set(['blend', 'style', 'pattern', 'cutout', 'erase']);
+export const continuationToolGroups = [
+  generationTools.filter((tool) => tool.id !== 'text' && !secondaryContinuationIds.has(tool.id)),
+  generationTools.filter((tool) => secondaryContinuationIds.has(tool.id)),
+] as const;
 
 export const generationViews = ['front', 'side', 'rear', 'top', 'perspective'] as const;
 

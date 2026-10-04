@@ -23,6 +23,10 @@ import {
   generationViewNames,
   isValidEditRegion,
   type EditRegion,
+  type PatternPlacement,
+  isValidPatternPlacement,
+  isValidLocalCmf,
+  isValidPatternTask,
 } from '@open-industrial-design/design-model';
 import type { AppAction, ActionClock, ActionIdFactory } from './index';
 
@@ -31,8 +35,12 @@ const now = () => Date.now();
 
 export const LOCAL_EDIT_PROTECTION_ERROR =
   'Local edit protection failed. The returned image could not be decoded or its dimensions differ from the source. No candidate was saved and no retry was sent.';
+export const CUTOUT_PROTECTION_ERROR =
+  'Background removal failed validation: expected a same-size image with transparent background and visible product. No candidate was saved and no retry was sent.';
 
 function safeProviderMessage(error: unknown): string {
+  if (error instanceof Error && error.message === CUTOUT_PROTECTION_ERROR)
+    return CUTOUT_PROTECTION_ERROR;
   if (error instanceof Error && error.message === LOCAL_EDIT_PROTECTION_ERROR)
     return LOCAL_EDIT_PROTECTION_ERROR;
   if (!(error instanceof AIProviderError))
@@ -50,18 +58,67 @@ function safeProviderMessage(error: unknown): string {
   return messages[error.code];
 }
 
+/** One source rule for constraints, lineage and stale-result detection. */
+function generationSourceDesign(
+  node: GenerationNode,
+  edges: readonly Edge[],
+  sources: readonly BaseNode[],
+  designs: readonly Design[],
+  candidates: readonly GenerationCandidate[],
+) {
+  if (node.textOnly || node.patternTask?.kind === 'create') return undefined;
+  const main = edges.find(
+    (edge) =>
+      edge.type === 'generation_input' &&
+      edge.targetNodeId === node.id &&
+      edge.inputRole === 'base',
+  );
+  const source = sources.find((item) => item.id === main?.sourceNodeId);
+  const designId =
+    source?.type === 'candidate'
+      ? candidates.find((candidate) => candidate.id === (source as CandidateNode).candidateId)
+          ?.sourceDesignId
+      : source?.designId;
+  return designs.find((design) => design.id === designId);
+}
+
 export function generationInputSignature(
   node: GenerationNode,
   edges: readonly Edge[],
   sources: readonly BaseNode[],
+  designs: readonly Design[] = [],
+  candidates: readonly GenerationCandidate[] = [],
 ) {
   const byId = new Map(sources.map((source) => [source.id, source]));
+  const design = generationSourceDesign(node, edges, sources, designs, candidates);
   return JSON.stringify({
+    sourceDesign: design
+      ? {
+          id: design.id,
+          dna: design.dna
+            ? {
+                silhouetteLocked: design.dna.silhouetteLocked,
+                proportionLocked: design.dna.proportionLocked,
+                geometryLocked: design.dna.geometryLocked,
+                detailLocked: design.dna.detailLocked,
+                cmfLocked: design.dna.cmfLocked,
+                brandLocked: design.dna.brandLocked,
+                notes: design.dna.notes ?? [],
+              }
+            : undefined,
+        }
+      : undefined,
     direction: node.direction,
     notes: node.notes,
     count: node.count,
+    textOnly: node.textOnly,
     requestedViews: node.requestedViews,
     localEdit: node.localEdit,
+    localEditMode: node.localEditMode,
+    localCmf: node.localCmf,
+    removeBackground: node.removeBackground,
+    patternPlacement: node.patternPlacement,
+    patternTask: node.patternTask,
     editRegion: node.editRegion,
     inputs: edges
       .filter((edge) => edge.type === 'generation_input' && edge.targetNodeId === node.id)
@@ -91,6 +148,11 @@ export interface CanvasGenerateInput {
 }
 
 export interface CanvasGenerateRuntime {
+  composePattern?(
+    source: ProviderImageInput,
+    pattern: ProviderImageInput,
+    placement: PatternPlacement,
+  ): Promise<ProviderImageInput>;
   signal?: AIRequestSignal;
   router: Pick<CapabilityRouter, 'execute'>;
   credentials: Pick<ProviderCredentialStore, 'get'>;
@@ -104,6 +166,10 @@ export interface CanvasGenerateRuntime {
     result: ProviderImageInput,
     region: EditRegion,
   ): Promise<ProviderImageInput>;
+  protectCutout?(
+    source: ProviderImageInput,
+    result: ProviderImageInput,
+  ): Promise<ProviderImageInput>;
   saveGeneration(generation: Generation): Promise<void>;
   saveGenerationInputs?(generation: Generation, images: ProviderImageInput[]): Promise<void>;
   stageCandidates(
@@ -111,6 +177,80 @@ export interface CanvasGenerateRuntime {
   ): Promise<void>;
   idFactory?: ActionIdFactory;
   clock?: ActionClock;
+}
+
+export interface CanvasBatchInput {
+  tasks: CanvasGenerateInput[];
+}
+export interface CanvasBatchProgress {
+  nodeId: string;
+  index: number;
+  total: number;
+  status: 'running' | 'success' | 'failed' | 'cancelled';
+}
+export function createCanvasBatchGenerateAction(): AppAction<
+  CanvasBatchInput,
+  { completedNodeIds: string[] },
+  CanvasGenerateRuntime & { onProgress?(progress: CanvasBatchProgress): void }
+> {
+  const single = createCanvasGenerateAction();
+  return {
+    descriptor: {
+      id: 'ai.canvasBatchGenerate',
+      label: 'Run canvas task queue',
+      description: 'Run manually confirmed tasks in order; stop on failure or cancellation.',
+      kind: 'ai',
+    },
+    validate(context, input) {
+      if (
+        !Array.isArray(input.tasks) ||
+        !input.tasks.length ||
+        input.tasks.length > 16 ||
+        new Set(input.tasks.map((task) => task.node.id)).size !== input.tasks.length
+      )
+        return { ok: false, message: 'Choose one to sixteen distinct tasks.' };
+      for (const task of input.tasks) {
+        const result = single.validate(context, task);
+        if (!result.ok) return result;
+      }
+      return { ok: true };
+    },
+    async run(context, input, runtime) {
+      // Validate every task before the first request, including direct callers outside ActionRunner.
+      if (
+        !input.tasks.length ||
+        input.tasks.length > 16 ||
+        new Set(input.tasks.map((task) => task.node.id)).size !== input.tasks.length
+      )
+        throw new Error('Invalid task queue.');
+      for (const task of input.tasks)
+        if (!single.validate(context, task).ok)
+          throw new Error('Task queue validation failed. No requests were sent.');
+      const completedNodeIds: string[] = [];
+      for (const [index, task] of input.tasks.entries()) {
+        if (runtime.signal?.aborted)
+          throw new Error('Task queue cancelled. Completed results were retained.');
+        const progress = { nodeId: task.node.id, index: index + 1, total: input.tasks.length };
+        runtime.onProgress?.({ ...progress, status: 'running' });
+        try {
+          await single.run(context, task, runtime);
+          completedNodeIds.push(task.node.id);
+          runtime.onProgress?.({ ...progress, status: 'success' });
+        } catch {
+          runtime.onProgress?.({
+            ...progress,
+            status: runtime.signal?.aborted ? 'cancelled' : 'failed',
+          });
+          throw new Error(
+            runtime.signal?.aborted
+              ? 'Task queue cancelled. Completed results were retained; the Provider may charge for work already started.'
+              : 'Task queue stopped after a failed task. Completed results were retained; no automatic retry was sent.',
+          );
+        }
+      }
+      return { completedNodeIds };
+    },
+  };
 }
 
 export function createCanvasGenerateAction(): AppAction<
@@ -134,6 +274,26 @@ export function createCanvasGenerateAction(): AppAction<
         return { ok: false, message: 'Choose one to four results.' };
       const views = input.node.requestedViews;
       if (
+        input.node.localCmf !== undefined &&
+        (!isValidLocalCmf(input.node.localCmf) ||
+          !input.node.localEdit ||
+          input.node.localEditMode ||
+          !Object.values(input.node.localCmf).some((value) => value.trim()))
+      )
+        return {
+          ok: false,
+          message:
+            'Local CMF requires a selection and at least one color, material or finish instruction; it cannot erase objects.',
+        };
+      if (
+        input.node.localEditMode !== undefined &&
+        (input.node.localEditMode !== 'erase' || !input.node.localEdit || views)
+      )
+        return {
+          ok: false,
+          message: 'Erasing requires local selection editing without view generation.',
+        };
+      if (
         views &&
         (!Array.isArray(views) ||
           !views.length ||
@@ -146,12 +306,51 @@ export function createCanvasGenerateAction(): AppAction<
           ok: false,
           message: 'Choose one to four unique views; count must match selected views.',
         };
-      if (input.provider.enabled === false)
+      if (!input.node.patternPlacement && input.provider.enabled === false)
         return { ok: false, message: 'Selected Provider is disabled.' };
       const edges = input.edges.filter(
         (edge) => edge.type === 'generation_input' && edge.targetNodeId === input.node.id,
       );
-      if (!edges.length || edges.length > 5)
+      const pattern = input.node.patternTask;
+      if (
+        pattern !== undefined &&
+        (!isValidPatternTask(pattern) ||
+          input.node.localEdit ||
+          input.node.localEditMode ||
+          input.node.localCmf ||
+          input.node.editRegion ||
+          input.node.removeBackground ||
+          input.node.patternPlacement ||
+          views ||
+          (pattern.kind === 'transfer' &&
+            (input.node.textOnly ||
+              !pattern.placement.trim() ||
+              edges.length !== 2 ||
+              !edges.some((edge) => edge.inputRole === 'base') ||
+              !edges.some((edge) => edge.inputRole === 'reference'))))
+      )
+        return {
+          ok: false,
+          message:
+            'Pattern transfer requires one product main image, one pattern reference and a placement instruction; pattern tasks cannot combine other image operations.',
+        };
+      if (input.node.textOnly !== undefined && typeof input.node.textOnly !== 'boolean')
+        return { ok: false, message: 'Invalid text-only generation mode.' };
+      if (
+        input.node.textOnly &&
+        (edges.length ||
+          input.node.localEdit ||
+          input.node.localEditMode ||
+          input.node.editRegion ||
+          input.node.removeBackground ||
+          input.node.patternPlacement ||
+          views)
+      )
+        return {
+          ok: false,
+          message: 'Text-only generation requires no image connections or image operations.',
+        };
+      if ((!input.node.textOnly && !edges.length) || edges.length > 5)
         return { ok: false, message: 'Connect one to five visual sources.' };
       if (
         edges.filter((edge) => edge.inputRole === 'base').length > 1 ||
@@ -159,6 +358,35 @@ export function createCanvasGenerateAction(): AppAction<
       )
         return { ok: false, message: 'Too many generation inputs.' };
       const sourceIds = new Set<string>();
+      if (
+        input.node.patternPlacement &&
+        (!isValidPatternPlacement(input.node.patternPlacement) ||
+          input.node.count !== 1 ||
+          input.node.localEdit ||
+          input.node.removeBackground ||
+          views ||
+          edges.length !== 2 ||
+          !edges.some((e) => e.inputRole === 'base') ||
+          !edges.some((e) => e.inputRole === 'reference'))
+      )
+        return {
+          ok: false,
+          message:
+            'Pattern placement requires one main image, one pattern reference and one local result.',
+        };
+      if (
+        input.node.removeBackground &&
+        (input.node.localEdit ||
+          views ||
+          input.provider.supportsTransparency !== true ||
+          edges.length !== 1 ||
+          edges[0]?.inputRole !== 'base')
+      )
+        return {
+          ok: false,
+          message:
+            'Background removal requires one main image and confirmed transparency support; it cannot combine masks or views.',
+        };
       if (input.node.localEdit) {
         if (input.node.requestedViews || input.provider.supportsMask !== true)
           return {
@@ -230,6 +458,10 @@ export function createCanvasGenerateAction(): AppAction<
       if (images.some((image) => !image))
         throw new Error('A connected image is missing. Restore its Asset before generating.');
       let mask: ProviderImageInput | undefined;
+      if (input.node.patternPlacement && !runtime.composePattern)
+        throw new Error('Local pattern compositing is unavailable.');
+      if (input.node.removeBackground && !runtime.protectCutout)
+        throw new Error('Cutout validation is unavailable.');
       if (input.node.localEdit) {
         if (!runtime.prepareMask || !runtime.protectLocalEdit || !input.node.editRegion)
           throw new Error('Mask preparation is unavailable.');
@@ -237,30 +469,47 @@ export function createCanvasGenerateAction(): AppAction<
         images[0] = prepared.image;
         mask = prepared.mask;
       }
-      const baseSource = sources[0];
-      const sourceDesign =
-        input.sourceDesigns.find(
-          (design) =>
-            baseSource?.type === 'candidate' &&
-            input.sourceCandidates?.some(
-              (candidate) =>
-                candidate.id === (baseSource as CandidateNode).candidateId &&
-                candidate.sourceDesignId === design.id,
-            ),
-        ) ??
-        input.sourceDesigns.find((design) => design.id === baseSource?.designId) ??
-        input.sourceDesigns.find((design) =>
-          sources.some((source) => source.designId === design.id),
-        );
+      const sourceDesign = generationSourceDesign(
+        input.node,
+        edges,
+        sources,
+        input.sourceDesigns,
+        input.sourceCandidates ?? [],
+      );
       const prompt = [
-        'Input images are supplied in the following order:',
+        input.node.textOnly ? '' : 'Input images are supplied in the following order:',
         ...edges.map((edge, index) =>
-          edge.inputRole === 'base'
-            ? `Image ${index + 1}: main product or sketch. Preserve its identity and functional structure unless the design direction explicitly requests a change.`
-            : `Image ${index + 1}: supplementary reference. Use only for the requested design attributes, not as a replacement for the main product.`,
+          input.node.patternTask?.kind === 'create'
+            ? `Image ${index + 1}: artwork style reference. Extract the requested motifs and visual language, not the product shape. Produce flat artwork, not a product mockup.`
+            : input.node.patternTask?.kind === 'transfer'
+              ? `Image ${index + 1}: ${edge.inputRole === 'base' ? 'target product; preserve its identity, geometry and functional structure' : 'pattern artwork to transfer onto the target product, not a replacement product'}.`
+              : edge.inputRole === 'base'
+                ? `Image ${index + 1}: main product or sketch. Preserve its identity and functional structure unless the design direction explicitly requests a change.`
+                : `Image ${index + 1}: supplementary reference. Use only for the requested design attributes, not as a replacement for the main product.`,
         ),
         input.node.direction.trim(),
         input.node.notes.trim(),
+        ...(input.node.patternTask?.kind === 'create'
+          ? [
+              'Generate standalone flat pattern artwork, not a product rendering.',
+              input.node.patternTask.repeat === 'tile'
+                ? 'Aim for a repeatable tile with matching opposite edges.'
+                : 'Create one standalone motif composition.',
+            ]
+          : input.node.patternTask?.kind === 'transfer'
+            ? [
+                `Apply the reference pattern only to: ${input.node.patternTask.placement.trim()}`,
+                `Relative motif scale: ${input.node.patternTask.scale}. Preserve the rest of the product and scene.`,
+              ]
+            : []),
+        ...(input.node.localCmf
+          ? [
+              'Change only the selected region CMF. Preserve silhouette, proportions, geometry, part boundaries and functional details. Do not replace or remove the part.',
+              `Target color: ${input.node.localCmf.color.trim() || 'Preserve original color'}`,
+              `Target material: ${input.node.localCmf.material.trim() || 'Preserve original material'}`,
+              `Target surface finish: ${input.node.localCmf.finish.trim() || 'Preserve original finish'}`,
+            ]
+          : []),
         mask
           ? 'Edit only the transparent mask region on image 1. Preserve the product and background outside that region.'
           : '',
@@ -273,8 +522,8 @@ export function createCanvasGenerateAction(): AppAction<
         id: id(),
         projectId: context.projectId,
         actionId: 'ai.canvasGenerate',
-        providerId: input.provider.id,
-        modelId: input.provider.model,
+        providerId: input.node.patternPlacement ? 'local-raster' : input.provider.id,
+        modelId: input.node.patternPlacement ? undefined : input.provider.model,
         createdAt: timestamp,
         updatedAt: timestamp,
         status: 'pending',
@@ -288,8 +537,16 @@ export function createCanvasGenerateAction(): AppAction<
         }),
         parameters: {
           count: input.node.count,
+          ...(input.node.textOnly ? { textOnly: true } : {}),
           generationNodeId: input.node.id,
           ...(input.node.requestedViews ? { requestedViews: input.node.requestedViews } : {}),
+          ...(input.node.localEditMode ? { localEditMode: input.node.localEditMode } : {}),
+          ...(input.node.localCmf ? { localCmf: { ...input.node.localCmf } } : {}),
+          ...(input.node.patternTask ? { patternTask: { ...input.node.patternTask } } : {}),
+          ...(input.node.removeBackground ? { removeBackground: true } : {}),
+          ...(input.node.patternPlacement
+            ? { patternPlacement: { ...input.node.patternPlacement } }
+            : {}),
           ...(input.node.editRegion ? { editRegion: { ...input.node.editRegion } } : {}),
           ...(mask ? { localEditProtection: 'selection-only-v1' } : {}),
         },
@@ -321,13 +578,37 @@ export function createCanvasGenerateAction(): AppAction<
           if (runtime.signal?.aborted) throw new Error('Generation cancelled.');
         };
         checkCancellation();
-        const credentials = await runtime.credentials.get(input.provider.id);
+        const credentials = input.node.patternPlacement
+          ? undefined
+          : await runtime.credentials.get(input.provider.id);
         const generated: Array<{
           image: ProviderImageInput;
           view?: NonNullable<GenerationNode['requestedViews']>[number];
         }> = [];
         // Sequential, bounded requests. Stage only after every view succeeds; no automatic retry.
-        if (input.node.requestedViews) {
+        if (input.node.textOnly) {
+          const result = await runtime.router.execute(
+            'image.generate',
+            { prompt, count: input.node.count },
+            { config: input.provider, credentials, signal: runtime.signal },
+          );
+          generated.push(...result.images.slice(0, input.node.count).map((image) => ({ image })));
+        } else if (input.node.patternPlacement) {
+          generated.push({
+            image: await runtime.composePattern!(
+              images[0]!,
+              images[1]!,
+              input.node.patternPlacement,
+            ),
+          });
+        } else if (input.node.removeBackground) {
+          const result = await runtime.router.execute(
+            'image.cutout',
+            { image: images[0]!, count: input.node.count, prompt },
+            { config: input.provider, credentials, signal: runtime.signal },
+          );
+          generated.push(...result.images.slice(0, input.node.count).map((image) => ({ image })));
+        } else if (input.node.requestedViews) {
           for (const view of input.node.requestedViews) {
             checkCancellation();
             const result = await runtime.router.execute(
@@ -345,20 +626,31 @@ export function createCanvasGenerateAction(): AppAction<
           }
         } else {
           checkCancellation();
-          const result = await runtime.router.execute(
-            'image.edit',
-            {
-              prompt,
-              images: images as ProviderImageInput[],
-              count: input.node.count,
-              ...(mask ? { mask } : {}),
-            },
-            { config: input.provider, credentials, signal: runtime.signal },
-          );
+          const request = {
+            prompt,
+            images: images as ProviderImageInput[],
+            count: input.node.count,
+            ...(mask ? { mask } : {}),
+          };
+          const providerContext = { config: input.provider, credentials, signal: runtime.signal };
+          const result =
+            input.node.localEditMode === 'erase'
+              ? await runtime.router.execute(
+                  'image.erase',
+                  { ...request, mask: mask! },
+                  providerContext,
+                )
+              : await runtime.router.execute('image.edit', request, providerContext);
           generated.push(...result.images.slice(0, input.node.count).map((image) => ({ image })));
         }
         checkCancellation();
-        const signature = generationInputSignature(input.node, edges, sources);
+        const signature = generationInputSignature(
+          input.node,
+          edges,
+          sources,
+          input.sourceDesigns,
+          input.sourceCandidates,
+        );
         if (!generated.length)
           throw new Error('The Provider returned no images. No candidate was saved.');
         if (mask) {
@@ -373,6 +665,17 @@ export function createCanvasGenerateAction(): AppAction<
             }
           } catch {
             throw new Error(LOCAL_EDIT_PROTECTION_ERROR);
+          }
+          checkCancellation();
+        }
+        if (input.node.removeBackground) {
+          try {
+            for (const result of generated) {
+              checkCancellation();
+              result.image = await runtime.protectCutout!(images[0]!, result.image);
+            }
+          } catch {
+            throw new Error(CUTOUT_PROTECTION_ERROR);
           }
           checkCancellation();
         }

@@ -12,7 +12,12 @@ const demoPreviewIds = {
 export function restoreDemoPreviewIds(nodes: CanvasNode[]): CanvasNode[] {
   let changed = false;
   const restored = nodes.map((node) => {
-    if (node.type === 'text' || node.type === 'generation' || node.type === 'candidate')
+    if (
+      node.type === 'text' ||
+      node.type === 'generation' ||
+      node.type === 'candidate' ||
+      node.type === 'group'
+    )
       return node;
     const preview = demoPreviewIds[node.id as keyof typeof demoPreviewIds];
     if (!preview || node[preview.field]) return node;

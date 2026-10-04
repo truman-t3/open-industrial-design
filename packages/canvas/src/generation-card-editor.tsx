@@ -59,20 +59,24 @@ export function GenerationCardEditor({
         <span
           className="generation-card-editor__provider"
           title={
-            ready && providerName
+            node.patternPlacement
+              ? translate(locale, 'generation.pattern.local')
+              : ready && providerName
+                ? translate(locale, 'generation.cardProvider', {
+                    name: providerName,
+                    count: node.count,
+                  })
+                : translate(locale, 'generation.cardProviderMissing')
+          }
+        >
+          {node.patternPlacement
+            ? translate(locale, 'generation.pattern.local')
+            : ready && providerName
               ? translate(locale, 'generation.cardProvider', {
                   name: providerName,
                   count: node.count,
                 })
-              : translate(locale, 'generation.cardProviderMissing')
-          }
-        >
-          {ready && providerName
-            ? translate(locale, 'generation.cardProvider', {
-                name: providerName,
-                count: node.count,
-              })
-            : translate(locale, 'generation.cardProviderMissing')}
+              : translate(locale, 'generation.cardProviderMissing')}
         </span>
         {status ? (
           <span className="generation-card-editor__status" role="status" title={status}>
@@ -85,9 +89,11 @@ export function GenerationCardEditor({
         className="generation-card-editor__run"
         disabled={busy || node.locked}
         title={
-          ready
-            ? `${providerName ?? ''} · ${node.count}`
-            : translate(locale, 'generation.providerRequired')
+          node.patternPlacement
+            ? translate(locale, 'generation.pattern.local')
+            : ready
+              ? `${providerName ?? ''} · ${node.count}`
+              : translate(locale, 'generation.providerRequired')
         }
         onClick={() => {
           commit();
@@ -96,7 +102,13 @@ export function GenerationCardEditor({
       >
         {translate(
           locale,
-          busy ? 'generation.running' : ready ? 'generation.run' : 'generation.configure',
+          busy
+            ? 'generation.running'
+            : node.patternPlacement
+              ? 'generation.pattern.run'
+              : ready
+                ? 'generation.run'
+                : 'generation.configure',
         )}
         {ready && !busy ? ` · ${node.count}` : ''}
       </button>

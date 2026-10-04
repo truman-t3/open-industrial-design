@@ -3,6 +3,7 @@ import {
   type BaseNode,
   type Edge,
   type GenerationInputRole,
+  type GenerationNode,
 } from '@open-industrial-design/design-model';
 
 export type ConnectionTarget = {
@@ -12,6 +13,21 @@ export type ConnectionTarget = {
 };
 
 export type CanvasInteractionMode = 'select' | 'pan';
+
+/** Graph navigation targets the design card, not whichever supporting card was loaded first. */
+export function findDesignCanvasNode<T extends BaseNode>(nodes: readonly T[], designId: string) {
+  const visible = nodes.filter((node) => node.designId === designId && !node.hidden);
+  return visible.find((node) => node.type === 'concept' || node.type === 'variant') ?? visible[0];
+}
+
+/** Supporting CMF/view cards must not take over a Design's lineage endpoint. */
+export function designLineageNodes(nodes: readonly BaseNode[]) {
+  return new Map(
+    nodes
+      .filter((node) => node.designId && (node.type === 'concept' || node.type === 'variant'))
+      .map((node) => [node.designId!, node]),
+  );
+}
 
 export type CanvasShortcutAction =
   'delete' | 'duplicate' | 'undo' | 'redo' | 'cancel-connection' | 'start-pan';
@@ -215,7 +231,7 @@ export function connectionTargetAt(
 ): ConnectionTarget | undefined {
   const reach = 20 / zoom;
   for (const node of [...nodes].reverse()) {
-    if (node.type !== 'generation') continue;
+    if (node.type !== 'generation' || (node as GenerationNode).textOnly) continue;
     const ports = [
       { role: 'base', y: 86 },
       { role: 'reference', y: 116 },
@@ -239,8 +255,122 @@ export function connectionTargetAt(
 }
 
 export function connectionCurve(startX: number, startY: number, endX: number, endY: number) {
-  const bend = Math.max(44, Math.abs(endX - startX) * 0.45);
+  const distance = Math.abs(endX - startX);
+  const bend = Math.min(Math.max(44, distance * 0.45), distance / 2);
   return [startX, startY, startX + bend, startY, endX - bend, endY, endX, endY];
+}
+
+/** Keep forward output wires outside intervening cards, rather than implying a chain of results. */
+type OutputRouteCard = Pick<BaseNode, 'id' | 'type' | 'x' | 'y' | 'width' | 'height' | 'hidden'>;
+export function forwardOutputRoute(
+  source: OutputRouteCard,
+  target: OutputRouteCard,
+  nodes: readonly OutputRouteCard[],
+) {
+  if (target.x + target.width / 2 < source.x + source.width / 2) {
+    const curve = connectionCurve(
+      target.x + target.width + 4,
+      target.y + target.height / 2,
+      source.x - 4,
+      source.y + source.height / 2,
+    );
+    return {
+      bezier: true,
+      points: [
+        curve[6]!,
+        curve[7]!,
+        curve[4]!,
+        curve[5]!,
+        curve[2]!,
+        curve[3]!,
+        curve[0]!,
+        curve[1]!,
+      ],
+    };
+  }
+  const startX = source.x + source.width + 4;
+  const startY = source.y + source.height / 2;
+  const endX = target.x - 4;
+  const endY = target.y + target.height / 2;
+  const between = nodes.filter(
+    (node) =>
+      node.id !== source.id &&
+      node.id !== target.id &&
+      !node.hidden &&
+      node.type !== 'group' &&
+      node.x > startX + 8 &&
+      node.x + node.width < endX - 8 &&
+      node.y < Math.max(startY, endY) + 8 &&
+      node.y + node.height > Math.min(startY, endY) - 8,
+  );
+  const obstructed = between.some(
+    (node) =>
+      node.y < Math.max(startY, endY) + 8 && node.y + node.height > Math.min(startY, endY) - 8,
+  );
+  if (!obstructed) return { bezier: true, points: connectionCurve(startX, startY, endX, endY) };
+  const corridorY = Math.min(source.y, target.y, ...between.map((node) => node.y)) - 24;
+  const exitX = Math.min(...between.map((node) => node.x)) - 12;
+  const entryX = Math.max(...between.map((node) => node.x + node.width)) + 12;
+  return {
+    bezier: false,
+    points: [
+      startX,
+      startY,
+      exitX,
+      startY,
+      exitX,
+      corridorY,
+      entryX,
+      corridorY,
+      entryX,
+      endY,
+      endX,
+      endY,
+    ],
+  };
+}
+
+/** Backward inputs travel around their endpoint cards, not through the source image. */
+export function generationInputRoute(
+  source: Pick<BaseNode, 'x' | 'y' | 'width' | 'height'>,
+  target: Pick<BaseNode, 'x' | 'y' | 'width' | 'height'>,
+  role: GenerationInputRole,
+) {
+  const startX = source.x + source.width - 4;
+  const startY = source.y + source.height / 2;
+  const endX = target.x - 4;
+  const endY = target.y + (role === 'base' ? 86 : 116);
+  if (endX >= startX) {
+    return { bezier: true, points: connectionCurve(startX, startY, endX, endY) };
+  }
+  const gap = 32;
+  const sourceBottom = source.y + source.height;
+  const targetBottom = target.y + target.height;
+  const corridorY =
+    target.y >= sourceBottom + gap * 2
+      ? (sourceBottom + target.y) / 2
+      : source.y >= targetBottom + gap * 2
+        ? (targetBottom + source.y) / 2
+        : Math.min(source.y, target.y) - gap;
+  const right = Math.max(source.x + source.width, target.x + target.width) + gap;
+  const left = Math.min(source.x, target.x) - gap;
+  return {
+    bezier: false,
+    points: [
+      startX,
+      startY,
+      right,
+      startY,
+      right,
+      corridorY,
+      left,
+      corridorY,
+      left,
+      endY,
+      endX,
+      endY,
+    ],
+  };
 }
 
 export function verticalConnectionCurve(

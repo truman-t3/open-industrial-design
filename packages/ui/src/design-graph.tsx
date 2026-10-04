@@ -53,10 +53,12 @@ function DesignGraphCard({ data, selected }: NodeProps<GraphDesignNode>) {
             ? 'design-graph-card design-graph-card--selected nodrag'
             : 'design-graph-card nodrag'
         }
-        onClick={() => openDesign(graphData.designId)}
-        onPointerDown={(event) => {
+        onClick={(event) => {
           event.stopPropagation();
           openDesign(graphData.designId);
+        }}
+        onPointerDown={(event) => {
+          event.stopPropagation();
         }}
         type="button"
       >

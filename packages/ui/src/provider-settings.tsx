@@ -10,6 +10,7 @@ export interface ProviderSettingsDraft {
   apiKey: string;
   rememberKey: boolean;
   supportsMask?: boolean;
+  supportsTransparency?: boolean;
 }
 
 export interface ProviderSettingsProps {
@@ -45,6 +46,7 @@ function toDraft(
         apiKey: '',
         rememberKey: config.rememberKey,
         supportsMask: config.supportsMask ?? false,
+        supportsTransparency: config.supportsTransparency ?? false,
       }
     : { ...defaultDraft, name: defaultName };
 }
@@ -160,6 +162,14 @@ function ProviderForm({
         {t('provider.supportsMask')}
       </label>
       <p className="provider-settings__privacy">{t('provider.maskHint')}</p>
+      <label className="provider-settings__remember">
+        <input
+          type="checkbox"
+          checked={draft.supportsTransparency ?? false}
+          onChange={(event) => update('supportsTransparency', event.target.checked)}
+        />
+        {t('provider.supportsTransparency')}
+      </label>
       <div className="provider-settings__buttons">
         <button className="button--primary" disabled={busy} type="submit">
           {t('provider.save')}

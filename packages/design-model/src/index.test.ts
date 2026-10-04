@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   PROJECT_SCHEMA_VERSION,
+  isValidResearchLibrary,
   addCMFVariant,
   createCMFSet,
   createConcept,
@@ -28,6 +29,81 @@ import {
 const timestamps = { createdAt: 1, updatedAt: 2 };
 
 describe('domain model contracts', () => {
+  it('validates user-curated research without inventing images or design lineage', () => {
+    const library = {
+      entries: [
+        {
+          id: 'note',
+          ...timestamps,
+          title: 'Grip study',
+          notes: 'Compare handles',
+          tags: ['grip'],
+          sourceUrl: 'https://example.com/product',
+          competitor: { brand: 'User supplied', product: 'Lamp', recordedOn: '2026-10-04' },
+        },
+      ],
+      collections: [
+        { id: 'inspiration', ...timestamps, name: 'Inspiration', entryIds: ['note'] },
+        { id: 'competitors', ...timestamps, name: 'Competitors', entryIds: ['note'] },
+      ],
+    };
+    expect(isValidResearchLibrary(library, [], 'project')).toBe(true);
+    expect(isValidResearchLibrary({ entries: [], collections: [] }, [], 'project')).toBe(true);
+    const mutate = (change: (draft: Record<string, unknown>) => void) => {
+      const draft = structuredClone(library) as unknown as Record<string, unknown>;
+      change(draft);
+      expect(isValidResearchLibrary(draft, [], 'project')).toBe(false);
+    };
+    mutate((draft) => {
+      draft.extra = true;
+    });
+    mutate((draft) => {
+      draft.entries = [...library.entries, ...library.entries];
+    });
+    mutate((draft) => {
+      draft.collections = [{ ...library.collections[0], entryIds: ['missing'] }];
+    });
+    mutate((draft) => {
+      draft.collections = [{ ...library.collections[0], entryIds: ['note', 'note'] }];
+    });
+    for (const patch of [
+      { assetId: 'missing' },
+      { sourceUrl: 'javascript:alert(1)' },
+      { sourceUrl: 'https://user:secret@example.com' },
+      { title: ' ' },
+      { notes: '', sourceUrl: '' },
+      { tags: ['same', 'SAME'] },
+      { competitor: { brand: '', product: '', recordedOn: '2026-02-30' } },
+      { competitor: { brand: '', product: '', recordedOn: 'yesterday' } },
+      { updatedAt: Number.NaN },
+      { createdAt: 5, updatedAt: 2 },
+      { apiKey: 'not-allowed' },
+    ])
+      mutate((draft) => {
+        draft.entries = [{ ...library.entries[0], ...patch }];
+      });
+    const asset: Asset = {
+      id: 'image',
+      projectId: 'project',
+      ...timestamps,
+      type: 'image',
+      name: 'Lamp',
+      mimeType: 'image/png',
+      size: 1,
+      storage: { type: 'indexeddb', blobId: 'image' },
+    };
+    const withImage = {
+      ...library,
+      entries: [{ ...library.entries[0]!, assetId: 'image', notes: '', sourceUrl: '' }],
+    };
+    expect(isValidResearchLibrary(withImage, [asset], 'project')).toBe(true);
+    expect(isValidResearchLibrary(withImage, [{ ...asset, projectId: 'other' }], 'project')).toBe(
+      false,
+    );
+    expect(isValidResearchLibrary(withImage, [{ ...asset, type: 'document' }], 'project')).toBe(
+      false,
+    );
+  });
   it('rejects duplicate main images, excess references, invalid sources and cross-board inputs', () => {
     const visual = (id: string, boardId = 'board') => ({
       id,

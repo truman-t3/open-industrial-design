@@ -8,6 +8,41 @@ describe('candidate inspector selection', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it.each(['en', 'zh-CN'])(
+    'distinguishes static sketch references from editable source in %s',
+    (language) => {
+      vi.stubGlobal('navigator', { language });
+      const render = (editable: boolean) =>
+        renderToStaticMarkup(
+          <LocalizationProvider>
+            <WorkspaceInspector
+              workspace="canvas"
+              onOpenAi={vi.fn()}
+              onEditSketch={vi.fn()}
+              node={
+                {
+                  id: 'sketch',
+                  type: 'sketch',
+                  label: 'Sketch',
+                  x: 0,
+                  y: 0,
+                  width: 180,
+                  height: 200,
+                  ...(editable ? { sketchDocumentId: 'doc' } : {}),
+                } as NonNullable<WorkspaceInspectorProps['node']>
+              }
+            />
+          </LocalizationProvider>,
+        );
+      const edit = language === 'en' ? 'Edit original sketch' : '编辑原始草图';
+      const hint = language === 'en' ? 'static sketch reference' : '静态草图参考';
+      expect(render(false)).toContain(hint);
+      expect(render(false)).not.toContain(edit);
+      expect(render(true)).toContain(edit);
+      expect(render(true)).not.toContain(hint);
+    },
+  );
+
+  it.each(['en', 'zh-CN'])(
     'matches input order and candidate identities in %s without changing data',
     (language) => {
       vi.stubGlobal('navigator', { language });

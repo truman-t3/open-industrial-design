@@ -15,8 +15,31 @@ vi.mock('react-konva', async () => {
       {
         'data-shape': name,
         'data-node': props.id,
+        'data-text': props.text,
+        'data-visible': props.visible === undefined ? undefined : String(props.visible),
         'data-draggable': String(props.draggable),
         'data-output': props.onMouseDown ? 'true' : undefined,
+        onDoubleClick: props.onTransformEnd
+          ? () =>
+              (props.onTransformEnd as (event: unknown) => void)({
+                target: {
+                  x: () => 5,
+                  y: () => 6,
+                  width: () => 0,
+                  height: () => 0,
+                  scaleX: () => 1.5,
+                  scaleY: () => 2,
+                  rotation: () => 0,
+                  scale: () => {},
+                },
+              })
+          : undefined,
+        onClick: props.onClick
+          ? (event: import('react').MouseEvent) => {
+              event.stopPropagation();
+              (props.onClick as (event: unknown) => void)({ cancelBubble: false, evt: event });
+            }
+          : undefined,
         onMouseDown: props.onMouseDown
           ? (event: import('react').MouseEvent) => {
               event.stopPropagation();
@@ -119,6 +142,58 @@ describe('Canvas connection lifecycle', () => {
     );
   }
 
+  it('resizes using model dimensions rather than the zero-sized Konva Group attributes', () => {
+    act(() =>
+      container
+        .querySelector('[data-node="source"]')!
+        .dispatchEvent(new MouseEvent('dblclick', { bubbles: true })),
+    );
+    expect(onNodesChange).toHaveBeenCalledWith([
+      expect.objectContaining({ id: 'source', x: 5, y: 6, width: 180, height: 160 }),
+    ]);
+  });
+
+  it('keeps a selected text task readable below the inline editor zoom threshold', () => {
+    const task = {
+      ...node,
+      id: 'task',
+      type: 'generation',
+      label: 'Text concept',
+      direction: 'A white portable lamp',
+      notes: '',
+      count: 2,
+      textOnly: true,
+    } as CanvasNode;
+    act(() => {
+      useCanvasRuntimeStore.getState().setViewport({ x: 0, y: 0, zoom: 0.65 });
+      useCanvasRuntimeStore.getState().select(task.id, false);
+      root.render(
+        <CanvasWorkspace
+          boardId="board"
+          nodes={[task]}
+          onNodesChange={onNodesChange}
+          onDelete={onDelete}
+          onDuplicate={vi.fn()}
+          onUndo={onUndo}
+          onRedo={vi.fn()}
+          generationRun={{ busy: false, ready: true, onRun: vi.fn() }}
+        />,
+      );
+    });
+    expect(
+      container.querySelector('[data-text="A white portable lamp"]')?.getAttribute('data-visible'),
+    ).toBe('true');
+    expect(container.querySelector('.generation-card-editor')).toBeNull();
+    expect(container.querySelector('[data-text="Main image"]')?.getAttribute('data-visible')).toBe(
+      'false',
+    );
+    act(() => useCanvasRuntimeStore.getState().setViewport({ x: 0, y: 0, zoom: 1 }));
+    expect(
+      container.querySelector('[data-text="A white portable lamp"]')?.getAttribute('data-visible'),
+    ).toBe('false');
+    expect(container.querySelector('.generation-card-editor textarea')).not.toBeNull();
+  });
+
   it('zoom and framing change only the viewport, preserving selection and node layout', () => {
     act(() => useCanvasRuntimeStore.getState().select('source', false));
     const selection = useCanvasRuntimeStore.getState().selectedIds;
@@ -141,8 +216,8 @@ describe('Canvas connection lifecycle', () => {
 
   it('disables navigation during a draft connection and restores it on cancellation', () => {
     startConnection();
-    const buttons = () => Array.from(container.querySelectorAll<HTMLButtonElement>('nav button'));
-    expect(buttons()).toHaveLength(4);
+    const buttons = () => Array.from(container.querySelectorAll<HTMLButtonElement>('nav > button'));
+    expect(buttons()).toHaveLength(5);
     expect(buttons().every((button) => button.disabled)).toBe(true);
     act(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })));
     expect(buttons().every((button) => !button.disabled)).toBe(true);
@@ -218,5 +293,56 @@ describe('Canvas connection lifecycle', () => {
     act(() => root.render(null));
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete' }));
     expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  it('includes independent candidates in explicit Shift multi-selection for grouping', () => {
+    const candidate: CanvasNode = {
+      ...node,
+      id: 'result',
+      type: 'candidate',
+      candidateId: 'candidate',
+      x: 220,
+    };
+    act(() =>
+      root.render(
+        <CanvasWorkspace
+          boardId="board"
+          nodes={[
+            node,
+            candidate,
+            {
+              ...node,
+              id: 'task',
+              type: 'generation',
+              label: 'Task',
+              direction: 'test',
+              notes: '',
+              count: 1,
+            },
+          ]}
+          generationCandidates={[{ id: 'candidate', generationNodeId: 'task' }]}
+          onNodesChange={onNodesChange}
+          onDelete={onDelete}
+          onDuplicate={vi.fn()}
+          onUndo={onUndo}
+          onRedo={vi.fn()}
+        />,
+      ),
+    );
+    const click = (id: string, shiftKey = false) =>
+      act(() => {
+        container
+          .querySelector(`[data-node="${id}"]`)!
+          .dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey }));
+      });
+    click('result');
+    expect(useCanvasRuntimeStore.getState().selectedCandidateId).toBe('candidate');
+    click('source', true);
+    expect(useCanvasRuntimeStore.getState().selectedIds).toEqual(['result', 'source']);
+    expect(useCanvasRuntimeStore.getState().selectedCandidateId).toBeUndefined();
+    click('source');
+    click('result', true);
+    expect(useCanvasRuntimeStore.getState().selectedIds).toEqual(['source', 'result']);
+    expect(onNodesChange).not.toHaveBeenCalled();
   });
 });

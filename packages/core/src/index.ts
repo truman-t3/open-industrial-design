@@ -9,6 +9,7 @@ export {
   supportedLocales,
   translate,
   translateDemoLabel,
+  translateGenerationConnectionError,
   translateDesignKind,
   translateDesignStatus,
   translateGraphRelation,

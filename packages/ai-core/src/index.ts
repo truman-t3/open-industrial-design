@@ -4,7 +4,13 @@
  */
 
 export type AICapability =
-  'text.generate' | 'vision.analyze' | 'image.generate' | 'image.edit' | 'image.variation';
+  | 'text.generate'
+  | 'vision.analyze'
+  | 'image.generate'
+  | 'image.edit'
+  | 'image.erase'
+  | 'image.cutout'
+  | 'image.variation';
 
 export type ProviderErrorCode =
   | 'unauthorized'
@@ -37,6 +43,7 @@ export interface ProviderConfig {
   enabled?: boolean;
   /** Explicit user confirmation of the configured service/model's mask support. */
   supportsMask?: boolean;
+  supportsTransparency?: boolean;
 }
 
 /** Runtime-only secret. It is deliberately excluded from ProviderConfig. */
@@ -111,6 +118,8 @@ export interface TextGenerateRequest {
 export interface VisionAnalyzeRequest {
   prompt: string;
   image: ProviderImageInput;
+  /** Additional evidence in caller order; at most seven, for eight images in total. */
+  references?: ProviderImageInput[];
 }
 
 export interface ImageGenerateRequest {
@@ -129,6 +138,15 @@ export interface ImageEditRequest {
 export interface ImageVariationRequest {
   image: ProviderImageInput;
   count?: number;
+}
+
+export interface ImageCutoutRequest extends ImageVariationRequest {
+  prompt?: string;
+}
+
+/** Erasing always requires a real alpha mask, never an unmasked prompt-only fallback. */
+export interface ImageEraseRequest extends ImageEditRequest {
+  mask: ProviderImageInput;
 }
 
 /** Runtime input reference. Asset resolution remains outside the Provider adapter. */
@@ -155,6 +173,8 @@ export interface AICapabilityRequests {
   'vision.analyze': VisionAnalyzeRequest;
   'image.generate': ImageGenerateRequest;
   'image.edit': ImageEditRequest;
+  'image.erase': ImageEraseRequest;
+  'image.cutout': ImageCutoutRequest;
   'image.variation': ImageVariationRequest;
 }
 
@@ -163,6 +183,8 @@ export interface AICapabilityResults {
   'vision.analyze': VisionAnalyzeResult;
   'image.generate': ImageResult;
   'image.edit': ImageResult;
+  'image.erase': ImageResult;
+  'image.cutout': ImageResult;
   'image.variation': ImageResult;
 }
 

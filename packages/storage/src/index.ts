@@ -1,7 +1,20 @@
 import Dexie, { type Table } from 'dexie';
 import {
   materializeCandidateResults,
+  createVariant,
+  createConcept,
+  transitionDesignStatus,
+  designStatuses,
+  reconcileCanvasGroups,
+  validateCanvasGroups,
   validateGenerationInput,
+  isValidMaterialKnowledge,
+  isValidResearchLibrary,
+  type ResearchLibrary,
+  type ResearchEntry,
+  isValidDesignViews,
+  isValidCMFVariantDraft,
+  type MaterialKnowledge,
   type CandidateNode,
 } from '@open-industrial-design/design-model';
 import type {
@@ -15,8 +28,10 @@ import type {
   BaseNode,
   Board,
   CMFSet,
+  CMFNode,
   CMFVariant,
   Design,
+  DesignStatus,
   DesignRelation,
   Edge,
   Generation,
@@ -26,8 +41,12 @@ import type {
   Model3DNode,
   Project,
   ProjectRepository,
+  ReferenceNode,
+  ImageNode,
   SketchDocument,
+  SketchNode,
   ViewSet,
+  ViewSetNode,
 } from '@open-industrial-design/design-model';
 import type {
   ProjectArchiveData,
@@ -41,6 +60,12 @@ import {
 export interface AssetBlob {
   id: string;
   blob: Blob;
+}
+export interface LocalMaterialEntry {
+  asset: Asset;
+  projectName: string;
+  notes: string[];
+  referenceTypes: string[];
 }
 export interface GenerationInputBlob extends AssetBlob {
   projectId: string;
@@ -57,6 +82,15 @@ export interface PersistedProjectSnapshot {
   nodes: BaseNode[];
   /** Live workflow edges, including edges restored by the canvas undo/redo state. */
   edges?: Edge[];
+}
+
+/** Session-only undo data. Blobs never enter serialized Action history or canvas state. */
+export interface CanvasDeletionSnapshot {
+  projectId: string;
+  boardId: string;
+  before: { nodes: BaseNode[]; edges: Edge[]; candidates: GenerationCandidate[] };
+  after: { nodes: BaseNode[]; edges: Edge[]; candidates: GenerationCandidate[] };
+  removedBlobs: AssetBlob[];
 }
 
 export class OpenIndustrialDesignDatabase extends Dexie {
@@ -147,6 +181,26 @@ export class OpenIndustrialDesignDatabase extends Dexie {
       .upgrade(async (transaction) => {
         await transaction.table('projects').toCollection().modify({ schemaVersion: 7 });
       });
+    this.version(6)
+      .stores({})
+      .upgrade(async (transaction) => {
+        await transaction
+          .table('nodes')
+          .toCollection()
+          .modify((node) => {
+            if (node.type === 'group') {
+              node.childNodeIds = [];
+              node.rotation = 0;
+              node.label ??= '';
+            }
+          });
+        await transaction.table('projects').toCollection().modify({ schemaVersion: 8 });
+      });
+    this.version(7)
+      .stores({})
+      .upgrade(async (transaction) => {
+        await transaction.table('projects').toCollection().modify({ schemaVersion: 9 });
+      });
   }
 }
 
@@ -191,6 +245,16 @@ async function saveGenerationStatus(database: OpenIndustrialDesignDatabase, valu
       throw new Error('Generation project ownership is immutable.');
     if (JSON.stringify(existing?.inputSnapshots) !== JSON.stringify(value.inputSnapshots))
       throw new Error('Generation input snapshots are immutable; use atomic input persistence.');
+    if (
+      existing?.actionId === 'ai.analyzeMaterials' &&
+      (value.actionId !== existing.actionId ||
+        value.prompt !== existing.prompt ||
+        JSON.stringify(value.parameters?.researchEvidence) !==
+          JSON.stringify(existing.parameters?.researchEvidence) ||
+        JSON.stringify(value.parameters?.evidence) !==
+          JSON.stringify(existing.parameters?.evidence))
+    )
+      throw new Error('Analysis evidence is immutable.');
     await database.generations.put(value);
   });
 }
@@ -200,8 +264,83 @@ export class DexieProjectRepository implements ProjectRepository {
   getProject(id: string) {
     return this.database.projects.get(id);
   }
-  saveProject(project: Project) {
-    return this.database.projects.put(project).then(() => undefined);
+  async saveProject(project: Project) {
+    await this.database.transaction('rw', this.database.projects, async () => {
+      const current = await this.database.projects.get(project.id);
+      await this.database.projects.put({
+        ...project,
+        ...(current ? { researchLibrary: current.researchLibrary } : {}),
+      });
+    });
+  }
+  /** Compare-and-save user research; Canvas autosave never owns these records. */
+  async saveResearchLibrary(
+    projectId: string,
+    library: ResearchLibrary,
+    expected: ResearchLibrary | undefined,
+  ) {
+    await this.database.transaction(
+      'rw',
+      [this.database.projects, this.database.assets],
+      async () => {
+        const project = await this.database.projects.get(projectId);
+        if (!project) throw new Error('Research project is missing.');
+        if (JSON.stringify(project.researchLibrary) !== JSON.stringify(expected))
+          throw new Error('Research library changed. Reload before saving.');
+        const assets = await this.database.assets.where('projectId').equals(projectId).toArray();
+        if (!isValidResearchLibrary(library, assets, projectId))
+          throw new Error('Invalid research library.');
+        await this.database.projects.update(projectId, {
+          researchLibrary: structuredClone(library),
+          updatedAt: Date.now(),
+        });
+      },
+    );
+  }
+  async importResearchImage(
+    asset: Asset,
+    blob: Blob,
+    entry: ResearchEntry,
+    collectionId: string | undefined,
+    expected: ResearchLibrary | undefined,
+  ) {
+    await this.database.transaction(
+      'rw',
+      [this.database.projects, this.database.assets, this.database.assetBlobs],
+      async () => {
+        if (
+          asset.type !== 'image' ||
+          asset.storage.type !== 'indexeddb' ||
+          entry.assetId !== asset.id ||
+          !['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif'].includes(
+            asset.mimeType,
+          ) ||
+          asset.mimeType !== blob.type ||
+          asset.size !== blob.size ||
+          !blob.size ||
+          blob.size > 25 * 1024 * 1024 ||
+          !Number.isInteger(asset.width) ||
+          !Number.isInteger(asset.height) ||
+          asset.width! <= 0 ||
+          asset.height! <= 0 ||
+          asset.width! * asset.height! > 32_000_000 ||
+          (await this.database.assets.get(asset.id)) ||
+          (await this.database.assetBlobs.get(asset.storage.blobId))
+        )
+          throw new Error('Invalid research image or identity conflict.');
+        const library = structuredClone(expected ?? { entries: [], collections: [] });
+        library.entries.push(entry);
+        if (collectionId !== undefined) {
+          const collection = library.collections.find((item) => item.id === collectionId);
+          if (!collection) throw new Error('Research collection is missing.');
+          collection.entryIds.push(entry.id);
+          collection.updatedAt = Date.now();
+        }
+        await this.database.assets.add(asset);
+        await this.database.assetBlobs.add({ id: asset.storage.blobId, blob });
+        await this.saveResearchLibrary(asset.projectId, library, expected);
+      },
+    );
   }
   getBoard(id: string) {
     return this.database.boards.get(id);
@@ -263,6 +402,50 @@ export class DexieProjectRepository implements ProjectRepository {
       },
     );
   }
+  async createGenerationBatch(
+    steps: Array<{ node: GenerationNode; edge: Edge; referenceEdges?: Edge[] }>,
+  ): Promise<Board> {
+    if (
+      !steps.length ||
+      steps.length > 16 ||
+      steps.some((step) => step.node.boardId !== steps[0]!.node.boardId)
+    )
+      throw new Error('A batch must contain one to sixteen steps on one board.');
+    // Nested step transactions join this transaction; any failed step rolls back the batch.
+    return this.database.transaction(
+      'rw',
+      [this.database.boards, this.database.nodes, this.database.edges],
+      async () => {
+        let board: Board | undefined;
+        for (const step of steps) {
+          board = await this.createGenerationStep(step.node, step.edge);
+          for (const edge of step.referenceEdges ?? []) {
+            if (
+              edge.type !== 'generation_input' ||
+              edge.inputRole !== 'reference' ||
+              edge.boardId !== board.id ||
+              edge.targetNodeId !== step.node.id
+            )
+              throw new Error('Invalid shared reference.');
+            const nodes = await this.database.nodes.where('boardId').equals(board.id).toArray();
+            const edges = await this.database.edges.where('boardId').equals(board.id).toArray();
+            const error = validateGenerationInput(
+              nodes,
+              edges,
+              edge.sourceNodeId,
+              step.node.id,
+              'reference',
+            );
+            if (error) throw new Error(error);
+            await this.database.edges.add(edge);
+            board = { ...board, edgeIds: [...board.edgeIds, edge.id] };
+            await this.database.boards.put(board);
+          }
+        }
+        return board!;
+      },
+    );
+  }
   async saveBoardEdge(edge: Edge): Promise<Board> {
     return this.database.transaction(
       'rw',
@@ -302,6 +485,97 @@ export class DexieProjectRepository implements ProjectRepository {
       },
     );
   }
+  async deleteCanvasNodesWithUndo(boardId: string, nodeIds: readonly string[]) {
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.boards,
+        this.database.nodes,
+        this.database.edges,
+        this.database.candidates,
+        this.database.candidateBlobs,
+      ],
+      async () => {
+        const board = await this.database.boards.get(boardId);
+        if (!board) throw new Error('Board is missing.');
+        const read = async () => ({
+          nodes: await this.database.nodes.where('boardId').equals(boardId).toArray(),
+          edges: await this.database.edges.where('boardId').equals(boardId).toArray(),
+          candidates: await this.database.candidates.where('boardId').equals(boardId).toArray(),
+        });
+        const before = await read();
+        const blobs = await this.database.candidateBlobs.bulkGet(
+          before.candidates.map((item) => item.id),
+        );
+        const updatedBoard = await this.deleteCanvasNodes(boardId, nodeIds);
+        const after = await read();
+        const removedCandidates = before.candidates.filter(
+          (item) => !after.candidates.some((current) => current.id === item.id),
+        );
+        const removedBlobs = removedCandidates.map((item) =>
+          blobs.find((blob) => blob?.id === item.id),
+        );
+        if (removedBlobs.some((blob) => !blob?.blob.size))
+          throw new Error('Candidate image missing; reversible deletion refused.');
+        const undo: CanvasDeletionSnapshot = {
+          projectId: board.projectId,
+          boardId,
+          before,
+          after,
+          removedBlobs: removedBlobs as AssetBlob[],
+        };
+        return { board: updatedBoard, undo };
+      },
+    );
+  }
+  async restoreCanvasDeletion(snapshot: CanvasDeletionSnapshot): Promise<Board> {
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.boards,
+        this.database.nodes,
+        this.database.edges,
+        this.database.candidates,
+        this.database.candidateBlobs,
+      ],
+      async () => {
+        const board = await this.database.boards.get(snapshot.boardId);
+        if (!board || board.projectId !== snapshot.projectId)
+          throw new Error('Deletion board unavailable.');
+        const current = {
+          nodes: await this.database.nodes.where('boardId').equals(board.id).toArray(),
+          edges: await this.database.edges.where('boardId').equals(board.id).toArray(),
+          candidates: await this.database.candidates.where('boardId').equals(board.id).toArray(),
+        };
+        // Do not overwrite edits from another tab, adopted results, or newly reused IDs.
+        if (JSON.stringify(current) !== JSON.stringify(snapshot.after))
+          throw new Error('Board changed since deletion.');
+        for (const [table, before, after] of [
+          [this.database.nodes, snapshot.before.nodes, snapshot.after.nodes],
+          [this.database.edges, snapshot.before.edges, snapshot.after.edges],
+          [this.database.candidates, snapshot.before.candidates, snapshot.after.candidates],
+        ] as const) {
+          for (const item of before) {
+            if (item.boardId !== board.id) throw new Error('Deletion snapshot ownership mismatch.');
+            if (!after.some((entry) => entry.id === item.id) && (await table.get(item.id)))
+              throw new Error('Deletion restore ID conflict.');
+          }
+        }
+        await this.database.candidateBlobs.bulkAdd(snapshot.removedBlobs);
+        await this.database.candidates.bulkPut(snapshot.before.candidates);
+        await this.database.nodes.bulkPut(snapshot.before.nodes);
+        await this.database.edges.bulkPut(snapshot.before.edges);
+        const restored = {
+          ...board,
+          nodeIds: snapshot.before.nodes.map((node) => node.id),
+          edgeIds: snapshot.before.edges.map((edge) => edge.id),
+          updatedAt: Date.now(),
+        };
+        await this.database.boards.put(restored);
+        return restored;
+      },
+    );
+  }
   async deleteCanvasNodes(boardId: string, nodeIds: readonly string[]): Promise<Board> {
     return this.database.transaction(
       'rw',
@@ -316,6 +590,15 @@ export class DexieProjectRepository implements ProjectRepository {
         const board = await this.database.boards.get(boardId);
         if (!board) throw new Error('Board is missing.');
         const removed = new Set(nodeIds);
+        const boardNodes = await this.database.nodes.where('boardId').equals(boardId).toArray();
+        if (
+          [...removed].some(
+            (id) =>
+              !board.nodeIds.includes(id) ||
+              !boardNodes.some((node) => node.id === id && !node.locked),
+          )
+        )
+          throw new Error('Deletion contains unavailable or locked nodes.');
         const [edges, candidates] = await Promise.all([
           this.database.edges.where('boardId').equals(boardId).toArray(),
           this.database.candidates.where('boardId').equals(boardId).toArray(),
@@ -333,6 +616,8 @@ export class DexieProjectRepository implements ProjectRepository {
             removedCandidates.some((candidate) => candidate.id === node.candidateId),
           )
           .forEach((node) => removed.add(node.id));
+        if (boardNodes.some((node) => removed.has(node.id) && node.locked))
+          throw new Error('Deletion contains locked result nodes.');
         if (
           edges.some(
             (edge) =>
@@ -352,6 +637,10 @@ export class DexieProjectRepository implements ProjectRepository {
           updatedAt: Date.now(),
         };
         await this.database.nodes.bulkDelete([...removed]);
+        const remaining = await this.database.nodes.where('boardId').equals(boardId).toArray();
+        await this.database.nodes.bulkPut(
+          reconcileCanvasGroups(remaining).filter((node) => node.type === 'group'),
+        );
         await this.database.edges.bulkDelete(removedEdges.map((edge) => edge.id));
         await this.database.candidates.bulkDelete(
           removedCandidates.map((candidate) => candidate.id),
@@ -373,6 +662,32 @@ export class DexieProjectRepository implements ProjectRepository {
   saveDesign(design: Design) {
     return this.database.designs.put(design).then(() => undefined);
   }
+  async transitionDesignDecision(
+    projectId: string,
+    designId: string,
+    expectedStatus: DesignStatus,
+    status: DesignStatus,
+  ) {
+    return this.database.transaction(
+      'rw',
+      [this.database.projects, this.database.designs],
+      async () => {
+        const design = await this.database.designs.get(designId);
+        if (
+          !design ||
+          design.projectId !== projectId ||
+          !(await this.database.projects.get(projectId)) ||
+          design.status !== expectedStatus ||
+          !designStatuses.includes(status)
+        )
+          throw new Error('Design status is unavailable or has changed.');
+        const updated = transitionDesignStatus(design, status);
+        await this.database.designs.put(updated);
+        await this.database.projects.update(projectId, { updatedAt: updated.updatedAt });
+        return updated;
+      },
+    );
+  }
   listDesignRelations(projectId: string) {
     return this.database.relations.where('projectId').equals(projectId).toArray();
   }
@@ -382,14 +697,609 @@ export class DexieProjectRepository implements ProjectRepository {
   saveAsset(asset: Asset) {
     return this.database.assets.put(asset).then(() => undefined);
   }
+  async saveMaterialKnowledge(projectId: string, assetId: string, knowledge: MaterialKnowledge) {
+    if (!isValidMaterialKnowledge(knowledge)) throw new Error('Invalid material knowledge.');
+    await this.database.transaction(
+      'rw',
+      [this.database.assets, this.database.projects],
+      async () => {
+        const asset = await this.database.assets.get(assetId);
+        if (
+          !asset ||
+          asset.projectId !== projectId ||
+          asset.type !== 'image' ||
+          !(await this.database.projects.get(projectId))
+        )
+          throw new Error('Material is missing.');
+        const updatedAt = Date.now();
+        await this.database.assets.put({
+          ...asset,
+          knowledge: { ...knowledge, tags: [...knowledge.tags] },
+          updatedAt,
+        });
+        await this.database.projects.update(projectId, { updatedAt });
+      },
+    );
+  }
+  /** Local metadata only. Never fetch remote assets or read Provider credentials. */
+  async searchLocalMaterials(query = '', projectId?: string): Promise<LocalMaterialEntry[]> {
+    const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+    const [assets, projects, nodes] = await Promise.all([
+      projectId
+        ? this.database.assets.where('projectId').equals(projectId).toArray()
+        : this.database.assets.toArray(),
+      this.database.projects.toArray(),
+      this.database.nodes.toArray(),
+    ]);
+    const projectNames = new Map(projects.map((project) => [project.id, project.name]));
+    const references = new Map<string, ReferenceNode[]>();
+    for (const node of nodes) {
+      if (node.type !== 'reference') continue;
+      const reference = node as ReferenceNode;
+      const group = references.get(reference.assetId) ?? [];
+      group.push(reference);
+      references.set(reference.assetId, group);
+    }
+    return assets
+      .filter(
+        (asset) =>
+          asset.type === 'image' &&
+          asset.storage.type === 'indexeddb' &&
+          projectNames.has(asset.projectId) &&
+          asset.mimeType.startsWith('image/'),
+      )
+      .map((asset) => {
+        const sourceReferences = references.get(asset.id) ?? [];
+        return {
+          asset,
+          projectName: projectNames.get(asset.projectId)!,
+          notes: [
+            ...new Set(
+              sourceReferences
+                .map((node) => node.notes?.trim())
+                .filter((note): note is string => Boolean(note)),
+            ),
+          ],
+          referenceTypes: [
+            ...new Set(
+              sourceReferences
+                .map((node) => node.referenceType)
+                .filter((type): type is NonNullable<ReferenceNode['referenceType']> =>
+                  Boolean(type),
+                ),
+            ),
+          ],
+        };
+      })
+      .filter((entry) => {
+        const searchable = [
+          entry.asset.name,
+          entry.projectName,
+          ...entry.notes,
+          ...entry.referenceTypes,
+          entry.asset.knowledge?.notes ?? '',
+          ...(entry.asset.knowledge?.tags ?? []),
+        ]
+          .join(' ')
+          .toLocaleLowerCase();
+        return terms.every((term) => searchable.includes(term));
+      })
+      .sort(
+        (a, b) => b.asset.updatedAt - a.asset.updatedAt || a.asset.id.localeCompare(b.asset.id),
+      );
+  }
+  /** All-or-nothing import; decoding belongs to the browser adapter before this transaction. */
+  async importLocalImage(asset: Asset, node: ImageNode | ReferenceNode, blob: Blob) {
+    await this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.boards,
+        this.database.nodes,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const board = await this.database.boards.get(node.boardId);
+        const project = await this.database.projects.get(asset.projectId);
+        if (
+          !board ||
+          !project ||
+          board.projectId !== project.id ||
+          !project.boardIds.includes(board.id) ||
+          !asset.id ||
+          !node.id ||
+          asset.type !== 'image' ||
+          asset.storage.type !== 'indexeddb' ||
+          asset.storage.blobId !== asset.id ||
+          node.assetId !== asset.id ||
+          !['image', 'reference'].includes(node.type) ||
+          node.designId ||
+          !['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif'].includes(
+            asset.mimeType,
+          ) ||
+          blob.type !== asset.mimeType ||
+          blob.size !== asset.size ||
+          !blob.size ||
+          blob.size > 25 * 1024 * 1024 ||
+          !Number.isInteger(asset.width) ||
+          !Number.isInteger(asset.height) ||
+          !asset.width ||
+          !asset.height ||
+          asset.width <= 0 ||
+          asset.height <= 0 ||
+          asset.width * asset.height > 32_000_000 ||
+          ![node.x, node.y, node.width, node.height, node.rotation, node.zIndex].every(
+            Number.isFinite,
+          ) ||
+          node.width <= 0 ||
+          node.height <= 0
+        )
+          throw new Error('Invalid image import.');
+        await this.database.assets.add(asset);
+        await this.database.assetBlobs.add({ id: asset.id, blob });
+        await this.database.nodes.add(node);
+        await this.database.boards.put({
+          ...board,
+          nodeIds: [...board.nodeIds, node.id],
+          updatedAt: node.updatedAt,
+        });
+        await this.database.projects.update(project.id, { updatedAt: node.updatedAt });
+      },
+    );
+  }
+  /** Copy across projects so deleting the source cannot break the target project. */
+  async placeLocalMaterial(projectId: string, sourceAssetId: string, node: ReferenceNode) {
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.boards,
+        this.database.nodes,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const board = await this.database.boards.get(node.boardId);
+        const source = await this.database.assets.get(sourceAssetId);
+        if (
+          !board ||
+          board.projectId !== projectId ||
+          !(await this.database.projects.get(projectId)) ||
+          !source ||
+          !(await this.database.projects.get(source.projectId)) ||
+          source.type !== 'image' ||
+          source.storage.type !== 'indexeddb' ||
+          !source.mimeType.startsWith('image/') ||
+          node.type !== 'reference' ||
+          !node.id ||
+          node.assetId !== sourceAssetId ||
+          ![node.x, node.y, node.width, node.height, node.rotation, node.zIndex].every(
+            Number.isFinite,
+          ) ||
+          node.width <= 0 ||
+          node.height <= 0
+        )
+          throw new Error('Invalid material placement.');
+        const stored = await this.database.assetBlobs.get(source.storage.blobId);
+        if (!stored?.blob.size) throw new Error('Material file is missing.');
+        let asset = source;
+        if (source.projectId !== projectId) {
+          const id = crypto.randomUUID();
+          asset = {
+            ...source,
+            id,
+            projectId,
+            storage: { type: 'indexeddb', blobId: id },
+            createdAt: node.createdAt,
+            updatedAt: node.updatedAt,
+          };
+          // Source-specific links and metadata are not portable design lineage.
+          delete asset.thumbnailAssetId;
+          delete asset.metadata;
+          await this.database.assets.add(asset);
+          await this.database.assetBlobs.add({ id, blob: stored.blob });
+        }
+        const placed: ReferenceNode = { ...node, assetId: asset.id };
+        await this.database.nodes.add(placed);
+        await this.database.boards.put({
+          ...board,
+          nodeIds: [...board.nodeIds, placed.id],
+          updatedAt: node.updatedAt,
+        });
+        await this.database.projects.update(projectId, { updatedAt: node.updatedAt });
+        return { node: placed, asset };
+      },
+    );
+  }
   saveDesignRelation(value: DesignRelation) {
     return this.database.relations.put(value).then(() => undefined);
+  }
+  async createBlankConcept(
+    projectId: string,
+    boardId: string,
+    input: { name: string; x: number; y: number },
+  ) {
+    if (
+      typeof input?.name !== 'string' ||
+      !input.name.trim() ||
+      input.name.length > 200 ||
+      ![input.x, input.y].every(Number.isFinite)
+    )
+      throw new Error('Invalid concept input.');
+    return this.database.transaction(
+      'rw',
+      [this.database.projects, this.database.boards, this.database.nodes, this.database.designs],
+      async () => {
+        const project = await this.database.projects.get(projectId);
+        const board = await this.database.boards.get(boardId);
+        if (
+          !project ||
+          !board ||
+          board.projectId !== projectId ||
+          !project.boardIds.includes(boardId)
+        )
+          throw new Error('Concept board unavailable.');
+        const created = createConcept({ projectId, boardId, ...input, name: input.name.trim() });
+        const node = { ...created.node, label: created.design.name };
+        await this.database.designs.add(created.design);
+        await this.database.nodes.add(node);
+        await this.database.boards.put({
+          ...board,
+          nodeIds: [...board.nodeIds, node.id],
+          updatedAt: created.design.updatedAt,
+        });
+        await this.database.projects.update(projectId, { updatedAt: created.design.updatedAt });
+        return { design: created.design, node };
+      },
+    );
+  }
+  async createConceptFromImage(
+    projectId: string,
+    boardId: string,
+    input: {
+      sourceNodeId: string;
+      name: string;
+      x: number;
+      y: number;
+    },
+  ) {
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.boards,
+        this.database.nodes,
+        this.database.designs,
+        this.database.edges,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const source = await this.database.nodes.get(input.sourceNodeId);
+        const board = await this.database.boards.get(boardId);
+        if (
+          !source ||
+          source.boardId !== boardId ||
+          !board ||
+          board.projectId !== projectId ||
+          !board.nodeIds.includes(source.id) ||
+          !(await this.database.projects.get(projectId)) ||
+          !['image', 'reference', 'sketch'].includes(source.type) ||
+          typeof input.name !== 'string' ||
+          !input.name.trim() ||
+          input.name.length > 200 ||
+          ![input.x, input.y].every(Number.isFinite)
+        )
+          throw new Error('Invalid concept source.');
+        const assetId =
+          'assetId' in source
+            ? source.assetId
+            : 'previewAssetId' in source
+              ? source.previewAssetId
+              : undefined;
+        const asset =
+          typeof assetId === 'string' ? await this.database.assets.get(assetId) : undefined;
+        if (
+          !asset ||
+          asset.projectId !== projectId ||
+          !asset.mimeType.startsWith('image/') ||
+          asset.storage.type !== 'indexeddb' ||
+          !(await this.database.assetBlobs.get(asset.storage.blobId))?.blob.size
+        )
+          throw new Error('Concept preview is unavailable.');
+        const created = createConcept({
+          projectId,
+          boardId,
+          name: input.name.trim(),
+          x: input.x,
+          y: input.y,
+          previewAssetId: asset.id,
+        });
+        const edge: Edge = {
+          id: crypto.randomUUID(),
+          boardId,
+          sourceNodeId: source.id,
+          targetNodeId: created.node.id,
+          type: 'references',
+          createdAt: created.design.createdAt,
+          updatedAt: created.design.updatedAt,
+        };
+        await this.database.designs.add(created.design);
+        await this.database.nodes.add({ ...created.node, label: created.design.name } as BaseNode);
+        await this.database.edges.add(edge);
+        await this.database.boards.put({
+          ...board,
+          nodeIds: [...board.nodeIds, created.node.id],
+          edgeIds: [...board.edgeIds, edge.id],
+          updatedAt: created.design.updatedAt,
+        });
+        await this.database.projects.update(projectId, { updatedAt: created.design.updatedAt });
+        return { designId: created.design.id, nodeId: created.node.id };
+      },
+    );
+  }
+  async saveManualVariant(projectId: string, value: ReturnType<typeof createVariant>) {
+    const { design, node, relation } = value;
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.boards,
+        this.database.nodes,
+        this.database.designs,
+        this.database.relations,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const parent = design.parentDesignId
+          ? await this.database.designs.get(design.parentDesignId)
+          : undefined;
+        const board = await this.database.boards.get(node.boardId);
+        if (
+          !parent ||
+          parent.projectId !== projectId ||
+          !board ||
+          board.projectId !== projectId ||
+          !(await this.database.projects.get(projectId)) ||
+          design.projectId !== projectId ||
+          design.kind !== 'variant' ||
+          !design.name.trim() ||
+          design.name.length > 200 ||
+          node.type !== 'variant' ||
+          node.designId !== design.id ||
+          ![node.x, node.y, node.width, node.height].every(Number.isFinite) ||
+          node.width <= 0 ||
+          node.height <= 0 ||
+          relation.projectId !== projectId ||
+          relation.type !== 'variant_of' ||
+          relation.sourceDesignId !== parent.id ||
+          relation.targetDesignId !== design.id
+        )
+          throw new Error('Invalid manual variant ownership.');
+        if (node.previewAssetId) {
+          const asset = await this.database.assets.get(node.previewAssetId);
+          if (
+            !asset ||
+            asset.projectId !== projectId ||
+            !asset.mimeType.startsWith('image/') ||
+            asset.storage.type !== 'indexeddb' ||
+            !(await this.database.assetBlobs.get(asset.storage.blobId))?.blob.size
+          )
+            throw new Error('Variant preview is unavailable.');
+        }
+        // The current persisted parent is authoritative; a stale UI snapshot must not supply DNA.
+        const current = createVariant(parent, {
+          boardId: board.id,
+          name: design.name,
+          x: node.x,
+          y: node.y,
+          previewAssetId: node.previewAssetId,
+        });
+        await this.database.designs.add({ ...design, dna: current.design.dna });
+        await this.database.nodes.add(node);
+        await this.database.relations.add(relation);
+        await this.database.boards.put({
+          ...board,
+          nodeIds: [...board.nodeIds, node.id],
+          updatedAt: design.updatedAt,
+        });
+        await this.database.projects.update(projectId, { updatedAt: design.updatedAt });
+      },
+    );
   }
   saveViewSet(value: ViewSet) {
     return this.database.viewSets.put(value).then(() => undefined);
   }
+  listViewSets(projectId: string) {
+    return this.database.viewSets.where('projectId').equals(projectId).toArray();
+  }
+  async saveViewSetWithNode(value: ViewSet, node?: ViewSetNode, expectedExisting = false) {
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.designs,
+        this.database.viewSets,
+        this.database.nodes,
+        this.database.boards,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const design = await this.database.designs.get(value.designId);
+        const existing = await this.database.viewSets.get(value.id);
+        if (
+          !design ||
+          design.projectId !== value.projectId ||
+          !isValidDesignViews(value.views) ||
+          typeof value.name !== 'string' ||
+          !value.name.trim() ||
+          value.name.length > 200 ||
+          !(await this.database.projects.get(value.projectId)) ||
+          (existing &&
+            (existing.projectId !== value.projectId || existing.designId !== value.designId)) ||
+          (expectedExisting ? !existing : Boolean(existing)) ||
+          (!node && !expectedExisting)
+        )
+          throw new Error('Invalid view set ownership.');
+        for (const assetId of Object.values(value.views)) {
+          const asset = await this.database.assets.get(assetId);
+          if (
+            !asset ||
+            asset.projectId !== value.projectId ||
+            !asset.mimeType.startsWith('image/') ||
+            asset.storage.type !== 'indexeddb' ||
+            !(await this.database.assetBlobs.get(asset.storage.blobId))?.blob.size
+          )
+            throw new Error('View image is unavailable in this project.');
+        }
+        const viewSet = {
+          ...value,
+          views: { ...value.views },
+          createdAt: existing?.createdAt ?? value.createdAt,
+        };
+        if (node) {
+          const board = await this.database.boards.get(node.boardId);
+          if (
+            !board ||
+            board.projectId !== value.projectId ||
+            node.type !== 'viewset' ||
+            node.designId !== value.designId ||
+            node.viewSetId !== value.id ||
+            ![node.x, node.y, node.width, node.height].every(Number.isFinite) ||
+            node.width <= 0 ||
+            node.height <= 0
+          )
+            throw new Error('Invalid view set node.');
+          await this.database.nodes.add(node);
+          await this.database.boards.put({
+            ...board,
+            nodeIds: [...board.nodeIds, node.id],
+            updatedAt: value.updatedAt,
+          });
+        }
+        await this.database.viewSets.put(viewSet);
+        await this.database.projects.update(value.projectId, { updatedAt: value.updatedAt });
+        return { viewSet, ...(node ? { node } : {}) };
+      },
+    );
+  }
   saveCMFSet(value: CMFSet) {
     return this.database.cmfSets.put(value).then(() => undefined);
+  }
+  listCMFSets(projectId: string) {
+    return this.database.cmfSets.where('projectId').equals(projectId).toArray();
+  }
+  listCMFVariants(projectId: string) {
+    return this.database.cmfVariants.where('projectId').equals(projectId).toArray();
+  }
+  async saveCMFSetWithNode(
+    value: CMFSet,
+    values: CMFVariant[],
+    node?: CMFNode,
+    expectedExisting = false,
+  ) {
+    return this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.designs,
+        this.database.cmfSets,
+        this.database.cmfVariants,
+        this.database.nodes,
+        this.database.boards,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const design = await this.database.designs.get(value.designId);
+        const existing = await this.database.cmfSets.get(value.id);
+        if (
+          !design ||
+          design.projectId !== value.projectId ||
+          !(await this.database.projects.get(value.projectId)) ||
+          typeof value.name !== 'string' ||
+          !value.name.trim() ||
+          value.name.length > 200 ||
+          (expectedExisting ? !existing : Boolean(existing)) ||
+          (!node && !expectedExisting) ||
+          (existing &&
+            (existing.designId !== value.designId || existing.projectId !== value.projectId)) ||
+          !Array.isArray(values) ||
+          values.length < 1 ||
+          values.length > 24 ||
+          !Array.isArray(value.variantIds) ||
+          value.variantIds.length !== values.length ||
+          new Set(value.variantIds).size !== values.length ||
+          values.some((variant, index) => variant.id !== value.variantIds[index])
+        )
+          throw new Error('Invalid CMF set ownership.');
+        const variants: CMFVariant[] = [];
+        for (const variant of values) {
+          const { projectId, designId, createdAt, updatedAt, ...draft } = variant;
+          const previous = await this.database.cmfVariants.get(variant.id);
+          if (
+            projectId !== value.projectId ||
+            designId !== value.designId ||
+            !Number.isFinite(createdAt) ||
+            !Number.isFinite(updatedAt) ||
+            !isValidCMFVariantDraft(draft) ||
+            (previous &&
+              (!existing?.variantIds.includes(variant.id) ||
+                previous.projectId !== projectId ||
+                previous.designId !== designId))
+          )
+            throw new Error('Invalid CMF variant ownership.');
+          if (variant.textureAssetId) {
+            const asset = await this.database.assets.get(variant.textureAssetId);
+            if (
+              !asset ||
+              asset.projectId !== value.projectId ||
+              !asset.mimeType.startsWith('image/') ||
+              asset.storage.type !== 'indexeddb' ||
+              !(await this.database.assetBlobs.get(asset.storage.blobId))?.blob.size
+            )
+              throw new Error('CMF texture is unavailable in this project.');
+          }
+          variants.push({
+            ...variant,
+            ...(variant.color ? { color: { ...variant.color } } : {}),
+            createdAt: previous?.createdAt ?? createdAt,
+          });
+        }
+        if (node) {
+          const board = await this.database.boards.get(node.boardId);
+          if (
+            !board ||
+            board.projectId !== value.projectId ||
+            node.type !== 'cmf' ||
+            node.designId !== value.designId ||
+            node.cmfSetId !== value.id ||
+            ![node.x, node.y, node.width, node.height].every(Number.isFinite) ||
+            node.width <= 0 ||
+            node.height <= 0
+          )
+            throw new Error('Invalid CMF node.');
+          await this.database.nodes.add(node);
+          await this.database.boards.put({
+            ...board,
+            nodeIds: [...board.nodeIds, node.id],
+            updatedAt: value.updatedAt,
+          });
+        }
+        const cmfSet = {
+          ...value,
+          variantIds: [...value.variantIds],
+          createdAt: existing?.createdAt ?? value.createdAt,
+        };
+        await this.database.cmfVariants.bulkPut(variants);
+        await this.database.cmfSets.put(cmfSet);
+        await this.database.projects.update(value.projectId, { updatedAt: value.updatedAt });
+        return { cmfSet, variants, ...(node ? { node } : {}) };
+      },
+    );
   }
   saveCMFVariant(value: CMFVariant) {
     return this.database.cmfVariants.put(value).then(() => undefined);
@@ -399,6 +1309,130 @@ export class DexieProjectRepository implements ProjectRepository {
   }
   saveSketchDocument(value: SketchDocument) {
     return this.database.sketchDocuments.put(value).then(() => undefined);
+  }
+  getSketchDocument(id: string) {
+    return this.database.sketchDocuments.get(id);
+  }
+
+  async saveSketchSnapshot(input: {
+    document: SketchDocument;
+    node: SketchNode;
+    source: Asset;
+    preview: Asset;
+    sourceBlob: Blob;
+    previewBlob: Blob;
+  }): Promise<void> {
+    const { document, node, source, preview, sourceBlob, previewBlob } = input;
+    // Decode before opening the transaction: Blob reads must not let Dexie go idle.
+    const scene = JSON.parse(await sourceBlob.text()) as Record<string, unknown>;
+    if (
+      scene.type !== 'excalidraw' ||
+      scene.version !== 2 ||
+      !Array.isArray(scene.elements) ||
+      sourceBlob.type !== 'application/json' ||
+      previewBlob.type !== 'image/png' ||
+      !sourceBlob.size ||
+      !previewBlob.size ||
+      sourceBlob.size > 50 * 1024 * 1024 ||
+      previewBlob.size > 25 * 1024 * 1024 ||
+      document.format !== 'excalidraw' ||
+      document.formatVersion !== 2 ||
+      node.type !== 'sketch' ||
+      node.sketchDocumentId !== document.id ||
+      node.previewAssetId !== preview.id ||
+      document.sourceAssetId !== source.id ||
+      document.previewAssetId !== preview.id ||
+      source.id === preview.id ||
+      source.type !== 'document' ||
+      preview.type !== 'image' ||
+      source.mimeType !== sourceBlob.type ||
+      preview.mimeType !== previewBlob.type ||
+      source.size !== sourceBlob.size ||
+      preview.size !== previewBlob.size ||
+      [source, preview].some(
+        (asset) =>
+          asset.projectId !== document.projectId ||
+          asset.storage.type !== 'indexeddb' ||
+          asset.storage.blobId !== asset.id,
+      ) ||
+      ![node.x, node.y, node.width, node.height, node.rotation, node.zIndex].every(
+        Number.isFinite,
+      ) ||
+      node.width <= 0 ||
+      node.height <= 0
+    )
+      throw new Error('Invalid sketch snapshot.');
+    await this.database.transaction(
+      'rw',
+      [
+        this.database.projects,
+        this.database.boards,
+        this.database.nodes,
+        this.database.sketchDocuments,
+        this.database.assets,
+        this.database.assetBlobs,
+      ],
+      async () => {
+        const project = await this.database.projects.get(document.projectId);
+        const board = await this.database.boards.get(node.boardId);
+        const previous = (await this.database.nodes.get(node.id)) as SketchNode | undefined;
+        const oldDocument = await this.database.sketchDocuments.get(document.id);
+        if (
+          !project ||
+          !board ||
+          board.projectId !== project.id ||
+          !project.boardIds.includes(board.id) ||
+          (previous &&
+            (previous.type !== 'sketch' ||
+              previous.boardId !== board.id ||
+              previous.locked ||
+              previous.sketchDocumentId !== document.id ||
+              previous.createdAt !== node.createdAt)) ||
+          (oldDocument &&
+            (oldDocument.projectId !== project.id ||
+              !previous ||
+              oldDocument.createdAt !== document.createdAt)) ||
+          (previous && !oldDocument) ||
+          (!previous && board.nodeIds.includes(node.id))
+        )
+          throw new Error('Invalid sketch ownership.');
+        // Each save owns fresh immutable assets. Existing generations may still reference old previews.
+        await this.database.assets.add(source);
+        await this.database.assets.add(preview);
+        await this.database.assetBlobs.add({ id: source.id, blob: sourceBlob });
+        await this.database.assetBlobs.add({ id: preview.id, blob: previewBlob });
+        await this.database.sketchDocuments.put(document);
+        await this.database.nodes.put(node);
+        const representations = (await this.database.nodes.toArray()).filter(
+          (item) =>
+            item.id !== node.id &&
+            item.type === 'sketch' &&
+            (item as SketchNode).sketchDocumentId === document.id,
+        );
+        for (const representation of representations) {
+          const ownerBoard = await this.database.boards.get(representation.boardId);
+          if (
+            !ownerBoard ||
+            ownerBoard.projectId !== project.id ||
+            !project.boardIds.includes(ownerBoard.id)
+          )
+            throw new Error('Invalid shared sketch ownership.');
+          await this.database.nodes.put({
+            ...representation,
+            previewAssetId: preview.id,
+            updatedAt: document.updatedAt,
+          } as SketchNode);
+          if (ownerBoard.id !== board.id)
+            await this.database.boards.put({ ...ownerBoard, updatedAt: document.updatedAt });
+        }
+        await this.database.boards.put({
+          ...board,
+          nodeIds: previous ? board.nodeIds : [...board.nodeIds, node.id],
+          updatedAt: document.updatedAt,
+        });
+        await this.database.projects.update(project.id, { updatedAt: document.updatedAt });
+      },
+    );
   }
   getGraphViewState(projectId: string) {
     return this.database.graphViewStates.get(projectId);
@@ -413,6 +1447,7 @@ export class DexieProjectRepository implements ProjectRepository {
     return this.database.assetBlobs.get(id);
   }
   async saveSnapshot(snapshot: PersistedProjectSnapshot) {
+    validateCanvasGroups(snapshot.nodes);
     await this.database.transaction(
       'rw',
       this.database.projects,
@@ -430,7 +1465,11 @@ export class DexieProjectRepository implements ProjectRepository {
             nodeIds.has(edge.sourceNodeId) &&
             nodeIds.has(edge.targetNodeId),
         );
-        await this.database.projects.put(snapshot.project);
+        const currentProject = await this.database.projects.get(snapshot.project.id);
+        await this.database.projects.put({
+          ...snapshot.project,
+          ...(currentProject ? { researchLibrary: currentProject.researchLibrary } : {}),
+        });
         await this.database.boards.put({
           ...snapshot.board,
           nodeIds: snapshot.nodes.map((node) => node.id),
@@ -810,6 +1849,26 @@ export class DexieProjectArchiveStorage {
 /** Atomic persistence port for an accepted AI candidate; it never calls a Provider. */
 export class DexieAIGenerationStorage {
   constructor(private readonly database: OpenIndustrialDesignDatabase) {}
+
+  async listMaterialAnalyses(projectId: string) {
+    return (await this.database.generations.where('projectId').equals(projectId).toArray())
+      .filter((run) => run.actionId === 'ai.analyzeMaterials')
+      .sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  async getMaterialAnalysisBlob(projectId: string, generationId: string, snapshotId: string) {
+    const run = await this.database.generations.get(generationId);
+    if (
+      run?.projectId !== projectId ||
+      run.actionId !== 'ai.analyzeMaterials' ||
+      !run.inputSnapshots?.some((input) => input.id === snapshotId)
+    )
+      return undefined;
+    const stored = await this.database.generationInputBlobs.get(snapshotId);
+    return stored?.projectId === projectId && stored.generationId === generationId
+      ? stored.blob
+      : undefined;
+  }
 
   saveGeneration(generation: Generation) {
     return saveGenerationStatus(this.database, generation);

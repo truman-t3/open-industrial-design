@@ -18,7 +18,16 @@ export default tseslint.config(
     },
   },
   {
-    files: ['scripts/**/*.mjs', 'packages/**/scripts/**/*.mjs', 'apps/web/*.mjs'],
+    files: ['scripts/desktop/**/*.cjs'],
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: [
+      'scripts/**/*.mjs',
+      'scripts/**/*.cjs',
+      'packages/**/scripts/**/*.mjs',
+      'apps/web/*.mjs',
+    ],
     languageOptions: {
       globals: globals.node,
     },

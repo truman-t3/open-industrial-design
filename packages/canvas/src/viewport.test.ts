@@ -1,7 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import { fitCanvasViewport, zoomViewport } from './viewport';
+import { fitCanvasViewport, isCanvasNodeInView, revealCanvasNode, zoomViewport } from './viewport';
 
 describe('Canvas view-only navigation', () => {
+  it('culls only offscreen render objects while accounting for zoom, pan, overscan and rotation', () => {
+    const size = { width: 800, height: 600 },
+      viewport = { x: 0, y: 0, zoom: 1 };
+    const node = { x: 1000, y: 20, width: 100, height: 100 };
+    expect(isCanvasNodeInView(node, viewport, size)).toBe(false);
+    expect(isCanvasNodeInView(node, { ...viewport, x: -300 }, size)).toBe(true);
+    expect(isCanvasNodeInView(node, { ...viewport, zoom: 0.5 }, size)).toBe(true);
+    expect(isCanvasNodeInView({ ...node, x: 900 }, viewport, size)).toBe(true);
+    expect(isCanvasNodeInView({ ...node, x: 900, rotation: 180 }, viewport, size, 0)).toBe(true);
+    expect(isCanvasNodeInView({ ...node, x: -500 }, viewport, size)).toBe(false);
+    expect(isCanvasNodeInView({ ...node, x: 10, y: 2000 }, viewport, size)).toBe(false);
+    expect(node).toEqual({ x: 1000, y: 20, width: 100, height: 100 });
+  });
+  it('reveals newly placed cards in all four directions without moving nodes or changing zoom', () => {
+    const viewport = { x: -70, y: 80, zoom: 0.75 };
+    for (const x of [-500, 200, 1600])
+      for (const y of [-470, 100, 1200]) {
+        const node = { x, y, width: 290, height: 300 };
+        const original = { ...node };
+        const result = revealCanvasNode(viewport, node, { width: 900, height: 650 });
+        expect(node.x * result.zoom + result.x).toBeGreaterThanOrEqual(24);
+        expect(node.y * result.zoom + result.y).toBeGreaterThanOrEqual(64);
+        expect((node.x + node.width) * result.zoom + result.x).toBeLessThanOrEqual(876);
+        expect((node.y + node.height) * result.zoom + result.y).toBeLessThanOrEqual(626);
+        expect(result.zoom).toBe(viewport.zoom);
+        expect(node).toEqual(original);
+      }
+  });
   it('keeps the same world point under the zoom anchor and clamps to wheel limits', () => {
     const before = { x: -70, y: 80, zoom: 0.5 };
     const anchor = { x: 400, y: 300 };

@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: MPL-2.0
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, readFileSync } from 'node:fs';
+import {
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  rmSync,
+  symlinkSync,
+  readFileSync,
+  readdirSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,6 +37,27 @@ test('public candidate excludes internal records, passes screening and resolves 
     }
   }
   assert.deepEqual(missing, []);
+});
+
+test('publication and source lists include every application and package source file', () => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const roots = [
+    'apps/web/src',
+    ...readdirSync(join(root, 'packages')).map((name) => `packages/${name}/src`),
+  ];
+  const files = roots.flatMap((dir) =>
+    readdirSync(join(root, dir), { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile() && /\.(?:[cm]?[jt]sx?|css)$/.test(entry.name))
+      .map((entry) => join(entry.parentPath, entry.name).slice(root.length).replaceAll('\\', '/')),
+  );
+  for (const list of ['public-files.json', 'source-files.json']) {
+    const allowed = JSON.parse(readFileSync(join(root, 'scripts', list), 'utf8'));
+    assert.deepEqual(
+      files.filter((file) => !allowed.includes(file)),
+      [],
+      `${list} omits source files`,
+    );
+  }
 });
 
 test('publication screening reports locations, never matched secrets', () => {

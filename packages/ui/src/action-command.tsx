@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type {
   ActionContext,
   ActionDescriptor,
@@ -24,6 +24,8 @@ const actionMessageKeys: Partial<
     }
   >
 > = {
+  'workspace.groupSelection': { label: 'workspace.group', description: 'workspace.groupHint' },
+  'workspace.ungroupSelection': { label: 'workspace.ungroup', description: 'workspace.groupHint' },
   'workspace.duplicateSelection': {
     label: 'action.workspace.duplicate.label',
     description: 'action.workspace.duplicate.description',
@@ -64,8 +66,15 @@ function ActionList({
   const { t } = useLocalization();
   const [error, setError] = useState<string>();
   const normalizedQuery = query.trim().toLocaleLowerCase();
+  const localizedAction = (action: ActionDescriptor) => {
+    const keys = actionMessageKeys[action.id];
+    return keys ? { description: t(keys.description), label: t(keys.label) } : action;
+  };
   const actions = registry.listRunnable(context).filter((action) => {
-    return `${action.label} ${action.description}`.toLocaleLowerCase().includes(normalizedQuery);
+    const localized = localizedAction(action);
+    return `${localized.label} ${localized.description} ${action.label} ${action.description}`
+      .toLocaleLowerCase()
+      .includes(normalizedQuery);
   });
   const executionState = useActionState(runner);
   const runningActionIds = new Set(
@@ -73,10 +82,6 @@ function ActionList({
       .filter((execution) => execution.status === 'running')
       .map((execution) => execution.actionId),
   );
-  const localizedAction = (action: ActionDescriptor) => {
-    const keys = actionMessageKeys[action.id];
-    return keys ? { description: t(keys.description), label: t(keys.label) } : action;
-  };
 
   const run = async (descriptor: ActionDescriptor) => {
     if (descriptor.defaultInput === undefined) return;
@@ -162,11 +167,54 @@ export interface ActionContextMenuProps extends ActionSurfaceProps {
 /** Selection context menu backed by the same ActionRegistry as the palette. */
 export function ActionContextMenu({ position, ...props }: ActionContextMenuProps) {
   const { t } = useLocalization();
+  const menuRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    const place = () => {
+      menu.style.left = `${Math.max(8, Math.min(position.x, window.innerWidth - menu.offsetWidth - 8))}px`;
+      menu.style.top = `${Math.max(8, Math.min(position.y, window.innerHeight - menu.offsetHeight - 8))}px`;
+    };
+    place();
+    menu.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
+    const observer = new ResizeObserver(place);
+    observer.observe(menu);
+    window.addEventListener('resize', place);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', place);
+    };
+  }, [position.x, position.y]);
+  const onClose = props.onClose;
+  useEffect(() => {
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !menuRef.current?.contains(event.target)) onClose();
+    };
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
+  }, [onClose]);
   return (
     <div
+      ref={menuRef}
       aria-label={t('action.selection')}
       className="action-context-menu"
       onContextMenu={(event) => event.preventDefault()}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        if (event.key === 'Escape' || event.key === 'Tab') {
+          onClose();
+          return;
+        }
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+        event.preventDefault();
+        const buttons = Array.from(
+          event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'),
+        );
+        const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const next =
+          (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+        buttons[next]?.focus();
+      }}
       role="menu"
       style={{ left: position.x, top: position.y }}
     >

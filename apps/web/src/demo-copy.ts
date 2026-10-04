@@ -87,6 +87,7 @@ export function createDemoCopy(
       updatedAt: timestamp,
     };
     if (node.designId) node.designId = id(node.designId);
+    if (node.type === 'group') node.childNodeIds = node.childNodeIds.map(id);
     if ('assetId' in node && typeof node.assetId === 'string')
       node.assetId = assetIds[node.assetId] ?? node.assetId;
     if ('previewAssetId' in node && typeof node.previewAssetId === 'string')

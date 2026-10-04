@@ -1,26 +1,54 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { dracoDecoderPath } from './runtime-assets';
-import { prepareEditMask, protectLocalEdit } from './edit-mask';
+import { prepareEditMask, protectLocalEdit, protectCutout, composePattern } from './edit-mask';
+import { defaultPatternPlacement } from '@open-industrial-design/design-model';
 import { downloadOidProject, type ProjectDownload } from './project-download';
 import { createDemoCopyArchive, fitDemoCopyViewport } from './demo-copy';
-import { findGenerationTool, generationInputLabel } from './generation-tools';
+import { findGenerationTool, generationInputLabel, queueInputSummaries } from './generation-tools';
+import { ExplorationBatch, ExplorationQueue } from './exploration-batch';
+import { MaterialLibrary } from './material-library';
+import { ResearchLibraryDialog } from './research-library';
+import type { ResearchLibrary } from '@open-industrial-design/design-model';
+import type { ResearchCommand } from '@open-industrial-design/actions';
 import { updateWorkspaceStatus } from './workspace-status';
-import { saveWorkspaceBeforeLeaving } from './workspace-save';
+import { createWorkspaceSaveQueue, preventUnsavedWorkspaceUnload } from './workspace-save';
 import { archiveErrorMessage } from './archive-error';
+import { refreshSketchPreview } from './sketch-history';
 import {
   ActionRegistry,
   ActionRunner,
   CandidateTray,
   createCanvasGenerateAction,
+  createCanvasBatchGenerateAction,
+  type CanvasBatchProgress,
   createGenerationStepAction,
+  createExplorationBatchAction,
+  createPlaceMaterialAction,
+  createSaveMaterialKnowledgeAction,
+  createResearchCommandAction,
+  createImportResearchImageAction,
+  createSaveDesignDnaAction,
+  createSaveViewSetAction,
+  createSaveCMFSetAction,
+  createVariantAction,
+  createConceptFromImageAction,
+  createBlankConceptAction,
+  createTransitionDesignStatusAction,
+  type PlaceMaterialResult,
+  type CreateExplorationBatchInput,
+  type ExplorationBatchStep,
   createKeepCanvasCandidateAction,
   generationInputSignature,
   LOCAL_EDIT_PROTECTION_ERROR,
   createAIAnalyzeDesignAction,
+  createAIAnalyzeMaterialsAction,
   createAIGenerateVariantAction,
   createAITestConnectionAction,
   createKeepCandidateAction,
   createWorkspaceActions,
+  createSaveTextNodeAction,
+  createImportImageAction,
+  createSaveSketchAction,
   type ActionContext,
 } from '@open-industrial-design/actions';
 import {
@@ -39,12 +67,18 @@ import {
 } from '@open-industrial-design/ai-openai-compatible';
 import {
   CanvasWorkspace,
+  revealCanvasNode,
+  findDesignCanvasNode,
   findFreeNodePosition,
   type CanvasNode,
   type CanvasInteractionMode,
   useCanvasRuntimeStore,
 } from '@open-industrial-design/canvas';
-import { appMetadata, translateDemoLabel } from '@open-industrial-design/core';
+import {
+  appMetadata,
+  translateDemoLabel,
+  translateGenerationConnectionError,
+} from '@open-industrial-design/core';
 import {
   createOidProjectArchive,
   importOidProjectArchive,
@@ -60,6 +94,13 @@ import type {
   BaseNode,
   CameraState,
   Design,
+  DesignStatus,
+  ViewSet,
+  ViewSetNode,
+  CMFSet,
+  CMFVariant,
+  CMFVariantDraft,
+  CMFNode,
   DesignRelation,
   Edge,
   GenerationCandidate,
@@ -69,24 +110,30 @@ import type {
   GraphViewState,
   Project,
   Asset,
+  SketchNode,
+  SketchDocument,
+  ReferenceNode,
+  MaterialKnowledge,
   Model3DNode,
 } from '@open-industrial-design/design-model';
 import {
   PROJECT_SCHEMA_VERSION,
-  createConcept,
+  createCanvasGroup,
+  reconcileCanvasGroups,
   createModel3DNode,
-  createReferenceNode,
   validateGenerationInput,
 } from '@open-industrial-design/design-model';
 import {
   DexieProjectArchiveStorage,
   DexieProjectRepository,
+  type CanvasDeletionSnapshot,
   DexieAIGenerationStorage,
   DexieCanvasGenerationStorage,
   DexieProviderConfigRepository,
   DexieProviderCredentialStore,
   DexieThreeViewerStorage,
   OpenIndustrialDesignDatabase,
+  type LocalMaterialEntry,
 } from '@open-industrial-design/storage';
 import {
   ActionCommandPalette,
@@ -107,8 +154,13 @@ import { UiIcon } from './ui-icons';
 
 const database = new OpenIndustrialDesignDatabase();
 const repository = new DexieProjectRepository(database);
+const searchLocalMaterials = (query: string, projectId?: string) =>
+  repository.searchLocalMaterials(query, projectId);
+const loadMaterialBlob = async (id: string) => (await repository.getAssetBlob(id))?.blob;
 const archiveStorage = new DexieProjectArchiveStorage(database);
 const generationStorage = new DexieAIGenerationStorage(database);
+const loadAnalysisBlob = (projectId: string, generationId: string, snapshotId: string) =>
+  generationStorage.getMaterialAnalysisBlob(projectId, generationId, snapshotId);
 const canvasGenerationStorage = new DexieCanvasGenerationStorage(database);
 const threeViewerStorage = new DexieThreeViewerStorage(database);
 const providerConfigsRepository = new DexieProviderConfigRepository(database);
@@ -123,11 +175,28 @@ const capabilityRouter = new CapabilityRouter(providerRegistry);
 const actionRegistry = new ActionRegistry();
 createWorkspaceActions().forEach((action) => actionRegistry.register(action));
 actionRegistry.register(createAITestConnectionAction());
+actionRegistry.register(createSaveSketchAction());
 actionRegistry.register(createAIAnalyzeDesignAction());
+actionRegistry.register(createAIAnalyzeMaterialsAction());
 actionRegistry.register(createAIGenerateVariantAction());
 actionRegistry.register(createKeepCandidateAction());
 actionRegistry.register(createCanvasGenerateAction());
 actionRegistry.register(createGenerationStepAction());
+actionRegistry.register(createCanvasBatchGenerateAction());
+actionRegistry.register(createExplorationBatchAction());
+actionRegistry.register(createPlaceMaterialAction());
+actionRegistry.register(createSaveMaterialKnowledgeAction());
+actionRegistry.register(createResearchCommandAction());
+actionRegistry.register(createImportResearchImageAction());
+actionRegistry.register(createSaveDesignDnaAction());
+actionRegistry.register(createSaveViewSetAction());
+actionRegistry.register(createSaveCMFSetAction());
+actionRegistry.register(createVariantAction());
+actionRegistry.register(createConceptFromImageAction());
+actionRegistry.register(createBlankConceptAction());
+actionRegistry.register(createTransitionDesignStatusAction());
+actionRegistry.register(createSaveTextNodeAction());
+actionRegistry.register(createImportImageAction());
 actionRegistry.register(createKeepCanvasCandidateAction());
 const actionRunner = new ActionRunner(actionRegistry);
 const candidateTray = new CandidateTray();
@@ -155,7 +224,7 @@ const seedNodes: CanvasNode[] = [
     designId: 'concept-1',
     previewAssetId: 'demo-lamp-concept',
     x: 545,
-    y: 210,
+    y: 360,
     width: 280,
     height: 300,
     rotation: 0,
@@ -186,7 +255,7 @@ const seedNodes: CanvasNode[] = [
     label: '参考图 · 户外情境',
     assetId: 'demo-lamp-reference',
     x: 30,
-    y: 390,
+    y: 525,
     width: 180,
     height: 200,
     rotation: 0,
@@ -201,7 +270,7 @@ const seedNodes: CanvasNode[] = [
     label: '草图 · 形态探索',
     previewAssetId: 'demo-lamp-sketch',
     x: 30,
-    y: 155,
+    y: 290,
     width: 180,
     height: 200,
     rotation: 0,
@@ -216,9 +285,9 @@ const seedNodes: CanvasNode[] = [
     label: '户外场景表达 · 示例素材',
     assetId: 'demo-lamp-scene',
     x: 1150,
-    y: 850,
-    width: 210,
-    height: 220,
+    y: 810,
+    width: 430,
+    height: 270,
     rotation: 0,
     zIndex: 1,
   },
@@ -230,8 +299,8 @@ const seedNodes: CanvasNode[] = [
     type: 'image',
     label: '矿物蓝灰 CMF · 示例素材',
     assetId: 'demo-lamp-cmf-blue',
-    x: 1150,
-    y: 340,
+    x: 1380,
+    y: 90,
     width: 200,
     height: 220,
     rotation: 0,
@@ -246,7 +315,7 @@ const seedNodes: CanvasNode[] = [
     label: '旋钮局部方案 · 示例素材',
     assetId: 'demo-lamp-detail-knob',
     x: 1150,
-    y: 600,
+    y: 450,
     width: 200,
     height: 220,
     rotation: 0,
@@ -261,7 +330,7 @@ const seedNodes: CanvasNode[] = [
     label: '提手转轴局部 · 示例素材',
     assetId: 'demo-lamp-detail-handle',
     x: 1380,
-    y: 600,
+    y: 450,
     width: 200,
     height: 220,
     rotation: 0,
@@ -275,14 +344,14 @@ const demoGenerationNodes: GenerationNode[] = [
     label: '草图渲染 · 待运行',
     direction: '将主图草图转化为工业设计效果图，保留轮廓、比例与功能结构；参考图仅用于材质与光线。',
     x: 260,
-    y: 250,
+    y: 390,
   },
   {
     id: 'demo-cmf',
     label: 'CMF 探索 · 待运行',
     direction: '保留主图产品轮廓与结构，探索暖白外壳、细腻哑光表面与深灰五金的协调 CMF 方案。',
     x: 895,
-    y: 210,
+    y: 90,
   },
   {
     id: 'demo-scene',
@@ -290,14 +359,14 @@ const demoGenerationNodes: GenerationNode[] = [
     direction:
       '保留灯具设计特征与比例，放入黄昏户外露营场景，表达真实尺度、温暖照明与自然使用方式。',
     x: 895,
-    y: 850,
+    y: 810,
   },
   {
     id: 'demo-detail',
     label: '局部细节探索 · 待运行',
     direction: '保持灯具整体造型不变，只微调正面旋钮纹理与提手转轴细节。',
     x: 895,
-    y: 555,
+    y: 450,
   },
 ].map((brief) => ({
   ...brief,
@@ -545,6 +614,13 @@ export function App() {
   const [candidatePreviewUrls, setCandidatePreviewUrls] = useState<Record<string, string>>({});
   const [generationStatuses, setGenerationStatuses] = useState<Record<string, string>>({});
   const [generationBusy, setGenerationBusy] = useState(false);
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [queueOpen, setQueueOpen] = useState(false);
+  const [materialsOpen, setMaterialsOpen] = useState(false);
+  const [researchOpen, setResearchOpen] = useState(false);
+  const [queueInitialIds, setQueueInitialIds] = useState<string[]>([]);
+  const [queueProgress, setQueueProgress] = useState<CanvasBatchProgress>();
+  const [queueReport, setQueueReport] = useState('');
   const generationRequestRef = useRef<{ nodeId: string; controller: AbortController } | undefined>(
     undefined,
   );
@@ -559,10 +635,20 @@ export function App() {
   const [demoOpening, setDemoOpening] = useState(false);
   const demoOpeningRef = useRef(false);
   const [namingIntent, setNamingIntent] = useState<NamingIntent>();
+  const namingPendingRef = useRef(false);
+  const [namingBusy, setNamingBusy] = useState(false);
+  const [namingFailed, setNamingFailed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [editingSketch, setEditingSketch] = useState(false);
+  const [sketchDraft, setSketchDraft] = useState<{
+    node: SketchNode & { label: string };
+    document: SketchDocument;
+    source: string;
+  }>();
   const [history, setHistory] = useState<CanvasNode[][]>([seedNodes]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [canvasMutationBusy, setCanvasMutationBusy] = useState(false);
+  const deletionUndoRef = useRef(new WeakMap<CanvasNode[], CanvasDeletionSnapshot>());
   const [workspaceMode, setWorkspaceMode] = useState<'canvas' | 'graph' | 'viewer'>('canvas');
   const [canvasInteractionMode, setCanvasInteractionMode] =
     useState<CanvasInteractionMode>('select');
@@ -570,6 +656,7 @@ export function App() {
   const [relations, setRelations] = useState<DesignRelation[]>(seedRelations);
   const [graphViewState, setGraphViewState] = useState<GraphViewState>();
   const [selectedDesignId, setSelectedDesignId] = useState<string>();
+  const [designNodeToReveal, setDesignNodeToReveal] = useState<string>();
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number }>();
   const [archiveStatus, setArchiveStatus] = useState<string>();
@@ -583,6 +670,8 @@ export function App() {
   const [archiveBusy, setArchiveBusy] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'failed' | 'saved' | 'saving'>('saved');
   const [saveError, setSaveError] = useState<string>();
+  const saveQueue = useRef(createWorkspaceSaveQueue());
+  const saveAttempt = useRef(0);
   const [storageError, setStorageError] = useState<string>();
   const [providerConfigs, setProviderConfigs] = useState<ProviderConfig[]>([]);
   const [selectedProviderId, setSelectedProviderId] = useState<string>();
@@ -600,12 +689,17 @@ export function App() {
   >('unconfigured');
   const [busyCandidateId, setBusyCandidateId] = useState<string>();
   const [modelAssets, setModelAssets] = useState<Asset[]>([]);
+  const [viewSets, setViewSets] = useState<ViewSet[]>([]);
+  const [cmfSets, setCMFSets] = useState<CMFSet[]>([]);
+  const [cmfVariants, setCMFVariants] = useState<CMFVariant[]>([]);
   const [activeModelAssetId, setActiveModelAssetId] = useState<string>();
   const [activeModelUrl, setActiveModelUrl] = useState<string>();
   const [viewerStatus, setViewerStatus] = useState<string>();
   const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
   const importInputRef = useRef<HTMLInputElement>(null);
   const referenceImportInputRef = useRef<HTMLInputElement>(null);
+  const imageImportKindRef = useRef<'image' | 'reference'>('reference');
+  const imageImportPendingRef = useRef(false);
   const modelImportInputRef = useRef<HTMLInputElement>(null);
   const activeModelUrlRef = useRef<string | undefined>(undefined);
   const previewUrlsRef = useRef<Record<string, string>>({});
@@ -614,6 +708,8 @@ export function App() {
   const selectedIds = useCanvasRuntimeStore((state) => state.selectedIds);
   const selectedCandidateId = useCanvasRuntimeStore((state) => state.selectedCandidateId);
   const canvasViewport = useCanvasRuntimeStore((state) => state.viewport);
+  const saveInputs = useRef({ board, project, edges, canvasViewport });
+  saveInputs.current = { board, project, edges, canvasViewport };
   const clearSelection = useCanvasRuntimeStore((state) => state.clearSelection);
   const clearCandidateSelection = useCanvasRuntimeStore((state) => state.clearCandidateSelection);
   const selectCanvasNode = useCanvasRuntimeStore((state) => state.select);
@@ -671,7 +767,9 @@ export function App() {
     selectedNodeIds: selectedIds,
     selectedDesignIds: selectedDesignId ? [selectedDesignId] : [],
   };
-  const commit = (next: CanvasNode[]) => {
+  const commit = (next: CanvasNode[], completingDeletion = false) => {
+    if (deletionPendingRef.current && !completingDeletion) return nodesRef.current;
+    next = reconcileCanvasGroups(next);
     next = next.map((node) => {
       if (node.type !== 'generation') return node;
       const task = node as GenerationNode;
@@ -689,6 +787,7 @@ export function App() {
     setNodes(next);
     setHistory((old) => [...old.slice(0, historyIndex + 1), next]);
     setHistoryIndex((old) => old + 1);
+    return next;
   };
   const replaceNodesAndResetHistory = (next: CanvasNode[]) => {
     nodesRef.current = next;
@@ -696,53 +795,125 @@ export function App() {
     setHistory([next]);
     setHistoryIndex(0);
   };
-  const remove = () => {
-    if (!selectedIds.length) return;
+  const deletionPendingRef = useRef(false);
+  const remove = async () => {
+    if (!selectedIds.length || generationBusy || deletionPendingRef.current) return;
     const removed = [...selectedIds];
-    void repository
-      .deleteCanvasNodes(board.id, removed)
-      .then((updatedBoard) => {
-        setBoard(updatedBoard);
-        setEdges((current) =>
-          current.filter(
-            (edge) => !removed.includes(edge.sourceNodeId) && !removed.includes(edge.targetNodeId),
-          ),
-        );
-        setGenerationCandidates((current) =>
-          current.filter((candidate) => !removed.includes(candidate.generationNodeId)),
-        );
-        commit(nodes.filter((node) => !removed.includes(node.id)));
-        clearSelection();
-      })
-      .catch((error: unknown) =>
-        setSaveError(error instanceof Error ? error.message : t('common.error')),
+    deletionPendingRef.current = true;
+    setCanvasMutationBusy(true);
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) return;
+      const deletion = await repository.deleteCanvasNodesWithUndo(board.id, removed);
+      const updatedBoard = deletion.board;
+      setBoard(updatedBoard);
+      setEdges((current) => current.filter((edge) => updatedBoard.edgeIds.includes(edge.id)));
+      setGenerationCandidates(await canvasGenerationStorage.listCandidates(board.id));
+      const frame = commit(
+        nodesRef.current.filter((node) => updatedBoard.nodeIds.includes(node.id)),
+        true,
       );
+      deletionUndoRef.current.set(frame, deletion.undo);
+      clearSelection();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : t('common.error'));
+    } finally {
+      deletionPendingRef.current = false;
+      setCanvasMutationBusy(false);
+      setGenerationBusy(false);
+    }
   };
   const duplicate = () => {
-    const copies = nodes
-      .filter((node) => selectedIds.includes(node.id))
-      .map((node) => ({ ...node, id: crypto.randomUUID(), x: node.x + 16, y: node.y + 16 }));
+    const copyIds = new Set(selectedIds);
+    nodes.forEach((node) => {
+      if (node.type === 'group' && copyIds.has(node.id))
+        node.childNodeIds.forEach((id) => copyIds.add(id));
+    });
+    const originals = nodes.filter((node) => copyIds.has(node.id));
+    if (originals.some((node) => node.type === 'candidate')) {
+      setSaveError(t('workspace.copyCandidateHint'));
+      return;
+    }
+    const ids = new Map(originals.map((node) => [node.id, crypto.randomUUID()]));
+    const copies = originals.map((node): CanvasNode => ({
+      ...node,
+      id: ids.get(node.id)!,
+      x: node.x + 16,
+      y: node.y + 16,
+      ...(node.type === 'group'
+        ? { childNodeIds: node.childNodeIds.map((id) => ids.get(id)!) }
+        : {}),
+    }));
     if (copies.length) commit([...nodes, ...copies]);
   };
-  const undo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      nodesRef.current = history[historyIndex - 1];
-      setNodes(history[historyIndex - 1]);
+  const moveHistory = async (direction: -1 | 1) => {
+    const target = historyIndex + direction;
+    if (target < 0 || target >= history.length || generationBusy || deletionPendingRef.current)
+      return;
+    const frame = direction === -1 ? history[historyIndex] : history[target];
+    const deletion = deletionUndoRef.current.get(frame);
+    deletionPendingRef.current = true;
+    setCanvasMutationBusy(true);
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) return;
+      if (deletion) {
+        if (direction === -1) {
+          setBoard(await repository.restoreCanvasDeletion(deletion));
+        } else {
+          const removed = deletion.before.nodes
+            .filter((node) => !deletion.after.nodes.some((other) => other.id === node.id))
+            .map((node) => node.id);
+          const redone = await repository.deleteCanvasNodesWithUndo(board.id, removed);
+          deletionUndoRef.current.set(frame, redone.undo);
+          setBoard(redone.board);
+        }
+        setEdges(await repository.listEdges(board.id));
+        setGenerationCandidates(await canvasGenerationStorage.listCandidates(board.id));
+      }
+      setHistoryIndex(target);
+      nodesRef.current = history[target];
+      setNodes(history[target]);
       clearSelection();
+    } catch {
+      setSaveError(t('workspace.historyFailed'));
+    } finally {
+      deletionPendingRef.current = false;
+      setCanvasMutationBusy(false);
+      setGenerationBusy(false);
     }
   };
+  const undo = () => {
+    void moveHistory(-1);
+  };
   const redo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      nodesRef.current = history[historyIndex + 1];
-      setNodes(history[historyIndex + 1]);
-      clearSelection();
-    }
+    void moveHistory(1);
   };
   const workspaceActionRuntime = {
     duplicateSelection: duplicate,
     deleteSelection: remove,
+    groupSelection: () => {
+      try {
+        const group = createCanvasGroup(
+          nodes,
+          selectedIds,
+          crypto.randomUUID(),
+          t('node.group'),
+          Date.now(),
+        );
+        commit([...nodes, group]);
+        selectCanvasNode(group.id, false);
+      } catch {
+        setSaveError(t('workspace.groupHint'));
+      }
+    },
+    ungroupSelection: () => {
+      const groups = nodes.filter((node) => node.type === 'group' && selectedIds.includes(node.id));
+      if (groups.length) {
+        commit(nodes.filter((node) => !groups.includes(node)));
+        clearSelection();
+      }
+    },
   };
   const registerPreviewUrl = useCallback((assetId: string, blob: Blob) => {
     const nextUrl = URL.createObjectURL(blob);
@@ -763,15 +934,17 @@ export function App() {
   );
   useEffect(() => {
     if (!hydrated || appView !== 'workspace') return;
-    const previewAssetIds = nodes.flatMap((node) => {
-      const previewId =
-        'previewAssetId' in node && typeof node.previewAssetId === 'string'
-          ? node.previewAssetId
-          : undefined;
-      const assetId =
-        'assetId' in node && typeof node.assetId === 'string' ? node.assetId : undefined;
-      return [previewId, assetId].filter((value): value is string => Boolean(value));
-    });
+    const previewAssetIds = nodes
+      .flatMap((node) => {
+        const previewId =
+          'previewAssetId' in node && typeof node.previewAssetId === 'string'
+            ? node.previewAssetId
+            : undefined;
+        const assetId =
+          'assetId' in node && typeof node.assetId === 'string' ? node.assetId : undefined;
+        return [previewId, assetId].filter((value): value is string => Boolean(value));
+      })
+      .concat(viewSets.flatMap((set) => Object.values(set.views)));
     void Promise.all(
       previewAssetIds
         .filter((assetId) => !previewUrlsRef.current[assetId])
@@ -793,7 +966,7 @@ export function App() {
           }
         }),
     );
-  }, [activeProjectId, appView, hydrated, nodes, registerPreviewUrl, t]);
+  }, [activeProjectId, appView, hydrated, nodes, viewSets, registerPreviewUrl, t]);
   useEffect(() => {
     let cancelled = false;
     void Promise.all(
@@ -818,8 +991,13 @@ export function App() {
     };
   }, [generationCandidates]);
   const runWorkspaceAction = (
-    actionId: 'workspace.duplicateSelection' | 'workspace.deleteSelection',
+    actionId:
+      | 'workspace.duplicateSelection'
+      | 'workspace.deleteSelection'
+      | 'workspace.groupSelection'
+      | 'workspace.ungroupSelection',
   ) => {
+    if (deletionPendingRef.current) return;
     void actionRunner.run({
       actionId,
       context: actionContext,
@@ -840,6 +1018,9 @@ export function App() {
           storedGraphViewState,
           storedModelAssets,
           storedBoards,
+          storedViewSets,
+          storedCMFSets,
+          storedCMFVariants,
         ] = await Promise.all([
           repository.loadSnapshot(activeProjectId),
           repository.listDesigns(activeProjectId),
@@ -847,6 +1028,9 @@ export function App() {
           repository.getGraphViewState(activeProjectId),
           threeViewerStorage.listModelAssets(activeProjectId),
           repository.listBoards(activeProjectId),
+          repository.listViewSets(activeProjectId),
+          repository.listCMFSets(activeProjectId),
+          repository.listCMFVariants(activeProjectId),
         ]);
         if (cancelled) return;
         const activeBoardId =
@@ -900,6 +1084,9 @@ export function App() {
         setEdges(!snapshot && activeProjectId === seedProject.id ? [...seedEdges] : storedEdges);
         setGenerationCandidates(orderGenerationCandidates(storedCandidates));
         setModelAssets(storedModelAssets);
+        setViewSets(storedViewSets);
+        setCMFSets(storedCMFSets);
+        setCMFVariants(storedCMFVariants);
         setStorageError(undefined);
       } catch (error) {
         if (cancelled) return;
@@ -994,22 +1181,37 @@ export function App() {
   }, [nodes, selectedIds]);
   const flushPendingSave = useCallback(async () => {
     if (!hydrated) return false;
+    const attempt = ++saveAttempt.current;
+    const currentNodes = nodesRef.current;
+    const inputs = saveInputs.current;
     setSaveStatus('saving');
     setSaveError(undefined);
-    const result = await saveWorkspaceBeforeLeaving(async () => {
+    const result = await saveQueue.current(async () => {
       const now = Date.now();
       await repository.saveSnapshot({
-        project: { ...project, updatedAt: now },
+        project: { ...inputs.project, updatedAt: now },
         board: {
-          ...board,
+          ...inputs.board,
           updatedAt: now,
-          nodeIds: nodes.map((node) => node.id),
-          viewport: canvasViewport,
+          nodeIds: currentNodes.map((node) => node.id),
+          viewport: inputs.canvasViewport,
         },
-        nodes,
-        edges,
+        nodes: currentNodes,
+        edges: inputs.edges,
       });
     });
+    // An older completion must not hide a newer pending write or permit navigation.
+    if (attempt !== saveAttempt.current) return false;
+    const latest = saveInputs.current;
+    if (
+      result.ok &&
+      (currentNodes !== nodesRef.current ||
+        inputs.board !== latest.board ||
+        inputs.project !== latest.project ||
+        inputs.edges !== latest.edges ||
+        inputs.canvasViewport !== latest.canvasViewport)
+    )
+      return false;
     if (result.ok) {
       setSaveStatus('saved');
       return true;
@@ -1023,13 +1225,20 @@ export function App() {
     if (await flushPendingSave()) setAppView('home');
   };
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || appView === 'home' || saveStatus === 'saved') return;
+    window.addEventListener('beforeunload', preventUnsavedWorkspaceUnload);
+    return () => window.removeEventListener('beforeunload', preventUnsavedWorkspaceUnload);
+  }, [appView, hydrated, saveStatus]);
+  useEffect(() => {
+    // Domain actions persist nodes atomically before publishing them to React.
+    // Do not let a deferred UI snapshot erase those nodes during that interval.
+    if (!hydrated || generationBusy) return;
     setSaveStatus('saving');
     const timer = window.setTimeout(() => {
       void flushPendingSave();
     }, 750);
     return () => window.clearTimeout(timer);
-  }, [flushPendingSave, hydrated]);
+  }, [flushPendingSave, hydrated, generationBusy]);
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (
@@ -1041,7 +1250,7 @@ export function App() {
         return;
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === 's') {
         event.preventDefault();
-        void flushPendingSave();
+        if (!generationBusy) void flushPendingSave();
       }
       if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === 'k') {
         event.preventDefault();
@@ -1054,13 +1263,87 @@ export function App() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [flushPendingSave]);
-  const openDesign = (designId: string) => {
-    setSelectedDesignId(designId);
-    const associatedNode = nodes.find((node) => node.designId === designId);
-    if (associatedNode) selectCanvasNode(associatedNode.id, false);
-    setWorkspaceMode('canvas');
+  }, [flushPendingSave, generationBusy]);
+  const designNavigationPending = useRef(false);
+  const reopenSketch = async () => {
+    if (generationBusy || selectedNode?.type !== 'sketch' || selectedNode.locked) return;
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Pending save failed.');
+      if (
+        !('sketchDocumentId' in selectedNode) ||
+        typeof selectedNode.sketchDocumentId !== 'string'
+      )
+        throw new Error('Missing sketch document.');
+      const node: SketchNode & { label: string } = {
+        ...selectedNode,
+        type: 'sketch',
+        sketchDocumentId: selectedNode.sketchDocumentId,
+      };
+      const document = await repository.getSketchDocument(node.sketchDocumentId);
+      if (!document || document.projectId !== project.id) throw new Error('Missing sketch source.');
+      const asset = await repository.getAsset(document.sourceAssetId);
+      if (!asset || asset.projectId !== project.id || asset.storage.type !== 'indexeddb')
+        throw new Error('Missing sketch asset.');
+      const stored = await repository.getAssetBlob(asset.storage.blobId);
+      if (!stored || stored.blob.size > 50 * 1024 * 1024) throw new Error('Missing sketch file.');
+      const source = await stored.blob.text();
+      (await import('@open-industrial-design/ui/sketch')).parseSketchScene(source);
+      setSketchDraft({ node, document, source });
+      setEditingSketch(true);
+    } catch {
+      setArchiveStatus(t('sketch.loadFailed'));
+      setArchiveFailed(true);
+    } finally {
+      setGenerationBusy(false);
+    }
   };
+  const openDesign = async (designId: string) => {
+    if (generationBusy || designNavigationPending.current) return;
+    designNavigationPending.current = true;
+    try {
+      const associatedNode = findDesignCanvasNode(nodesRef.current, designId);
+      if (!associatedNode) {
+        const otherBoards = boards.filter(
+          (item) => item.id !== board.id && item.projectId === project.id,
+        );
+        const matches = await Promise.all(
+          otherBoards.map(async (item) => ({
+            board: item,
+            node: findDesignCanvasNode(await repository.listNodes(item.id), designId),
+          })),
+        );
+        const match = matches.find((item) => item.node);
+        if (match?.node) {
+          await selectBoard(match.board, match.node.id);
+          return;
+        }
+      }
+      setSelectedDesignId(designId);
+      if (associatedNode) selectCanvasNode(associatedNode.id, false);
+      else clearSelection();
+      setDesignNodeToReveal(associatedNode?.id);
+      setWorkspaceMode('canvas');
+    } catch {
+      setSaveError(t('common.error'));
+    } finally {
+      designNavigationPending.current = false;
+    }
+  };
+  useEffect(() => {
+    if (workspaceMode !== 'canvas' || !designNodeToReveal) return;
+    const node = nodes.find((item) => item.id === designNodeToReveal);
+    const canvas = document.querySelector('.konva-canvas');
+    if (node && canvas) {
+      setCanvasViewport(
+        revealCanvasNode(useCanvasRuntimeStore.getState().viewport, node, {
+          width: canvas.clientWidth,
+          height: canvas.clientHeight,
+        }),
+      );
+    }
+    setDesignNodeToReveal(undefined);
+  }, [workspaceMode, designNodeToReveal, nodes, setCanvasViewport]);
   const openProject = (nextProject: Project) => {
     setArchiveStatus(undefined);
     setProjectDownload(undefined);
@@ -1120,6 +1403,9 @@ export function App() {
       setNodes(copiedNodes);
       setEdges(copy.edges);
       setGenerationCandidates([]);
+      setViewSets(copy.viewSets);
+      setCMFSets(copy.cmfSets);
+      setCMFVariants(copy.cmfVariants);
       setHistory([copiedNodes]);
       setHistoryIndex(0);
       setDesigns(copy.designs);
@@ -1184,7 +1470,7 @@ export function App() {
     }
     await refreshRecentProjects();
   };
-  const selectBoard = async (nextBoard: Board) => {
+  const selectBoard = async (nextBoard: Board, focusNodeId?: string) => {
     if (nextBoard.id === board.id) return;
     if (!(await flushPendingSave())) return;
     // Sidebar entries are labels, not the latest persisted viewport or node index.
@@ -1194,12 +1480,12 @@ export function App() {
       return;
     }
     const updatedProject = { ...project, activeBoardId: nextBoard.id, updatedAt: Date.now() };
-    await repository.saveProject(updatedProject);
     const nextNodes = (await repository.listNodes(nextBoard.id)) as CanvasNode[];
     const [nextEdges, nextCandidates] = await Promise.all([
       repository.listEdges(nextBoard.id),
       canvasGenerationStorage.listCandidates(nextBoard.id),
     ]);
+    await repository.saveProject(updatedProject);
     setProject(updatedProject);
     setBoard(savedBoard);
     setBoards((current) => current.map((item) => (item.id === savedBoard.id ? savedBoard : item)));
@@ -1209,6 +1495,12 @@ export function App() {
     setHistory([nextNodes]);
     setHistoryIndex(0);
     clearSelection();
+    const focusNode = nextNodes.find((item) => item.id === focusNodeId && !item.hidden);
+    if (focusNode) {
+      selectCanvasNode(focusNode.id, false);
+      setSelectedDesignId(focusNode.designId);
+      setDesignNodeToReveal(focusNode.id);
+    }
     setWorkspaceMode('canvas');
   };
   const createBoard = async (inputName: string) => {
@@ -1253,14 +1545,24 @@ export function App() {
     if (board.id === updated.id) setBoard(updated);
   };
   const submitNamingIntent = async () => {
-    if (!namingIntent?.value.trim()) return;
+    if (!namingIntent?.value.trim() || namingPendingRef.current) return;
     const intent = namingIntent;
-    if (intent.kind === 'new-project') await createProject(intent.value);
-    if (intent.kind === 'rename-project') await renameProject(intent.target, intent.value);
-    if (intent.kind === 'new-board') await createBoard(intent.value);
-    if (intent.kind === 'new-concept') await createConceptCard(intent.value);
-    if (intent.kind === 'rename-board') await renameBoard(intent.target, intent.value);
-    setNamingIntent(undefined);
+    namingPendingRef.current = true;
+    setNamingBusy(true);
+    setNamingFailed(false);
+    try {
+      if (intent.kind === 'new-project') await createProject(intent.value);
+      if (intent.kind === 'rename-project') await renameProject(intent.target, intent.value);
+      if (intent.kind === 'new-board') await createBoard(intent.value);
+      if (intent.kind === 'new-concept') await createConceptCard(intent.value);
+      if (intent.kind === 'rename-board') await renameBoard(intent.target, intent.value);
+      setNamingIntent(undefined);
+    } catch {
+      setNamingFailed(true);
+    } finally {
+      namingPendingRef.current = false;
+      setNamingBusy(false);
+    }
   };
   const deleteBoard = async (target: Board) => {
     if (boards.length <= 1) {
@@ -1303,67 +1605,96 @@ export function App() {
     }
   };
   const importReference = async (file: File) => {
-    const timestamp = Date.now();
-    const assetId = crypto.randomUUID();
-    const asset: Asset = {
-      id: assetId,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      projectId: project.id,
-      type: 'image',
-      name: file.name,
-      mimeType: file.type || 'image/png',
-      size: file.size,
-      storage: { type: 'indexeddb', blobId: assetId },
-    };
-    const referenceNode = {
-      ...createReferenceNode({
-        assetId,
-        boardId: board.id,
-        height: 220,
-        referenceType: 'form',
-        rotation: 0,
-        width: 280,
-        x: 100 + (nodes.length % 3) * 52,
-        y: 160 + (nodes.length % 3) * 52,
-        zIndex: nodes.length + 1,
-      }),
-      label: `Reference — ${file.name}`,
-    } as CanvasNode;
+    if (generationBusy || imageImportPendingRef.current || !hydrated) return;
+    const kind = imageImportKindRef.current;
+    imageImportPendingRef.current = true;
+    setGenerationBusy(true);
     try {
-      await Promise.all([
-        repository.saveAsset(asset),
-        repository.saveAssetBlob({ id: assetId, blob: file }),
-        repository.saveNode(referenceNode),
-        repository.saveBoard({ ...board, nodeIds: [...board.nodeIds, referenceNode.id] }),
-      ]);
-      registerPreviewUrl(assetId, file);
-      commit([...nodes, referenceNode]);
-    } catch (error) {
-      setSaveStatus('failed');
-      setSaveError(error instanceof Error ? error.message : t('feedback.referenceImportFailed'));
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      if (
+        !['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif'].includes(file.type) ||
+        !file.size ||
+        file.size > 25 * 1024 * 1024
+      )
+        throw new Error('Unsupported image.');
+      const bitmap = await createImageBitmap(file);
+      const width = bitmap.width,
+        height = bitmap.height;
+      bitmap.close();
+      const viewport = useCanvasRuntimeStore.getState().viewport;
+      const position = findFreeNodePosition(nodesRef.current, {
+        x: (80 - viewport.x) / viewport.zoom,
+        y: (100 - viewport.y) / viewport.zoom,
+        width: 280,
+        height: Math.max(180, Math.min(400, (256 * height) / width + 68)),
+      });
+      const record = await actionRunner.run({
+        actionId: 'workspace.importImage',
+        context: actionContext,
+        input: {
+          name: file.name,
+          kind,
+          mimeType: file.type,
+          size: file.size,
+          width,
+          height,
+          ...position,
+        },
+        runtime: { blob: file, save: repository.importLocalImage.bind(repository) },
+      });
+      if (record.status !== 'success') throw new Error('Import failed.');
+      const result = record.result as unknown as { asset: Asset; node: CanvasNode };
+      registerPreviewUrl(result.asset.id, file);
+      commit([...nodesRef.current, result.node]);
+      selectCanvasNode(result.node.id, false);
+      const canvas = document.querySelector('.konva-canvas');
+      setCanvasViewport(
+        revealCanvasNode(viewport, result.node, {
+          width: canvas?.clientWidth ?? 740,
+          height: canvas?.clientHeight ?? 500,
+        }),
+      );
+      setArchiveStatus(undefined);
+      setArchiveFailed(false);
+    } catch {
+      setArchiveStatus(t('image.importFailed'));
+      setArchiveFailed(true);
+      setProjectDownload(undefined);
+    } finally {
+      imageImportPendingRef.current = false;
+      setGenerationBusy(false);
     }
   };
   const createConceptCard = async (name: string) => {
     const normalizedName = name.trim();
     if (!normalizedName) return;
-    const created = createConcept({
-      boardId: board.id,
-      name: normalizedName,
-      projectId: project.id,
-      x: 220 + (nodes.length % 3) * 60,
-      y: 180 + (nodes.length % 3) * 48,
-    });
-    const conceptNode = { ...created.node, label: `Concept — ${normalizedName}` } as CanvasNode;
-    await Promise.all([
-      repository.saveDesign(created.design),
-      repository.saveNode(conceptNode),
-      repository.saveBoard({ ...board, nodeIds: [...board.nodeIds, conceptNode.id] }),
-    ]);
-    setDesigns((current) => [...current, created.design]);
-    commit([...nodes, conceptNode]);
-    setSelectedDesignId(created.design.id);
-    selectCanvasNode(conceptNode.id, false);
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const position = findFreeNodePosition(nodesRef.current, {
+        x: 220,
+        y: 180,
+        width: 320,
+        height: 360,
+      });
+      const record = await actionRunner.run({
+        actionId: 'design.createBlankConcept',
+        context: actionContext,
+        input: { name: normalizedName, ...position },
+        runtime: { create: repository.createBlankConcept.bind(repository) },
+      });
+      if (record.status !== 'success') throw new Error('Concept creation failed.');
+      const created = record.result as unknown as { design: Design; node: CanvasNode };
+      setDesigns((current) => [...current, created.design]);
+      commit([...nodesRef.current, created.node]);
+      setSelectedDesignId(created.design.id);
+      selectCanvasNode(created.node.id, false);
+      setDesignNodeToReveal(created.node.id);
+      setWorkspaceMode('canvas');
+    } finally {
+      setGenerationBusy(false);
+    }
   };
   const continueExploration = async (toolId: string) => {
     const tool = findGenerationTool(toolId);
@@ -1378,7 +1709,18 @@ export function App() {
           sourceNodeId: explorationSource.id,
           label: t(tool.label),
           direction: t(tool.prompt),
-          localEdit: tool.id === 'local',
+          requestedViews: tool.id === 'view' ? ['perspective'] : undefined,
+          localEdit: ['local', 'erase', 'local-cmf'].includes(tool.id),
+          localCmf: tool.id === 'local-cmf' ? { color: '', material: '', finish: '' } : undefined,
+          localEditMode: tool.id === 'erase' ? 'erase' : undefined,
+          removeBackground: tool.id === 'cutout' ? true : undefined,
+          patternPlacement: tool.id === 'pattern' ? { ...defaultPatternPlacement } : undefined,
+          patternTask:
+            tool.id === 'pattern-create'
+              ? { kind: 'create', repeat: 'single' }
+              : tool.id === 'pattern-transfer'
+                ? { kind: 'transfer', placement: '', scale: 'medium' }
+                : undefined,
         },
         runtime: {
           nodes,
@@ -1398,19 +1740,46 @@ export function App() {
       const canvas = document.querySelector('.konva-canvas');
       const width = canvas?.clientWidth ?? 740;
       const height = canvas?.clientHeight ?? 500;
-      const right = (result.node.x + result.node.width) * viewport.zoom + viewport.x;
-      const bottom = (result.node.y + result.node.height) * viewport.zoom + viewport.y;
-      setCanvasViewport({
-        ...viewport,
-        x: viewport.x - Math.max(0, right - width + 24),
-        y: viewport.y - Math.max(0, bottom - height + 24),
-      });
+      setCanvasViewport(revealCanvasNode(viewport, result.node, { width, height }));
       setGenerationStatus(undefined);
     } catch (error) {
       setGenerationStatus(error instanceof Error ? error.message : t('common.error'));
     } finally {
       setGenerationBusy(false);
     }
+  };
+  const saveTextNote = async (nodeId: string | undefined, text: string, fontSize: number) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    const viewport = useCanvasRuntimeStore.getState().viewport;
+    const position = findFreeNodePosition(nodesRef.current, {
+      x: (80 - viewport.x) / viewport.zoom,
+      y: (100 - viewport.y) / viewport.zoom,
+      width: 320,
+      height: 180,
+    });
+    const record = await actionRunner.run({
+      actionId: 'workspace.saveText',
+      context: actionContext,
+      input: { nodeId, text, fontSize, ...position },
+      runtime: {
+        readNode: (id: string) => nodesRef.current.find((node) => node.id === id),
+        commitText: (node: CanvasNode) => {
+          const current = nodesRef.current;
+          commit(
+            nodeId ? current.map((item) => (item.id === nodeId ? node : item)) : [...current, node],
+          );
+          selectCanvasNode(node.id, false);
+          const canvas = document.querySelector('.konva-canvas');
+          setCanvasViewport(
+            revealCanvasNode(viewport, node, {
+              width: canvas?.clientWidth ?? 740,
+              height: canvas?.clientHeight ?? 500,
+            }),
+          );
+        },
+      },
+    });
+    if (record.status !== 'success') throw new Error(t('text.failed'));
   };
   const createGenerationCard = () => {
     const timestamp = Date.now();
@@ -1456,7 +1825,7 @@ export function App() {
   ) => {
     const error = validateGenerationInput(nodes, edges, sourceNodeId, targetNodeId, role);
     if (error) {
-      setGenerationStatus(error);
+      setGenerationStatus(translateGenerationConnectionError(locale, error));
       return;
     }
     const timestamp = Date.now();
@@ -1491,6 +1860,429 @@ export function App() {
       setGenerationStatus(error instanceof Error ? error.message : t('common.error'));
     }
   };
+  const prepareExplorationBatch = async (input: CreateExplorationBatchInput) => {
+    if (generationBusy || generationRequestRef.current) throw new Error('Generation is busy.');
+    if (!(await flushPendingSave())) throw new Error('Save failed.');
+    const record = await actionRunner.run({
+      actionId: 'workspace.createExplorationBatch',
+      context: actionContext,
+      input,
+      runtime: {
+        nodes: nodesRef.current,
+        edges,
+        saveBatch: async (steps: ExplorationBatchStep[]) => {
+          setBoard(await repository.createGenerationBatch(steps));
+        },
+      },
+    });
+    if (record.status !== 'success')
+      throw new Error(record.error?.message ?? 'Batch preparation failed.');
+    const { steps } = record.result as unknown as { steps: ExplorationBatchStep[] };
+    replaceNodesAndResetHistory([...nodesRef.current, ...steps.map((step) => step.node)]);
+    setEdges((current) => [
+      ...current,
+      ...steps.flatMap((step) => [step.edge, ...(step.referenceEdges ?? [])]),
+    ]);
+    selectCanvasNode(steps[0]!.node.id, false);
+    setQueueInitialIds(steps.map((step) => step.node.id));
+  };
+  const placeMaterial = async (entry: LocalMaterialEntry) => {
+    if (generationBusy || generationRequestRef.current || !(await flushPendingSave()))
+      throw new Error('Workspace is not ready.');
+    const position = findFreeNodePosition(nodesRef.current, {
+      x: 160,
+      y: 180,
+      width: 280,
+      height: 220,
+    });
+    const record = await actionRunner.run({
+      actionId: 'workspace.placeMaterial',
+      context: actionContext,
+      input: { assetId: entry.asset.id, name: entry.asset.name.slice(0, 500), ...position },
+      runtime: {
+        place: (projectId: string, assetId: string, node: ReferenceNode) =>
+          repository.placeLocalMaterial(projectId, assetId, node),
+      },
+    });
+    if (record.status !== 'success') throw new Error('Material placement failed.');
+    const result = record.result as unknown as PlaceMaterialResult;
+    replaceNodesAndResetHistory([
+      ...nodesRef.current,
+      { ...result.node, label: result.asset.name },
+    ]);
+    setBoard((current) => ({ ...current, nodeIds: [...current.nodeIds, result.node.id] }));
+    selectCanvasNode(result.node.id, false);
+  };
+  const loadResearch = useCallback(async () => {
+    const [saved, materials] = await Promise.all([
+      repository.getProject(project.id),
+      repository.searchLocalMaterials('', project.id),
+    ]);
+    if (!saved) throw new Error('Project unavailable.');
+    return { library: saved.researchLibrary, materials };
+  }, [project.id]);
+  const importResearchImage = async (
+    file: File,
+    collectionId: string | undefined,
+    expected: ResearchLibrary | undefined,
+  ) => {
+    if (
+      !['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif'].includes(file.type) ||
+      !file.size ||
+      file.size > 25 * 1024 * 1024
+    )
+      throw new Error('Unsupported image.');
+    const bitmap = await createImageBitmap(file);
+    const width = bitmap.width,
+      height = bitmap.height;
+    bitmap.close();
+    const record = await actionRunner.run({
+      actionId: 'workspace.importResearchImage',
+      context: actionContext,
+      input: {
+        name: file.name,
+        mimeType: file.type,
+        size: file.size,
+        width,
+        height,
+        collectionId,
+        expected,
+      },
+      runtime: { blob: file, save: repository.importResearchImage.bind(repository) },
+    });
+    if (record.status !== 'success') throw new Error('Research import failed.');
+  };
+  const saveResearch = async (command: ResearchCommand, expected: ResearchLibrary | undefined) => {
+    const record = await actionRunner.run({
+      actionId: 'workspace.editResearch',
+      context: actionContext,
+      input: { command, expected },
+      runtime: {
+        loadProject: (id: string) => repository.getProject(id),
+        loadAssets: async (id: string) =>
+          (await repository.searchLocalMaterials('', id)).map((item) => item.asset),
+        save: (id: string, library: ResearchLibrary, previous: ResearchLibrary | undefined) =>
+          repository.saveResearchLibrary(id, library, previous),
+      },
+    });
+    if (record.status !== 'success') throw new Error('Research save failed.');
+    const saved = await repository.getProject(project.id);
+    if (!saved?.researchLibrary) throw new Error('Research unavailable.');
+    return saved.researchLibrary;
+  };
+  const saveMaterialKnowledge = async (entry: LocalMaterialEntry, knowledge: MaterialKnowledge) => {
+    if (entry.asset.projectId !== project.id || generationBusy || !(await flushPendingSave()))
+      throw new Error('Workspace is not ready.');
+    const record = await actionRunner.run({
+      actionId: 'workspace.saveMaterialKnowledge',
+      context: actionContext,
+      input: { assetId: entry.asset.id, knowledge },
+      runtime: {
+        save: (projectId: string, assetId: string, value: MaterialKnowledge) =>
+          repository.saveMaterialKnowledge(projectId, assetId, value),
+      },
+    });
+    if (record.status !== 'success') throw new Error('Material save failed.');
+  };
+  const analyzeMaterials = async (
+    assetIds: string[],
+    question: string,
+    providerId: string,
+    research?: NonNullable<Project['researchLibrary']>['entries'],
+  ) => {
+    const provider = providerConfigs.find((item) => item.id === providerId);
+    if (!provider || generationBusy || !(await flushPendingSave())) throw new Error('Not ready.');
+    const record = await actionRunner.run({
+      actionId: 'ai.analyzeMaterials',
+      context: actionContext,
+      input: { assetIds, question, provider, ...(research ? { research } : {}) },
+      runtime: {
+        router: capabilityRouter,
+        credentials,
+        loadResearchProject: repository.getProject.bind(repository),
+        saveInputs: (generation: Generation, images: ProviderImageInput[]) =>
+          canvasGenerationStorage.saveGenerationInputs(
+            generation,
+            images.map((image, index) => ({
+              id: generation.inputSnapshots![index]!.id,
+              generationId: generation.id,
+              projectId: generation.projectId,
+              blob: new Blob([new Uint8Array(image.data)], { type: image.mimeType }),
+            })),
+          ),
+        saveGeneration: generationStorage.saveGeneration.bind(generationStorage),
+        loadMaterial: async (assetId: string) => {
+          const asset = await repository.getAsset(assetId);
+          if (!asset || asset.projectId !== project.id || asset.storage.type !== 'indexeddb')
+            return;
+          const stored = await repository.getAssetBlob(asset.storage.blobId);
+          if (!stored?.blob.size) return;
+          return {
+            asset,
+            image: {
+              mimeType: asset.mimeType,
+              data: new Uint8Array(await stored.blob.arrayBuffer()),
+            },
+          };
+        },
+      },
+    });
+    if (record.status !== 'success') throw new Error('Comparison failed.');
+    return (record.result as { analysis: string }).analysis;
+  };
+  const saveDesignDna = async (designId: string, dna: NonNullable<Design['dna']>) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const record = await actionRunner.run({
+        actionId: 'design.saveDna',
+        context: actionContext,
+        input: { designId, dna },
+        runtime: {
+          getDesign: repository.getDesign.bind(repository),
+          saveDesign: repository.saveDesign.bind(repository),
+        },
+      });
+      if (record.status !== 'success') throw new Error('Design constraints could not be saved.');
+      const updated = record.result as unknown as Design;
+      setDesigns((current) =>
+        current.map((design) => (design.id === updated.id ? updated : design)),
+      );
+    } finally {
+      setGenerationBusy(false);
+    }
+  };
+  const saveManualViews = async (
+    designId: string,
+    viewSetId: string | undefined,
+    name: string,
+    views: ViewSet['views'],
+    placeOnBoard = false,
+  ) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const source = nodes.find((node) => node.designId === designId);
+      const position = findFreeNodePosition(nodes, {
+        x: (source?.x ?? 0) + 400,
+        y: source?.y ?? 0,
+        width: 320,
+        height: 260,
+      });
+      const record = await actionRunner.run({
+        actionId: 'design.saveViewSet',
+        context: actionContext,
+        input: { designId, viewSetId, name, views, placeOnBoard, ...position },
+        runtime: { saveViewSetWithNode: repository.saveViewSetWithNode.bind(repository) },
+      });
+      if (record.status !== 'success') throw new Error('View set could not be saved.');
+      const result = record.result as unknown as { viewSet: ViewSet; node?: ViewSetNode };
+      setViewSets((current) => [
+        ...current.filter((set) => set.id !== result.viewSet.id),
+        result.viewSet,
+      ]);
+      if (result.node) {
+        replaceNodesAndResetHistory([
+          ...nodesRef.current,
+          { ...result.node, label: result.viewSet.name ?? t('views.title') },
+        ]);
+        selectCanvasNode(result.node.id, false);
+        const canvas = document.querySelector('.konva-canvas');
+        setCanvasViewport(
+          revealCanvasNode(useCanvasRuntimeStore.getState().viewport, result.node, {
+            width: canvas?.clientWidth ?? 740,
+            height: canvas?.clientHeight ?? 500,
+          }),
+        );
+      }
+    } finally {
+      setGenerationBusy(false);
+    }
+  };
+  const saveDesignDecision = async (
+    designId: string,
+    expectedStatus: DesignStatus,
+    status: DesignStatus,
+  ) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const record = await actionRunner.run({
+        actionId: 'design.transitionStatus',
+        context: actionContext,
+        input: { designId, expectedStatus, status },
+        runtime: { transition: repository.transitionDesignDecision.bind(repository) },
+      });
+      if (record.status !== 'success') throw new Error('Decision could not be saved.');
+      const updated = record.result as unknown as Design;
+      setDesigns((current) =>
+        current.map((design) => (design.id === updated.id ? updated : design)),
+      );
+    } finally {
+      setGenerationBusy(false);
+    }
+  };
+  const createManualConcept = async (sourceNodeId: string, name: string) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const source = nodesRef.current.find((node) => node.id === sourceNodeId);
+      if (!source) throw new Error('Source unavailable.');
+      const position = findFreeNodePosition(nodesRef.current, {
+        x: source.x + source.width + 80,
+        y: source.y,
+        width: 320,
+        height: 360,
+      });
+      const record = await actionRunner.run({
+        actionId: 'design.createFromImage',
+        context: actionContext,
+        input: { sourceNodeId, name, ...position },
+        runtime: { create: repository.createConceptFromImage.bind(repository) },
+      });
+      if (record.status !== 'success') throw new Error('Concept creation failed.');
+      const result = record.result as unknown as { designId: string; nodeId: string };
+      const snapshot = await repository.loadSnapshot(project.id);
+      const createdNode = snapshot?.nodes.find((node) => node.id === result.nodeId);
+      if (!createdNode) throw new Error('Concept card unavailable.');
+      setDesigns(await repository.listDesigns(project.id));
+      setEdges(await repository.listEdges(board.id));
+      replaceNodesAndResetHistory([
+        ...nodesRef.current,
+        { ...createdNode, label: name.trim() } as CanvasNode,
+      ]);
+      setSelectedDesignId(result.designId);
+      selectCanvasNode(result.nodeId, false);
+      const canvas = document.querySelector('.konva-canvas');
+      setCanvasViewport(
+        revealCanvasNode(useCanvasRuntimeStore.getState().viewport, createdNode, {
+          width: canvas?.clientWidth ?? 740,
+          height: canvas?.clientHeight ?? 500,
+        }),
+      );
+    } finally {
+      setGenerationBusy(false);
+    }
+  };
+  const createManualVariant = async (designId: string, name: string) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const sourceDesign = await repository.getDesign(designId);
+      const source = nodes.find(
+        (node) =>
+          node.designId === designId && (node.type === 'concept' || node.type === 'variant'),
+      );
+      if (!sourceDesign) throw new Error('Source design unavailable.');
+      const position = findFreeNodePosition(nodes, {
+        x: (source?.x ?? 0) + 400,
+        y: source?.y ?? 0,
+        width: 320,
+        height: 360,
+      });
+      const record = await actionRunner.run({
+        actionId: 'design.createVariant',
+        context: actionContext,
+        input: {
+          sourceDesign,
+          name,
+          ...position,
+          previewAssetId: source && 'previewAssetId' in source ? source.previewAssetId : undefined,
+        },
+        runtime: {
+          persistVariant: (value: Parameters<typeof repository.saveManualVariant>[1]) =>
+            repository.saveManualVariant(project.id, value),
+        },
+      });
+      if (record.status !== 'success') throw new Error('Variant creation failed.');
+      const result = record.result as unknown as { designId: string; nodeId: string };
+      const [storedDesigns, storedRelations, snapshot] = await Promise.all([
+        repository.listDesigns(project.id),
+        repository.listDesignRelations(project.id),
+        repository.loadSnapshot(project.id),
+      ]);
+      const createdNode = snapshot?.nodes.find((node) => node.id === result.nodeId);
+      if (!createdNode) throw new Error('Variant card unavailable.');
+      setDesigns(storedDesigns);
+      setRelations(storedRelations);
+      replaceNodesAndResetHistory([
+        ...nodesRef.current,
+        { ...createdNode, label: name.trim() } as CanvasNode,
+      ]);
+      setSelectedDesignId(result.designId);
+      selectCanvasNode(result.nodeId, false);
+      const canvas = document.querySelector('.konva-canvas');
+      setCanvasViewport(
+        revealCanvasNode(useCanvasRuntimeStore.getState().viewport, createdNode, {
+          width: canvas?.clientWidth ?? 740,
+          height: canvas?.clientHeight ?? 500,
+        }),
+      );
+    } finally {
+      setGenerationBusy(false);
+    }
+  };
+  const saveManualCMF = async (
+    designId: string,
+    cmfSetId: string | undefined,
+    name: string,
+    variants: CMFVariantDraft[],
+    placeOnBoard = false,
+  ) => {
+    if (generationBusy) throw new Error('Workspace is busy.');
+    setGenerationBusy(true);
+    try {
+      if (!(await flushPendingSave())) throw new Error('Save failed.');
+      const source = nodes.find((node) => node.designId === designId);
+      const position = findFreeNodePosition(nodes, {
+        x: (source?.x ?? 0) + 400,
+        y: source?.y ?? 0,
+        width: 320,
+        height: 260,
+      });
+      const record = await actionRunner.run({
+        actionId: 'design.saveCMFSet',
+        context: actionContext,
+        input: { designId, cmfSetId, name, variants, placeOnBoard, ...position },
+        runtime: { saveCMFSetWithNode: repository.saveCMFSetWithNode.bind(repository) },
+      });
+      if (record.status !== 'success') throw new Error('CMF could not be saved.');
+      const result = record.result as unknown as {
+        cmfSet: CMFSet;
+        variants: CMFVariant[];
+        node?: CMFNode;
+      };
+      setCMFSets((current) => [
+        ...current.filter((set) => set.id !== result.cmfSet.id),
+        result.cmfSet,
+      ]);
+      setCMFVariants((current) => [
+        ...current.filter((item) => !result.variants.some((v) => v.id === item.id)),
+        ...result.variants,
+      ]);
+      if (result.node) {
+        replaceNodesAndResetHistory([
+          ...nodesRef.current,
+          { ...result.node, label: result.cmfSet.name ?? 'CMF' },
+        ]);
+        selectCanvasNode(result.node.id, false);
+        const canvas = document.querySelector('.konva-canvas');
+        setCanvasViewport(
+          revealCanvasNode(useCanvasRuntimeStore.getState().viewport, result.node, {
+            width: canvas?.clientWidth ?? 740,
+            height: canvas?.clientHeight ?? 500,
+          }),
+        );
+      }
+    } finally {
+      setGenerationBusy(false);
+    }
+  };
   const updateGenerationNode = (patch: Partial<GenerationNode>) => {
     if (!selectedGenerationNode) return;
     commit(
@@ -1501,41 +2293,79 @@ export function App() {
       ),
     );
   };
-  const runCanvasGeneration = async (direction?: string) => {
-    if (!selectedGenerationNode || generationBusy || generationRequestRef.current) return;
+  const runCanvasGeneration = async (direction?: string, queuedTasks?: GenerationNode[]) => {
+    if (
+      (!selectedGenerationNode && !queuedTasks?.length) ||
+      generationBusy ||
+      generationRequestRef.current
+    )
+      return;
     const task =
-      direction === undefined ? selectedGenerationNode : { ...selectedGenerationNode, direction };
-    if (!selectedProvider || providerReadiness !== 'ready') {
+      queuedTasks?.[0] ??
+      (direction === undefined
+        ? selectedGenerationNode!
+        : { ...selectedGenerationNode!, direction });
+    const tasks = queuedTasks ?? [task];
+    if (
+      tasks.some((item) => !item.patternPlacement) &&
+      (!selectedProvider || providerReadiness !== 'ready')
+    ) {
       setGenerationStatus(t('generation.providerRequired'));
       return;
     }
-    const connectedEdges = edges.filter(
-      (edge) => edge.targetNodeId === selectedGenerationNode.id && edge.type === 'generation_input',
-    );
-    const sourceNodes = nodes.filter((node) =>
-      connectedEdges.some((edge) => edge.sourceNodeId === node.id),
-    );
+    const inputs = tasks.map((item) => {
+      const connectedEdges = edges.filter(
+        (edge) => edge.targetNodeId === item.id && edge.type === 'generation_input',
+      );
+      return {
+        node: item,
+        edges: connectedEdges,
+        sourceNodes: nodes.filter((node) =>
+          connectedEdges.some((edge) => edge.sourceNodeId === node.id),
+        ),
+        sourceDesigns: designs,
+        sourceCandidates: generationCandidates,
+        provider: item.patternPlacement
+          ? {
+              id: 'local-raster',
+              type: 'local-raster',
+              name: 'Local compositor',
+              rememberKey: false,
+            }
+          : selectedProvider!,
+      };
+    });
     const controller = new AbortController();
     generationRequestRef.current = { nodeId: task.id, controller };
     setGenerationBusy(true);
     setGenerationStatus(undefined);
+    if (queuedTasks) {
+      setQueueProgress(undefined);
+      setQueueReport('');
+    }
     try {
+      // Materializing results requires the task to exist durably, even when the user
+      // runs immediately after creating it or changing its mode. Failed saves never bill.
+      if (!(await flushPendingSave())) {
+        setGenerationStatus(t('feedback.unknownStorage'));
+        if (queuedTasks) setQueueReport(t('feedback.unknownStorage'));
+        return;
+      }
       const record = await actionRunner.run({
-        actionId: 'ai.canvasGenerate',
+        actionId: queuedTasks ? 'ai.canvasBatchGenerate' : 'ai.canvasGenerate',
         context: actionContext,
-        input: {
-          node: task,
-          edges: connectedEdges,
-          sourceNodes,
-          sourceDesigns: designs,
-          sourceCandidates: generationCandidates,
-          provider: selectedProvider,
-        },
+        input: queuedTasks ? { tasks: inputs } : inputs[0]!,
         runtime: {
+          onProgress: (progress: CanvasBatchProgress) => {
+            generationRequestRef.current = { nodeId: progress.nodeId, controller };
+            setQueueProgress(progress);
+          },
           router: capabilityRouter,
           signal: controller.signal,
           prepareMask: prepareEditMask,
           protectLocalEdit,
+          protectCutout,
+          composePattern,
           credentials,
           resolveImage: async (source: BaseNode) => {
             if (source.type === 'candidate' && 'candidateId' in source) {
@@ -1584,6 +2414,14 @@ export function App() {
           },
         },
       });
+      if (queuedTasks)
+        setQueueReport(
+          record.status === 'success'
+            ? t('generation.queue.complete')
+            : controller.signal.aborted
+              ? t('generation.cancelled')
+              : t('generation.queue.failed'),
+        );
       setGenerationStatus(
         record.status === 'success'
           ? t('generation.candidates')
@@ -1594,6 +2432,10 @@ export function App() {
               : (record.error?.message ?? t('generation.failed')),
       );
     } catch (error) {
+      if (queuedTasks)
+        setQueueReport(
+          controller.signal.aborted ? t('generation.cancelled') : t('generation.queue.failed'),
+        );
       setGenerationStatus(
         controller.signal.aborted
           ? t('generation.cancelled')
@@ -1623,7 +2465,7 @@ export function App() {
             destination === 'reference'
               ? t('generation.generatedReferenceName')
               : sourceName
-                ? `${sourceName} Variant`
+                ? t('generation.generatedVariantName', { name: sourceName })
                 : t('generation.generatedConceptName'),
         },
         runtime: {
@@ -1732,6 +2574,9 @@ export function App() {
     setRelations(archive.relations);
     setGraphViewState(archive.graphViewState);
     setModelAssets(archive.assets.filter((asset) => asset.type === 'model3d'));
+    setViewSets(archive.viewSets);
+    setCMFSets(archive.cmfSets);
+    setCMFVariants(archive.cmfVariants);
     setActiveModelAssetId(undefined);
     setActiveModelUrl(undefined);
     setViewerStatus(undefined);
@@ -1739,6 +2584,8 @@ export function App() {
     clearSelection();
     setActiveProjectId(archive.project.id);
     window.localStorage.setItem(activeProjectStorageKey, archive.project.id);
+    setWorkspaceMode('canvas');
+    setAppView('workspace');
   };
   const exportProject = async () => {
     setArchiveBusy(true);
@@ -1808,6 +2655,7 @@ export function App() {
       model: draft.model.trim() || OPENAI_COMPATIBLE_DEFAULT_MODEL,
       rememberKey: draft.rememberKey,
       supportsMask: draft.supportsMask ?? false,
+      supportsTransparency: draft.supportsTransparency ?? false,
       enabled: true,
     };
     await providerConfigsRepository.save(config);
@@ -2181,15 +3029,29 @@ export function App() {
           {t('provider.name')}
           <input
             autoFocus
+            disabled={namingBusy}
+            maxLength={namingIntent.kind === 'new-concept' ? 200 : undefined}
             onChange={(event) => setNamingIntent({ ...namingIntent, value: event.target.value })}
             value={namingIntent.value}
           />
         </label>
+        {namingFailed ? <p role="alert">{t('dialog.saveFailed')}</p> : null}
         <div>
-          <button onClick={() => setNamingIntent(undefined)} type="button">
+          <button
+            disabled={namingBusy}
+            onClick={() => {
+              setNamingIntent(undefined);
+              setNamingFailed(false);
+            }}
+            type="button"
+          >
             {t('common.cancel')}
           </button>
-          <button className="button--primary" type="submit">
+          <button
+            className="button--primary"
+            type="submit"
+            disabled={namingBusy || !namingIntent.value.trim()}
+          >
             {namingIntent.kind.startsWith('new') ? t('common.create') : t('dialog.saveName')}
           </button>
         </div>
@@ -2199,6 +3061,8 @@ export function App() {
   return appView === 'home' ? (
     <>
       <ProjectHome
+        importBusy={archiveBusy}
+        onImportProject={() => importInputRef.current?.click()}
         demoOpening={demoOpening}
         coverUrls={projectCoverUrls}
         loading={homeLoading}
@@ -2211,6 +3075,24 @@ export function App() {
         }
         projects={recentProjects}
       />
+      <input
+        accept=".oidproj,application/zip"
+        aria-label={t('workspace.import')}
+        className="archive-file-input"
+        disabled={archiveBusy}
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          event.currentTarget.value = '';
+          if (file) void importProject(file);
+        }}
+        ref={importInputRef}
+        type="file"
+      />
+      {archiveStatus ? (
+        <p className={`archive-status${archiveFailed ? ' is-error' : ''}`} role="status">
+          {archiveStatus}
+        </p>
+      ) : null}
       {storageError ? (
         <p className="storage-error" role="status">
           {storageError}
@@ -2220,7 +3102,12 @@ export function App() {
     </>
   ) : (
     <>
-      <main className="app-shell" aria-label={appMetadata.displayName}>
+      <main
+        className="app-shell"
+        aria-label={appMetadata.displayName}
+        inert={canvasMutationBusy}
+        aria-busy={canvasMutationBusy}
+      >
         <header className="top-bar">
           <BrandLogo className="brand-logo brand-logo--workspace" variant="icon" />
           <div className="project-title">
@@ -2266,7 +3153,13 @@ export function App() {
             >
               3D
             </button>
-            <button onClick={() => setEditingSketch(true)} type="button">
+            <button
+              onClick={() => {
+                setSketchDraft(undefined);
+                setEditingSketch(true);
+              }}
+              type="button"
+            >
               {t('workspace.sketch')}
             </button>
             <button onClick={() => setAiWorkbenchOpen((open) => !open)} type="button">
@@ -2326,7 +3219,11 @@ export function App() {
           <div className="storage-error" role="status">
             <span>{storageError ?? t('save.failedPreserved', { error: saveError ?? '' })}</span>
             {saveStatus === 'failed' ? (
-              <button type="button" onClick={() => void flushPendingSave()}>
+              <button
+                type="button"
+                disabled={generationBusy}
+                onClick={() => void flushPendingSave()}
+              >
                 {t('save.retry')}
               </button>
             ) : null}
@@ -2419,10 +3316,59 @@ export function App() {
                 </div>
                 {workspaceMode === 'canvas' ? (
                   <div>
-                    <button onClick={() => referenceImportInputRef.current?.click()} type="button">
+                    <button
+                      disabled={generationBusy || !hydrated}
+                      onClick={() => {
+                        imageImportKindRef.current = 'reference';
+                        referenceImportInputRef.current?.click();
+                      }}
+                      type="button"
+                    >
                       <UiIcon name="image" size={14} />
                       {t('workspace.importReference')}
                     </button>
+                    <button
+                      type="button"
+                      disabled={generationBusy}
+                      onClick={() => setMaterialsOpen(true)}
+                    >
+                      {t('materials.title')}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={generationBusy}
+                      onClick={() => setResearchOpen(true)}
+                    >
+                      {t('research.title')}
+                    </button>
+                    {researchOpen ? (
+                      <ResearchLibraryDialog
+                        providers={providerConfigs}
+                        onAnalyze={analyzeMaterials}
+                        loadAnalyses={() => generationStorage.listMaterialAnalyses(project.id)}
+                        loadAnalysisBlob={loadAnalysisBlob}
+                        onImport={importResearchImage}
+                        load={loadResearch}
+                        save={saveResearch}
+                        loadBlob={loadMaterialBlob}
+                        onPlace={placeMaterial}
+                        onClose={() => setResearchOpen(false)}
+                      />
+                    ) : null}
+                    {materialsOpen ? (
+                      <MaterialLibrary
+                        providers={providerConfigs}
+                        onAnalyze={analyzeMaterials}
+                        loadAnalyses={() => generationStorage.listMaterialAnalyses(project.id)}
+                        loadAnalysisBlob={loadAnalysisBlob}
+                        onSave={saveMaterialKnowledge}
+                        projectId={project.id}
+                        search={searchLocalMaterials}
+                        load={loadMaterialBlob}
+                        onPlace={placeMaterial}
+                        onClose={() => setMaterialsOpen(false)}
+                      />
+                    ) : null}
                     <button
                       onClick={() =>
                         setNamingIntent({ kind: 'new-concept', value: t('workspace.newConcept') })
@@ -2436,6 +3382,70 @@ export function App() {
                       <UiIcon name="plus" size={14} />
                       {t('workspace.newGeneration')}
                     </button>
+                    <button
+                      type="button"
+                      disabled={generationBusy}
+                      onClick={() => setBatchOpen(true)}
+                    >
+                      {t('generation.batch.title')}
+                    </button>
+                    {batchOpen ? (
+                      <ExplorationBatch
+                        sources={nodes
+                          .filter((node) =>
+                            [
+                              'reference',
+                              'image',
+                              'sketch',
+                              'concept',
+                              'variant',
+                              'candidate',
+                            ].includes(node.type),
+                          )
+                          .map((node) => ({
+                            id: node.id,
+                            label: generationInputLabel(node, generationCandidates, locale),
+                          }))}
+                        selectedIds={selectedIds}
+                        onPrepare={prepareExplorationBatch}
+                        onClose={() => setBatchOpen(false)}
+                      />
+                    ) : null}
+                    <button
+                      type="button"
+                      disabled={generationBusy}
+                      onClick={() => {
+                        setQueueProgress(undefined);
+                        setQueueReport('');
+                        setQueueOpen(true);
+                      }}
+                    >
+                      {t('generation.queue.title')}
+                    </button>
+                    {queueOpen ? (
+                      <ExplorationQueue
+                        inputSummaries={queueInputSummaries(
+                          nodes,
+                          edges,
+                          generationCandidates,
+                          locale,
+                        )}
+                        tasks={nodes.filter(
+                          (node): node is GenerationNode => node.type === 'generation',
+                        )}
+                        initialIds={queueInitialIds}
+                        providers={providerConfigs}
+                        providerId={selectedProviderId ?? ''}
+                        ready={providerReadiness === 'ready'}
+                        onProviderChange={setSelectedProviderId}
+                        busy={generationBusy}
+                        progress={queueProgress}
+                        report={queueReport}
+                        onRun={(tasks) => runCanvasGeneration(undefined, tasks)}
+                        onCancel={() => generationRequestRef.current?.controller.abort()}
+                        onClose={() => setQueueOpen(false)}
+                      />
+                    ) : null}
                     <button
                       aria-label={t('workspace.undo')}
                       className="workspace-surface__icon-button"
@@ -2478,9 +3488,7 @@ export function App() {
                       ] as const
                     ).map((item, index) => (
                       <button
-                        aria-label={
-                          index > 1 ? `${t(item)} · ${t('workspace.toolUnavailable')}` : t(item)
-                        }
+                        aria-label={t(item)}
                         aria-pressed={
                           index < 2
                             ? (index === 0 && canvasInteractionMode === 'select') ||
@@ -2493,22 +3501,24 @@ export function App() {
                             ? 'tool-button tool-button--active'
                             : 'tool-button'
                         }
-                        disabled={index > 1}
+                        disabled={generationBusy || !hydrated}
                         key={item}
                         onClick={
                           index === 0
                             ? () => setCanvasInteractionMode('select')
                             : index === 1
                               ? () => setCanvasInteractionMode('pan')
-                              : undefined
+                              : index === 2
+                                ? () =>
+                                    void saveTextNote(undefined, t('text.default'), 20).catch(() =>
+                                      setSaveError(t('text.failed')),
+                                    )
+                                : () => {
+                                    imageImportKindRef.current = 'image';
+                                    referenceImportInputRef.current?.click();
+                                  }
                         }
-                        title={
-                          index === 1
-                            ? t('workspace.panShortcut')
-                            : index > 1
-                              ? `${t(item)} · ${t('workspace.toolUnavailable')}`
-                              : t(item)
-                        }
+                        title={index === 1 ? t('workspace.panShortcut') : t(item)}
                         type="button"
                       >
                         <UiIcon
@@ -2526,6 +3536,27 @@ export function App() {
                       </button>
                     ))}
                     <span aria-hidden="true" className="canvas-floating-tools__divider" />
+                    <button
+                      type="button"
+                      className="tool-button"
+                      disabled={selectedIds.length < 2}
+                      title={t('workspace.groupHint')}
+                      onClick={() => runWorkspaceAction('workspace.groupSelection')}
+                    >
+                      {t('workspace.group')}
+                    </button>
+                    <button
+                      type="button"
+                      className="tool-button"
+                      disabled={
+                        !nodes.some(
+                          (node) => node.type === 'group' && selectedIds.includes(node.id),
+                        )
+                      }
+                      onClick={() => runWorkspaceAction('workspace.ungroupSelection')}
+                    >
+                      {t('workspace.ungroup')}
+                    </button>
                     <button
                       aria-label={t('workspace.duplicate')}
                       className="tool-button"
@@ -2549,6 +3580,17 @@ export function App() {
                   </nav>
                   <CanvasWorkspace
                     boardId={board.id}
+                    onImportReference={
+                      hydrated && !generationBusy
+                        ? () => {
+                            imageImportKindRef.current = 'reference';
+                            referenceImportInputRef.current?.click();
+                          }
+                        : undefined
+                    }
+                    onCreateConcept={() =>
+                      setNamingIntent({ kind: 'new-concept', value: t('workspace.newConcept') })
+                    }
                     interactionMode={canvasInteractionMode}
                     designs={designs}
                     edges={edges}
@@ -2568,6 +3610,9 @@ export function App() {
                     onRedo={redo}
                     onUndo={undo}
                     previewUrls={previewUrls}
+                    viewSets={viewSets}
+                    cmfSets={cmfSets}
+                    cmfVariants={cmfVariants}
                     generationRun={{
                       busy: generationBusy,
                       ready: Boolean(selectedProvider && providerReadiness === 'ready'),
@@ -2575,7 +3620,10 @@ export function App() {
                       status: generationStatus,
                       onRun: (nodeId, direction) => {
                         if (selectedGenerationNode?.id !== nodeId) return;
-                        if (!selectedProvider || providerReadiness !== 'ready') {
+                        if (
+                          !selectedGenerationNode?.patternPlacement &&
+                          (!selectedProvider || providerReadiness !== 'ready')
+                        ) {
                           setProviderSettingsOpen(true);
                           return;
                         }
@@ -2602,6 +3650,17 @@ export function App() {
               )}
             </div>
             <WorkspaceInspector
+              onEditSketch={() => void reopenSketch()}
+              onSaveText={(id, text, fontSize) => saveTextNote(id, text, fontSize)}
+              onRenameGroup={(id, label) =>
+                commit(
+                  nodes.map((node) =>
+                    node.id === id && node.type === 'group'
+                      ? { ...node, label, updatedAt: Date.now() }
+                      : node,
+                  ),
+                )
+              }
               exploration={
                 workspaceMode === 'canvas' &&
                 explorationSource &&
@@ -2679,7 +3738,13 @@ export function App() {
                                 : ('reference' as const),
                           };
                         }),
-                      signature: generationInputSignature(selectedGenerationNode, edges, nodes),
+                      signature: generationInputSignature(
+                        selectedGenerationNode,
+                        edges,
+                        nodes,
+                        designs,
+                        generationCandidates,
+                      ),
                       providers: providerConfigs,
                       selectedProviderId: selectedProviderId ?? '',
                       readiness: providerReadiness,
@@ -2703,6 +3768,57 @@ export function App() {
               }
               node={workspaceMode === 'canvas' ? selectedNode : undefined}
               designs={designs}
+              onSaveDna={saveDesignDna}
+              onCreateVariant={createManualVariant}
+              onCreateConcept={createManualConcept}
+              onSaveDecision={saveDesignDecision}
+              manualViews={{
+                placedIds: nodes.flatMap((node) =>
+                  node.type === 'viewset' && 'viewSetId' in node ? [node.viewSetId as string] : [],
+                ),
+                sets: viewSets,
+                previewUrls,
+                images: nodes.flatMap((node) => {
+                  const assetId =
+                    'previewAssetId' in node
+                      ? node.previewAssetId
+                      : 'assetId' in node
+                        ? node.assetId
+                        : undefined;
+                  return typeof assetId === 'string' && previewUrls[assetId]
+                    ? [
+                        {
+                          id: assetId,
+                          name:
+                            'label' in node && typeof node.label === 'string'
+                              ? node.label
+                              : assetId,
+                        },
+                      ]
+                    : [];
+                }),
+                onSave: saveManualViews,
+              }}
+              manualCMF={{
+                sets: cmfSets,
+                variants: cmfVariants,
+                onSave: saveManualCMF,
+                placedIds: nodes.flatMap((node) =>
+                  node.type === 'cmf' && 'cmfSetId' in node ? [node.cmfSetId as string] : [],
+                ),
+                images: nodes.flatMap((node) => {
+                  const id =
+                    'assetId' in node
+                      ? node.assetId
+                      : 'previewAssetId' in node
+                        ? node.previewAssetId
+                        : undefined;
+                  return typeof id === 'string' && previewUrls[id]
+                    ? [{ id, name: 'label' in node ? String(node.label) : id }]
+                    : [];
+                }),
+              }}
+              dnaBusy={generationBusy}
               onOpenAi={() => setAiWorkbenchOpen(true)}
               selectedDesign={
                 workspaceMode === 'canvas'
@@ -2719,21 +3835,22 @@ export function App() {
           </div>
         )}
         <footer className="status-bar">
-          <span>{t('workspace.localFirst')}</span>
+          <span className="status-bar__secondary">{t('workspace.localFirst')}</span>
           <span>
             {workspaceMode === 'graph'
               ? t('workspace.designCount', { count: designs.length })
               : t('workspace.nodeCount', { count: nodes.length })}
           </span>
-          <span>
+          <span className="status-bar__secondary">
             {workspaceMode === 'graph'
               ? t('workspace.graphRuntime')
               : workspaceMode === 'viewer'
                 ? t('workspace.viewerRuntime')
                 : t('workspace.canvasRuntime')}
           </span>
-          <span title={saveError}>
-            {saveLabel} · {t('workspace.flush')}
+          <span className="status-bar__save" title={saveError ?? t('workspace.flush')}>
+            {saveLabel}
+            <span className="status-bar__shortcut"> · {t('workspace.flush')}</span>
           </span>
         </footer>
         <input
@@ -2749,7 +3866,7 @@ export function App() {
           type="file"
         />
         <input
-          accept="image/*"
+          accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
           aria-label={t('workspace.importReference')}
           className="archive-file-input"
           onChange={(event) => {
@@ -2943,73 +4060,123 @@ export function App() {
               fallback={<p className="workspace-loading">{t('workspace.loadingSketch')}</p>}
             >
               <SketchWorkspace
+                initialSource={sketchDraft?.source}
                 onCancel={() => setEditingSketch(false)}
                 onSave={async ({ preview, source }) => {
-                  const sourceAssetId = crypto.randomUUID();
-                  const previewAssetId = crypto.randomUUID();
-                  const sketchDocumentId = crypto.randomUUID();
-                  const timestamp = Date.now();
-                  const sketchNode = {
-                    id: crypto.randomUUID(),
-                    createdAt: timestamp,
-                    updatedAt: timestamp,
-                    boardId: board.id,
-                    type: 'sketch',
-                    sketchDocumentId,
-                    previewAssetId,
-                    label: 'Sketch — working study',
-                    ...findFreeNodePosition(nodes, {
-                      x: 160,
-                      y: 180,
-                      width: 320,
-                      height: 240,
-                    }),
-                    width: 320,
-                    height: 240,
-                    rotation: 0,
-                    zIndex: nodes.length + 1,
-                  } as CanvasNode;
-                  await Promise.all([
-                    repository.saveAsset({
-                      id: sourceAssetId,
-                      createdAt: timestamp,
-                      updatedAt: timestamp,
-                      projectId: project.id,
-                      type: 'document',
-                      name: 'Sketch scene',
-                      mimeType: 'application/json',
-                      size: source.size,
-                      storage: { type: 'indexeddb', blobId: sourceAssetId },
-                    }),
-                    repository.saveAsset({
-                      id: previewAssetId,
-                      createdAt: timestamp,
-                      updatedAt: timestamp,
-                      projectId: project.id,
-                      type: 'image',
-                      name: 'Sketch preview.png',
-                      mimeType: 'image/png',
-                      size: preview.size,
-                      storage: { type: 'indexeddb', blobId: previewAssetId },
-                    }),
-                    repository.saveAssetBlob({ id: sourceAssetId, blob: source }),
-                    repository.saveAssetBlob({ id: previewAssetId, blob: preview }),
-                    repository.saveSketchDocument({
-                      id: sketchDocumentId,
-                      createdAt: timestamp,
-                      updatedAt: timestamp,
-                      projectId: project.id,
-                      format: 'excalidraw',
-                      formatVersion: 2,
-                      sourceAssetId,
-                      previewAssetId,
-                    }),
-                    repository.saveNode(sketchNode),
-                    repository.saveBoard({ ...board, nodeIds: [...board.nodeIds, sketchNode.id] }),
-                  ]);
-                  registerPreviewUrl(previewAssetId, preview);
-                  commit([...nodes, sketchNode]);
-                  setEditingSketch(false);
+                  setGenerationBusy(true);
+                  try {
+                    if (!(await flushPendingSave())) throw new Error('Pending save failed.');
+                    const sourceAssetId = crypto.randomUUID();
+                    const previewAssetId = crypto.randomUUID();
+                    const sketchDocumentId = sketchDraft?.document.id ?? crypto.randomUUID();
+                    const timestamp = Date.now();
+                    const sketchNode = sketchDraft
+                      ? {
+                          ...sketchDraft.node,
+                          previewAssetId,
+                          updatedAt: timestamp,
+                        }
+                      : ({
+                          id: crypto.randomUUID(),
+                          createdAt: timestamp,
+                          updatedAt: timestamp,
+                          boardId: board.id,
+                          type: 'sketch',
+                          sketchDocumentId,
+                          previewAssetId,
+                          label: 'Sketch — working study',
+                          ...findFreeNodePosition(nodes, {
+                            x: 160,
+                            y: 180,
+                            width: 320,
+                            height: 240,
+                          }),
+                          width: 320,
+                          height: 240,
+                          rotation: 0,
+                          zIndex: nodes.length + 1,
+                        } as CanvasNode);
+                    const record = await actionRunner.run({
+                      actionId: 'workspace.saveSketch',
+                      context: actionContext,
+                      input: {
+                        node: sketchNode,
+                        document: {
+                          id: sketchDocumentId,
+                          createdAt: sketchDraft?.document.createdAt ?? timestamp,
+                          updatedAt: timestamp,
+                          projectId: project.id,
+                          format: 'excalidraw',
+                          formatVersion: 2,
+                          sourceAssetId,
+                          previewAssetId,
+                        },
+                        source: {
+                          id: sourceAssetId,
+                          createdAt: timestamp,
+                          updatedAt: timestamp,
+                          projectId: project.id,
+                          type: 'document',
+                          name: 'Sketch scene',
+                          mimeType: 'application/json',
+                          size: source.size,
+                          storage: { type: 'indexeddb', blobId: sourceAssetId },
+                        },
+                        preview: {
+                          id: previewAssetId,
+                          createdAt: timestamp,
+                          updatedAt: timestamp,
+                          projectId: project.id,
+                          type: 'image',
+                          name: 'Sketch preview.png',
+                          mimeType: 'image/png',
+                          size: preview.size,
+                          storage: { type: 'indexeddb', blobId: previewAssetId },
+                        },
+                      },
+                      runtime: {
+                        sourceBlob: source,
+                        previewBlob: preview,
+                        save: repository.saveSketchSnapshot.bind(repository),
+                      },
+                    });
+                    if (record.status !== 'success') throw new Error('Sketch save failed.');
+                    registerPreviewUrl(previewAssetId, preview);
+                    if (sketchDraft) {
+                      const refresh = (frame: CanvasNode[]) =>
+                        refreshSketchPreview(frame, sketchDocumentId, previewAssetId, timestamp);
+                      const next = refresh(nodesRef.current);
+                      nodesRef.current = next;
+                      setNodes(next);
+                      setHistory((frames) =>
+                        frames.map((frame) => {
+                          const updated = refresh(frame);
+                          const deletion = deletionUndoRef.current.get(frame);
+                          if (deletion)
+                            deletionUndoRef.current.set(updated, {
+                              ...deletion,
+                              before: {
+                                ...deletion.before,
+                                nodes: refresh(deletion.before.nodes as CanvasNode[]),
+                              },
+                              after: {
+                                ...deletion.after,
+                                nodes: refresh(deletion.after.nodes as CanvasNode[]),
+                              },
+                            });
+                          return updated;
+                        }),
+                      );
+                    } else {
+                      commit([...nodesRef.current, sketchNode]);
+                    }
+                    selectCanvasNode(sketchNode.id, false);
+                    setDesignNodeToReveal(sketchNode.id);
+                    setWorkspaceMode('canvas');
+                    setEditingSketch(false);
+                  } finally {
+                    setGenerationBusy(false);
+                  }
                 }}
               />
             </Suspense>

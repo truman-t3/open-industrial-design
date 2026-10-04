@@ -16,7 +16,7 @@ export function CandidateReview({
   const { t } = useLocalization();
   const dialog = useRef<HTMLDialogElement>(null);
   const [selectedId, setSelectedId] = useState(initialId);
-  const [mode, setMode] = useState<'source' | 'candidates'>('source');
+  const [mode, setMode] = useState<'source' | 'candidates' | 'grid'>('source');
   const [comparisonId, setComparisonId] = useState(
     generation.candidates.find((item) => item.id !== initialId)?.id,
   );
@@ -68,6 +68,9 @@ export function CandidateReview({
           >
             {t('generation.compareCandidates')}
           </button>
+          <button type="button" aria-pressed={mode === 'grid'} onClick={() => setMode('grid')}>
+            {t('generation.compareGrid')}
+          </button>
         </div>
         {mode === 'candidates' && comparison ? (
           <label>
@@ -84,53 +87,85 @@ export function CandidateReview({
           </label>
         ) : null}
       </div>
-      <div className="candidate-review__comparison">
-        <figure>
-          <figcaption>
-            {mode === 'candidates' && comparison ? label(comparison.id) : t('generation.source')}
-          </figcaption>
-          {mode === 'candidates' && comparison?.inputSignature !== generation.signature ? (
-            <p role="status">{t('generation.stale')}</p>
-          ) : null}
-          {mode === 'candidates' ? (
-            comparison && generation.previewUrls[comparison.id] ? (
-              <img src={generation.previewUrls[comparison.id]} alt={label(comparison.id)} />
+      {mode === 'grid' ? (
+        <div
+          className="candidate-review__grid"
+          role="group"
+          aria-label={t('generation.compareGrid')}
+        >
+          {generation.candidates.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              aria-pressed={item.id === candidate?.id}
+              aria-label={label(item.id)}
+              disabled={busy}
+              onClick={() => setSelectedId(item.id)}
+            >
+              <strong>{label(item.id)}</strong>
+              {generation.previewUrls[item.id] ? (
+                <img src={generation.previewUrls[item.id]} alt="" />
+              ) : (
+                <span>{t('generation.previewUnavailable')}</span>
+              )}
+              {item.inputSignature !== generation.signature ? (
+                <span>{t('generation.stale')}</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="candidate-review__comparison">
+          <figure>
+            <figcaption>
+              {mode === 'candidates' && comparison ? label(comparison.id) : t('generation.source')}
+            </figcaption>
+            {mode === 'candidates' && comparison?.inputSignature !== generation.signature ? (
+              <p role="status">{t('generation.stale')}</p>
+            ) : null}
+            {mode === 'candidates' ? (
+              comparison && generation.previewUrls[comparison.id] ? (
+                <img src={generation.previewUrls[comparison.id]} alt={label(comparison.id)} />
+              ) : (
+                <p>{t('generation.previewUnavailable')}</p>
+              )
+            ) : source?.previewUrl ? (
+              <img src={source.previewUrl} alt={source.label} />
             ) : (
               <p>{t('generation.previewUnavailable')}</p>
-            )
-          ) : source?.previewUrl ? (
-            <img src={source.previewUrl} alt={source.label} />
-          ) : (
-            <p>{t('generation.previewUnavailable')}</p>
-          )}
-        </figure>
-        <figure>
-          <figcaption>{candidate ? label(candidate.id) : t('generation.candidates')}</figcaption>
-          {candidate && generation.previewUrls[candidate.id] ? (
-            <img src={generation.previewUrls[candidate.id]} alt={label(candidate.id)} />
-          ) : (
-            <p>{t('generation.previewUnavailable')}</p>
-          )}
-        </figure>
-      </div>
-      <nav className="candidate-review__thumbnails" aria-label={t('generation.candidates')}>
-        {generation.candidates.map((item, index) => (
-          <button
-            type="button"
-            key={item.id}
-            aria-pressed={item.id === candidate?.id}
-            aria-label={label(item.id)}
-            onClick={() => setSelectedId(item.id)}
-          >
-            {generation.previewUrls[item.id] ? (
-              <img src={generation.previewUrls[item.id]} alt="" />
-            ) : (
-              index + 1
             )}
-            <span>{label(item.id)}</span>
-          </button>
-        ))}
-      </nav>
+          </figure>
+          <figure>
+            <figcaption>{candidate ? label(candidate.id) : t('generation.candidates')}</figcaption>
+            {candidate && generation.previewUrls[candidate.id] ? (
+              <img src={generation.previewUrls[candidate.id]} alt={label(candidate.id)} />
+            ) : (
+              <p>{t('generation.previewUnavailable')}</p>
+            )}
+          </figure>
+        </div>
+      )}
+      {mode !== 'grid' ? (
+        <nav className="candidate-review__thumbnails" aria-label={t('generation.candidates')}>
+          {generation.candidates.map((item, index) => (
+            <button
+              type="button"
+              key={item.id}
+              aria-pressed={item.id === candidate?.id}
+              aria-label={label(item.id)}
+              disabled={busy}
+              onClick={() => setSelectedId(item.id)}
+            >
+              {generation.previewUrls[item.id] ? (
+                <img src={generation.previewUrls[item.id]} alt="" />
+              ) : (
+                index + 1
+              )}
+              <span>{label(item.id)}</span>
+            </button>
+          ))}
+        </nav>
+      ) : null}
       {candidate?.inputSignature !== generation.signature && candidate ? (
         <p role="status">{t('generation.stale')}</p>
       ) : null}

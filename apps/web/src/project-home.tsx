@@ -7,6 +7,8 @@ export interface ProjectHomeProps {
   projects: readonly Project[];
   loading: boolean;
   demoOpening?: boolean;
+  importBusy?: boolean;
+  onImportProject?(): void;
   coverUrls?: Record<string, string>;
   onCreateProject(): void;
   onDeleteProject(project: Project): void;
@@ -27,6 +29,8 @@ export function ProjectHome({
   projects,
   loading,
   demoOpening = false,
+  importBusy = false,
+  onImportProject,
   coverUrls = {},
   onCreateProject,
   onDeleteProject,
@@ -53,6 +57,16 @@ export function ProjectHome({
             <h1>{t('home.title')}</h1>
             <p>{t('home.description')}</p>
             <div className="project-home__hero-actions">
+              {onImportProject ? (
+                <button
+                  className="button--secondary"
+                  disabled={importBusy}
+                  onClick={onImportProject}
+                  type="button"
+                >
+                  {t('workspace.import')}
+                </button>
+              ) : null}
               <button className="button--primary" onClick={onCreateProject} type="button">
                 {t('home.newProject')}
               </button>

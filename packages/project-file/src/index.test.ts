@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, unzipSync, zipSync, Zip, ZipDeflate, ZipPassThrough } from 'fflate';
 import { describe, expect, it, vi } from 'vitest';
-import { materializeCandidateResults } from '@open-industrial-design/design-model';
+import { materializeCandidateResults, type GroupNode } from '@open-industrial-design/design-model';
 import {
   OID_PROJECT_FORMAT,
   ProjectArchiveError,
@@ -14,7 +14,7 @@ const snapshot = {
     id: 'project-1',
     createdAt: 1,
     updatedAt: 2,
-    schemaVersion: 7 as const,
+    schemaVersion: 9 as const,
     name: 'Portable lamp',
     boardIds: ['board-1'],
     activeBoardId: 'board-1',
@@ -97,6 +97,272 @@ const snapshot = {
 };
 
 describe('OID project archive', () => {
+  it('round-trips user collections and rejects dangling or unsafe research records', async () => {
+    const library = {
+      entries: [
+        {
+          id: 'research-1',
+          createdAt: 1,
+          updatedAt: 2,
+          title: 'Competitor notes',
+          notes: 'User observations',
+          tags: ['lamp'],
+          sourceUrl: 'https://example.com/lamp',
+          competitor: {
+            brand: 'Recorded brand',
+            product: 'Recorded product',
+            recordedOn: '2026-10-04',
+          },
+        },
+      ],
+      collections: [
+        {
+          id: 'collection-1',
+          createdAt: 1,
+          updatedAt: 2,
+          name: 'Portable lamps',
+          entryIds: ['research-1'],
+        },
+      ],
+    };
+    const data = { ...snapshot, project: { ...snapshot.project, researchLibrary: library } };
+    const restored = await importOidProjectArchive(await createOidProjectArchive(data));
+    expect(restored.project.researchLibrary).toEqual(library);
+    expect(
+      (await importOidProjectArchive(await createOidProjectArchive(snapshot))).project
+        .researchLibrary,
+    ).toBeUndefined();
+    for (const invalid of [
+      { ...library, entries: [{ ...library.entries[0]!, assetId: 'missing' }] },
+      { ...library, entries: [{ ...library.entries[0]!, sourceUrl: 'file:///private' }] },
+      { ...library, collections: [{ ...library.collections[0]!, entryIds: ['missing'] }] },
+    ]) {
+      await expect(
+        createOidProjectArchive({
+          ...data,
+          project: { ...data.project, researchLibrary: invalid },
+        }),
+      ).rejects.toMatchObject({ code: 'invalid_project_data' });
+    }
+    const entries = unzipSync(
+      new Uint8Array(await (await createOidProjectArchive(data)).arrayBuffer()),
+    );
+    const projectPath = Object.keys(entries).find((path) => path.endsWith('project.json'))!;
+    const project = JSON.parse(strFromU8(entries[projectPath]!));
+    project.researchLibrary.collections[0].entryIds = ['missing'];
+    entries[projectPath] = strToU8(JSON.stringify(project));
+    await expect(importOidProjectArchive(zipSync(entries))).rejects.toMatchObject({
+      code: 'invalid_project_data',
+    });
+  });
+  const manualSets = () => {
+    const entity = { projectId: 'project-1', createdAt: 1, updatedAt: 2, designId: 'design-1' };
+    return {
+      ...snapshot,
+      viewSets: [
+        { ...entity, id: 'views-1', name: 'Views', views: { left: 'asset-1', bottom: 'asset-1' } },
+      ],
+      cmfSets: [{ ...entity, id: 'cmf-1', variantIds: ['finish-1'] }],
+      cmfVariants: [
+        {
+          ...entity,
+          id: 'finish-1',
+          color: { name: 'Warm white', hex: '#eeeeee' },
+          material: 'Aluminium',
+          finish: 'Matte',
+          notes: 'Handle',
+          textureAssetId: 'asset-1',
+        },
+      ],
+      nodes: [
+        ...snapshot.nodes,
+        {
+          ...snapshot.nodes[0]!,
+          id: 'views-node',
+          type: 'viewset' as const,
+          designId: 'design-1',
+          viewSetId: 'views-1',
+        },
+        {
+          ...snapshot.nodes[0]!,
+          id: 'cmf-node',
+          type: 'cmf' as const,
+          designId: 'design-1',
+          cmfSetId: 'cmf-1',
+        },
+      ],
+    };
+  };
+  it('round-trips manual view slots and CMF membership without generation or lineage changes', async () => {
+    const data = manualSets();
+    const restored = await importOidProjectArchive(await createOidProjectArchive(data));
+    expect(restored.viewSets).toEqual(data.viewSets);
+    expect(restored.cmfSets).toEqual(data.cmfSets);
+    expect(restored.cmfVariants).toEqual(data.cmfVariants);
+    expect(restored.designs).toEqual(snapshot.designs);
+    expect(restored.generations).toEqual([]);
+  });
+  it.each([
+    { viewSets: [{ ...manualSets().viewSets[0], views: null }] },
+    { viewSets: [{ ...manualSets().viewSets[0], views: { side: 'asset-1' } }] },
+    { viewSets: [{ ...manualSets().viewSets[0], views: { left: 42 } }] },
+    { viewSets: [{ ...manualSets().viewSets[0], views: { front: 'missing' } }] },
+    { cmfSets: [{ ...manualSets().cmfSets[0], variantIds: ['missing'] }] },
+    { cmfSets: [{ ...manualSets().cmfSets[0], variantIds: ['finish-1', 'finish-1'] }] },
+    { cmfSets: [{ ...manualSets().cmfSets[0], variantIds: null }] },
+    { cmfVariants: [{ ...manualSets().cmfVariants[0], material: {} }] },
+    { cmfVariants: [{ ...manualSets().cmfVariants[0], color: [] }] },
+    { cmfVariants: [{ ...manualSets().cmfVariants[0], textureAssetId: 'missing' }] },
+    { viewSets: [] },
+    { cmfSets: [] },
+  ])('rejects malformed manual design records %#', async (patch) => {
+    const archive = await importOidProjectArchive(await createOidProjectArchive(manualSets()));
+    expect(() => validateProjectArchiveData({ ...archive, ...patch } as never)).toThrow(
+      ProjectArchiveError,
+    );
+  });
+  it('rejects existing but unrelated CMF variants and set nodes', async () => {
+    const data = await importOidProjectArchive(await createOidProjectArchive(manualSets()));
+    data.designs = [...data.designs, { ...snapshot.designs[0]!, id: 'other-design' }];
+    expect(() =>
+      validateProjectArchiveData({
+        ...data,
+        cmfVariants: [{ ...data.cmfVariants[0]!, designId: 'other-design' }],
+      }),
+    ).toThrow(ProjectArchiveError);
+    for (const type of ['viewset', 'cmf']) {
+      expect(() =>
+        validateProjectArchiveData({
+          ...data,
+          nodes: data.nodes.map((node) =>
+            node.type === type ? { ...node, designId: 'other-design' } : node,
+          ),
+        }),
+      ).toThrow(ProjectArchiveError);
+    }
+  });
+
+  it('round-trips local material knowledge and rejects unsafe or malformed entries', async () => {
+    const knowledge = {
+      notes: 'Rounded grip',
+      tags: ['CMF', 'ergonomics'],
+      sourceUrl: 'https://example.com/reference',
+    };
+    const data = { ...snapshot, assets: snapshot.assets.map((asset) => ({ ...asset, knowledge })) };
+    const restored = await importOidProjectArchive(await createOidProjectArchive(data));
+    expect(restored.assets[0]?.knowledge).toEqual(knowledge);
+    for (const patch of [
+      { notes: 'x'.repeat(4001) },
+      { tags: ['a', 'A'] },
+      { tags: [' '] },
+      { tags: Array.from({ length: 13 }, (_, index) => String(index)) },
+      { sourceUrl: 'javascript:alert(1)' },
+      { sourceUrl: 'file:///C:/private' },
+      { sourceUrl: 'https://user:password@example.com' },
+      { extra: 'unexpected' },
+    ])
+      await expect(
+        createOidProjectArchive({
+          ...data,
+          assets: snapshot.assets.map((asset) => ({
+            ...asset,
+            knowledge: { ...knowledge, ...patch },
+          })),
+        } as never),
+      ).rejects.toMatchObject({ code: 'invalid_project_data' });
+  });
+  it('round-trips pattern tasks and rejects malformed or mixed operations', async () => {
+    for (const patternTask of [
+      { kind: 'create', repeat: 'tile' },
+      { kind: 'transfer', placement: 'front panel', scale: 'small' },
+    ] as const) {
+      const task = {
+        ...snapshot.nodes[0]!,
+        id: 'pattern-task',
+        type: 'generation' as const,
+        label: 'Pattern',
+        direction: 'Botanical artwork',
+        notes: '',
+        count: 2,
+        patternTask,
+        textOnly: patternTask.kind === 'create',
+      };
+      const data = {
+        ...snapshot,
+        nodes: [...snapshot.nodes, task],
+        boards: snapshot.boards.map((board) => ({
+          ...board,
+          nodeIds: [...board.nodeIds, task.id],
+        })),
+      };
+      const restored = await importOidProjectArchive(await createOidProjectArchive(data));
+      expect(restored.nodes.find((item) => item.id === task.id)).toMatchObject({ patternTask });
+      for (const patch of [
+        { localEdit: true },
+        { removeBackground: true },
+        { patternTask: { kind: 'create', repeat: 'bad' } },
+        { patternTask: { kind: 'transfer', placement: 'x'.repeat(501), scale: 'small' } },
+      ])
+        await expect(
+          createOidProjectArchive({
+            ...data,
+            nodes: [...snapshot.nodes, { ...task, ...patch }],
+          } as never),
+        ).rejects.toMatchObject({ code: 'invalid_project_data' });
+    }
+  });
+  it('round-trips explicit text-only tasks and rejects mixed input modes', async () => {
+    const task = {
+      ...snapshot.nodes[0]!,
+      id: 'text-task',
+      type: 'generation' as const,
+      label: 'Text concept',
+      direction: 'Portable lamp',
+      notes: '',
+      count: 2,
+      textOnly: true,
+    };
+    const data = {
+      ...snapshot,
+      boards: snapshot.boards.map((board) => ({ ...board, nodeIds: [...board.nodeIds, task.id] })),
+      nodes: [...snapshot.nodes, task],
+    };
+    const archive = await createOidProjectArchive(data);
+    const restored = await importOidProjectArchive(archive);
+    expect(restored.nodes.find((item) => item.id === task.id)).toMatchObject({
+      textOnly: true,
+      direction: task.direction,
+    });
+    for (const patch of [
+      { textOnly: 'yes' },
+      { localEdit: true },
+      { removeBackground: true },
+      { requestedViews: ['front'] },
+    ])
+      await expect(
+        createOidProjectArchive({
+          ...data,
+          nodes: [...snapshot.nodes, { ...task, ...patch }],
+        } as never),
+      ).rejects.toMatchObject({ code: 'invalid_project_data' });
+    const edge = {
+      id: 'invalid-text-input',
+      boardId: task.boardId,
+      sourceNodeId: 'node-1',
+      targetNodeId: task.id,
+      type: 'generation_input' as const,
+      inputRole: 'base' as const,
+      createdAt: 1,
+      updatedAt: 1,
+    };
+    await expect(
+      createOidProjectArchive({
+        ...data,
+        edges: [edge],
+        boards: data.boards.map((board) => ({ ...board, edgeIds: [edge.id] })),
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_project_data' });
+  });
   it('rejects oversized Blobs before reading their bytes', async () => {
     const source = new Blob(['small']);
     Object.defineProperty(source, 'size', { value: 101 * 1024 * 1024 });
@@ -136,6 +402,39 @@ describe('OID project archive', () => {
       if (view.getUint32(i, true) === 0x02014b50) view.setUint32(i + 24, 1, true);
     }
     await expect(importOidProjectArchive(bytes)).rejects.toMatchObject({ code: 'corrupt_archive' });
+  });
+
+  it('round-trips groups and rejects invalid membership before export', async () => {
+    const group: GroupNode = {
+      ...snapshot.nodes[0],
+      type: 'group',
+      id: 'group',
+      label: 'Exploration',
+      childNodeIds: [snapshot.nodes[0].id],
+    };
+    const data = {
+      ...snapshot,
+      boards: snapshot.boards.map((board) => ({ ...board, nodeIds: [...board.nodeIds, group.id] })),
+      nodes: [...snapshot.nodes, group],
+    };
+    const archive = await createOidProjectArchive(data);
+    const restored = await importOidProjectArchive(archive);
+    expect(restored.nodes.find((node) => node.id === 'group')).toEqual(group);
+    await expect(
+      createOidProjectArchive({
+        ...data,
+        nodes: [...snapshot.nodes, { ...group, childNodeIds: ['group'] } as GroupNode],
+      }),
+    ).rejects.toThrow('Invalid Canvas group');
+    const entries = unzipSync(new Uint8Array(await archive.arrayBuffer()));
+    for (const entry of ['manifest.json', 'project.json']) {
+      const value = JSON.parse(strFromU8(entries[entry]!));
+      value.schemaVersion = 7;
+      entries[entry] = strToU8(JSON.stringify(value));
+    }
+    const migrated = await importOidProjectArchive(zipSync(entries));
+    expect(migrated.project.schemaVersion).toBe(9);
+    expect(migrated.nodes.find((node) => node.id === 'group')).toMatchObject({ childNodeIds: [] });
   });
 
   it.each([
@@ -219,7 +518,7 @@ describe('OID project archive', () => {
       assets: [{ ...snapshot.assets[0]!, metadata: { retained: 'yes' } }],
       manifest: {
         format: OID_PROJECT_FORMAT as typeof OID_PROJECT_FORMAT,
-        schemaVersion: 7,
+        schemaVersion: 9,
         projectId: 'project-1',
         projectName: 'Portable lamp',
         createdAt: 1,
@@ -293,6 +592,37 @@ describe('OID project archive', () => {
       ],
     };
     const blob = await createOidProjectArchive(data);
+    const materialRun = {
+      ...generation,
+      actionId: 'ai.analyzeMaterials',
+      inputSnapshots: [
+        {
+          id: 'run-input-0',
+          sourceAssetId: 'deleted-material',
+          role: 'reference' as const,
+          mimeType: 'image/png',
+        },
+      ],
+    };
+    const materialArchive = await importOidProjectArchive(
+      await createOidProjectArchive({ ...data, generations: [materialRun] }),
+    );
+    expect(materialArchive.generations).toEqual([materialRun]);
+    expect(
+      new Uint8Array(await materialArchive.generationInputBlobs![0]!.blob.arrayBuffer()),
+    ).toEqual(new Uint8Array([7, 8, 9]));
+    for (const invalid of [
+      { ...materialRun, actionId: 'ai.canvasGenerate' },
+      {
+        ...materialRun,
+        inputSnapshots: [{ ...materialRun.inputSnapshots[0]!, sourceAssetId: '' }],
+      },
+      { ...materialRun, inputSnapshots: [{ ...materialRun.inputSnapshots[0]!, sourceNodeId: '' }] },
+    ]) {
+      await expect(
+        createOidProjectArchive({ ...data, generations: [invalid] }),
+      ).rejects.toMatchObject({ code: 'invalid_project_data' });
+    }
     const restored = await importOidProjectArchive(blob);
     expect(restored.generations).toEqual([generation]);
     expect(restored.assets).toHaveLength(snapshot.assets.length);
@@ -360,7 +690,7 @@ describe('OID project archive', () => {
     });
     const restored = await importOidProjectArchive(archive);
 
-    expect(restored.manifest.schemaVersion).toBe(7);
+    expect(restored.manifest.schemaVersion).toBe(9);
     expect(restored.nodes).toEqual([modelNode]);
   });
 
@@ -397,7 +727,7 @@ describe('OID project archive', () => {
     const newerManifest = JSON.parse(strFromU8(newerSchema['manifest.json']!)) as {
       schemaVersion: number;
     };
-    newerManifest.schemaVersion = 8;
+    newerManifest.schemaVersion = 10;
     newerSchema['manifest.json'] = strToU8(JSON.stringify(newerManifest));
     await expect(importOidProjectArchive(zipSync(newerSchema))).rejects.toMatchObject({
       code: 'unsupported_schema_version',
@@ -416,11 +746,11 @@ describe('OID project archive', () => {
     entries['project.json'] = strToU8(JSON.stringify(project));
 
     const restored = await importOidProjectArchive(zipSync(entries));
-    expect(restored.project.schemaVersion).toBe(7);
+    expect(restored.project.schemaVersion).toBe(9);
     expect(restored.project.settings).toEqual({});
   });
 
-  it('migrates a schema 1 package without candidate entries to schema 5', async () => {
+  it('migrates a schema 1 package without candidate entries to the current schema', async () => {
     const archive = await createOidProjectArchive({ ...snapshot, exportedAt: 50 });
     const entries = unzipSync(new Uint8Array(await archive.arrayBuffer()));
     const manifest = JSON.parse(strFromU8(entries['manifest.json']!)) as { schemaVersion: number };
@@ -431,12 +761,12 @@ describe('OID project archive', () => {
     entries['project.json'] = strToU8(JSON.stringify(project));
     delete entries['data/candidates.json'];
     const restored = await importOidProjectArchive(zipSync(entries));
-    expect(restored.project.schemaVersion).toBe(7);
+    expect(restored.project.schemaVersion).toBe(9);
     expect(restored.candidates).toEqual([]);
   });
 
-  it.each([2, 3, 4])(
-    'migrates schema %i archives to schema 5 before output-edge validation',
+  it.each([2, 3, 4, 5, 6, 7, 8])(
+    'migrates baseline schema %i archives without losing source files or graph layout',
     async (version) => {
       const archive = await createOidProjectArchive({ ...snapshot, exportedAt: 50 });
       const entries = unzipSync(new Uint8Array(await archive.arrayBuffer()));
@@ -451,8 +781,15 @@ describe('OID project archive', () => {
 
       const restored = await importOidProjectArchive(zipSync(entries));
 
-      expect(restored.manifest.schemaVersion).toBe(7);
-      expect(restored.project.schemaVersion).toBe(7);
+      expect(restored.manifest.schemaVersion).toBe(9);
+      expect(restored.project.schemaVersion).toBe(9);
+      expect(restored.nodes).toEqual(snapshot.nodes);
+      expect(restored.boards).toEqual(snapshot.boards);
+      expect(restored.sketchDocuments).toEqual(snapshot.sketchDocuments);
+      expect(restored.graphViewState).toEqual(snapshot.graphViewState);
+      expect(restored.assetBlobs).toHaveLength(1);
+      expect(await restored.assetBlobs[0]!.blob.text()).toBe('{ "scene": true }');
+      expect(restored.assets[0]!.metadata).toEqual({ retained: 'yes' });
     },
   );
 
@@ -582,14 +919,132 @@ describe('OID project archive', () => {
       nodes: [...snapshot.nodes, outputNode, localTask, ...results.nodes],
     });
     const localRestored = await importOidProjectArchive(localArchive);
+    const cmfTask = {
+      ...localTask,
+      localCmf: { color: 'blue', material: 'aluminum', finish: 'matte' },
+    };
+    const cmfData = { ...data, nodes: [...snapshot.nodes, outputNode, cmfTask, ...results.nodes] };
+    const cmfRestored = await importOidProjectArchive(await createOidProjectArchive(cmfData));
+    expect(cmfRestored.nodes.find((item) => item.id === cmfTask.id)).toMatchObject({
+      localCmf: cmfTask.localCmf,
+      editRegion: cmfTask.editRegion,
+    });
+    for (const patch of [
+      { localCmf: { color: 42 } },
+      { localEdit: false },
+      { localEditMode: 'erase' },
+    ]) {
+      await expect(
+        createOidProjectArchive({
+          ...cmfData,
+          nodes: [...snapshot.nodes, outputNode, { ...cmfTask, ...patch }, ...results.nodes],
+        } as never),
+      ).rejects.toMatchObject({ code: 'invalid_project_data' });
+    }
+    const cutoutTask = {
+      ...localTask,
+      localEdit: undefined,
+      editRegion: undefined,
+      removeBackground: true,
+    };
+    const cutoutArchive = await createOidProjectArchive({
+      ...data,
+      nodes: [...snapshot.nodes, outputNode, cutoutTask, ...results.nodes],
+    });
+    const placement = { x: 0.5, y: 0.6, width: 0.3, height: 0.2, rotation: 45, opacity: 0.75 };
+    const patternTask = {
+      ...cutoutTask,
+      removeBackground: undefined,
+      count: 1,
+      patternPlacement: placement,
+    };
+    const patternArchive = await createOidProjectArchive({
+      ...data,
+      nodes: [...snapshot.nodes, outputNode, patternTask, ...results.nodes],
+    });
+    expect(
+      (await importOidProjectArchive(patternArchive)).nodes.find(
+        (item) => item.id === patternTask.id,
+      ),
+    ).toMatchObject({ patternPlacement: placement });
+    const cutoutRestored = await importOidProjectArchive(cutoutArchive);
+    expect(cutoutRestored.nodes.find((item) => item.id === cutoutTask.id)).toMatchObject({
+      removeBackground: true,
+    });
+    const invalidCutoutTask = { ...localTask, removeBackground: true };
+    await expect(
+      createOidProjectArchive({
+        ...data,
+        nodes: [...snapshot.nodes, invalidCutoutTask],
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_project_data' });
     expect(localRestored.nodes.find((item) => item.id === localTask.id)).toMatchObject({
       localEdit: true,
+      editRegion: localTask.editRegion,
+    });
+    for (const shape of [
+      {
+        kind: 'polygon',
+        points: [
+          [0, 0],
+          [1, 0],
+          [0, 1],
+        ],
+      },
+      {
+        kind: 'brush',
+        strokes: [
+          {
+            radius: 0.05,
+            points: [
+              [0.2, 0.2],
+              [0.6, 0.5],
+            ],
+          },
+        ],
+      },
+    ]) {
+      const shapedTask = {
+        ...localTask,
+        localEditMode: 'erase' as const,
+        editRegion: { ...localTask.editRegion, shape },
+      };
+      const shapedArchive = await createOidProjectArchive({
+        ...data,
+        nodes: [...snapshot.nodes, outputNode, shapedTask, ...results.nodes],
+      });
+      const shapedRestored = await importOidProjectArchive(shapedArchive);
+      expect(shapedRestored.nodes.find((item) => item.id === localTask.id)).toMatchObject({
+        editRegion: shapedTask.editRegion,
+        localEditMode: 'erase',
+      });
+    }
+    const legacyMaskEntries = unzipSync(new Uint8Array(await localArchive.arrayBuffer()));
+    for (const name of ['manifest.json', 'project.json']) {
+      const value = JSON.parse(strFromU8(legacyMaskEntries[name]!));
+      value.schemaVersion = 8;
+      legacyMaskEntries[name] = strToU8(JSON.stringify(value));
+    }
+    const legacyMask = await importOidProjectArchive(zipSync(legacyMaskEntries));
+    expect(legacyMask.project.schemaVersion).toBe(9);
+    expect(legacyMask.nodes.find((item) => item.id === localTask.id)).toMatchObject({
       editRegion: localTask.editRegion,
     });
     const invalidLocalTask = {
       ...localTask,
       editRegion: { ...localTask.editRegion, sourceAssetId: 'missing' },
     };
+    for (const patch of [
+      { localEditMode: 'unknown' },
+      { localEditMode: 'erase', localEdit: false },
+    ]) {
+      await expect(
+        createOidProjectArchive({
+          ...data,
+          nodes: [...snapshot.nodes, { ...localTask, ...patch }],
+        }),
+      ).rejects.toMatchObject({ code: 'invalid_project_data' });
+    }
     await expect(
       createOidProjectArchive({ ...data, nodes: [...snapshot.nodes, invalidLocalTask] }),
     ).rejects.toMatchObject({ code: 'invalid_project_data' });

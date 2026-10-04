@@ -48,7 +48,7 @@ describe('independent demo copies', () => {
         id: 'old-project',
         createdAt: 1,
         updatedAt: 1,
-        schemaVersion: 7,
+        schemaVersion: 9,
         name: 'Lamp template',
         settings: {},
         boardIds: ['board'],
@@ -143,7 +143,7 @@ describe('independent demo copies', () => {
     expect(archive).toMatchObject({
       manifest: {
         format: 'open-industrial-design',
-        schemaVersion: 7,
+        schemaVersion: 9,
         projectId: 'portable-demo',
         projectName: 'Portable lamp demo copy',
       },
@@ -160,7 +160,7 @@ describe('independent demo copies', () => {
 
   it('refuses to build a demo copy when a referenced image is missing', () => {
     const template = {
-      project: { id: 'template', schemaVersion: 7 } as Project,
+      project: { id: 'template', schemaVersion: 9 } as Project,
       board: { id: 'board' } as Board,
       nodes: [
         { id: 'source', boardId: 'board', type: 'reference', assetId: 'missing' },

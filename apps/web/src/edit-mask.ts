@@ -1,5 +1,71 @@
-import { isValidEditRegion, type EditRegion } from '@open-industrial-design/design-model';
+import {
+  isValidEditRegion,
+  isValidPatternPlacement,
+  type PatternPlacement,
+  type EditRegion,
+} from '@open-industrial-design/design-model';
 import type { ProviderImageInput } from '@open-industrial-design/ai-core';
+import { rasterEditSelection } from './selection-raster';
+
+/** Only take the model's matte, never its redrawn product RGB. */
+export function mergeCutoutPixels(source: Uint8ClampedArray, matte: Uint8ClampedArray) {
+  if (
+    !source.length ||
+    source.length !== matte.length ||
+    source.length % 4 ||
+    source.length > 16_777_216 * 4
+  )
+    throw new Error('Invalid cutout pixels.');
+  let transparent = false,
+    foreground = false;
+  const output = new Uint8ClampedArray(source);
+  for (let i = 3; i < source.length; i += 4) {
+    transparent ||= matte[i]! < 16;
+    foreground ||= matte[i]! > 239 && source[i]! > 0;
+    output[i] = Math.round((source[i]! * matte[i]!) / 255);
+  }
+  if (!transparent || !foreground)
+    throw new Error('Cutout must contain a transparent background and visible foreground.');
+  return output;
+}
+
+export async function protectCutout(
+  source: ProviderImageInput,
+  result: ProviderImageInput,
+): Promise<ProviderImageInput> {
+  const bitmaps: ImageBitmap[] = [];
+  try {
+    for (const image of [source, result])
+      bitmaps.push(
+        await createImageBitmap(new Blob([new Uint8Array(image.data)], { type: image.mimeType })),
+      );
+    const [base, matte] = bitmaps as [ImageBitmap, ImageBitmap];
+    if (
+      !base.width ||
+      !base.height ||
+      base.width * base.height > 16_777_216 ||
+      base.width !== matte.width ||
+      base.height !== matte.height
+    )
+      throw new Error('Cutout dimensions differ.');
+    const canvas = document.createElement('canvas');
+    canvas.width = base.width;
+    canvas.height = base.height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('Cutout compositing is unavailable.');
+    context.drawImage(base, 0, 0);
+    const original = context.getImageData(0, 0, base.width, base.height);
+    context.clearRect(0, 0, base.width, base.height);
+    context.drawImage(matte, 0, 0);
+    original.data.set(
+      mergeCutoutPixels(original.data, context.getImageData(0, 0, base.width, base.height).data),
+    );
+    context.putImageData(original, 0, 0);
+    return await png(canvas);
+  } finally {
+    bitmaps.forEach((bitmap) => bitmap.close());
+  }
+}
 
 function selectionBounds(region: EditRegion, width: number, height: number) {
   return {
@@ -8,6 +74,48 @@ function selectionBounds(region: EditRegion, width: number, height: number) {
     right: Math.min(width, Math.ceil((region.x + region.width) * width)),
     bottom: Math.min(height, Math.ceil((region.y + region.height) * height)),
   };
+}
+
+export async function composePattern(
+  source: ProviderImageInput,
+  pattern: ProviderImageInput,
+  placement: PatternPlacement,
+): Promise<ProviderImageInput> {
+  if (!isValidPatternPlacement(placement)) throw new Error('Invalid pattern placement.');
+  const bitmaps: ImageBitmap[] = [];
+  try {
+    for (const image of [source, pattern])
+      bitmaps.push(
+        await createImageBitmap(new Blob([new Uint8Array(image.data)], { type: image.mimeType })),
+      );
+    const [base, overlay] = bitmaps as [ImageBitmap, ImageBitmap];
+    if (
+      !base.width ||
+      !base.height ||
+      base.width * base.height > 16_777_216 ||
+      !overlay.width ||
+      !overlay.height ||
+      overlay.width * overlay.height > 16_777_216
+    )
+      throw new Error('Pattern images exceed supported dimensions.');
+    const canvas = document.createElement('canvas');
+    canvas.width = base.width;
+    canvas.height = base.height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Pattern compositing is unavailable.');
+    context.drawImage(base, 0, 0);
+    context.save();
+    context.globalAlpha = placement.opacity;
+    context.translate(placement.x * base.width, placement.y * base.height);
+    context.rotate((placement.rotation * Math.PI) / 180);
+    const width = placement.width * base.width,
+      height = placement.height * base.height;
+    context.drawImage(overlay, -width / 2, -height / 2, width, height);
+    context.restore();
+    return await png(canvas);
+  } finally {
+    bitmaps.forEach((bitmap) => bitmap.close());
+  }
 }
 
 /** Preserve decoded source pixels exactly outside the same rectangle used by the mask. */
@@ -30,9 +138,13 @@ export function mergeLocalEditPixels(
   )
     throw new Error('Invalid local edit pixels.');
   const output = new Uint8ClampedArray(source);
-  const bounds = selectionBounds(region, width, height);
+  const selection = rasterEditSelection(region, width, height);
+  const bounds = region.shape
+    ? { x: 0, y: 0, right: width, bottom: height }
+    : selectionBounds(region, width, height);
   for (let y = bounds.y; y < bounds.bottom; y += 1) {
     for (let x = bounds.x; x < bounds.right; x += 1) {
+      if (!selection[y * width + x]) continue;
       const offset = (y * width + x) * 4;
       const alpha = result[offset + 3]! / 255;
       const baseAlpha = source[offset + 3]! / 255;
@@ -147,8 +259,16 @@ export async function prepareEditMask(image: ProviderImageInput, region: EditReg
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = '#ffffff';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    const { x, y, right, bottom } = selectionBounds(region, canvas.width, canvas.height);
-    context.clearRect(x, y, right - x, bottom - y);
+    if (!region.shape) {
+      const { x, y, right, bottom } = selectionBounds(region, canvas.width, canvas.height);
+      context.clearRect(x, y, right - x, bottom - y);
+    } else {
+      const selection = rasterEditSelection(region, canvas.width, canvas.height);
+      if (!selection.includes(1)) throw new Error('The selection contains no image pixels.');
+      const mask = context.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < selection.length; i++) mask.data[i * 4 + 3] = selection[i] ? 0 : 255;
+      context.putImageData(mask, 0, 0);
+    }
     return { image: input, mask: await png(canvas) };
   } finally {
     bitmap.close();

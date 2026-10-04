@@ -3,6 +3,40 @@
 > 本文档定义 Open Industrial Design 的核心领域模型。  
 > 目标：让 Canvas、AI、3D、Local Storage、未来 Cloud 和 Plugin 都围绕同一套稳定语义工作。
 
+## 当前选区与分组实现（2026-10-03）
+
+2026-10-04 用户资料库数据层：可选 `Project.researchLibrary` 保存 `ResearchEntry[]` 与 `ResearchCollection[]`。条目包含标题、说明、标签、来源链接、可选图片 Asset 引用及用户填写的品牌／产品／记录日期；没有图片时需有文字或链接，不虚构文件 Asset。收藏板只保存条目 ID，同一条目可属于多个收藏板，收藏组织不等于 Canvas Board 或 Design 血缘。最多 2000 条资料、200 个收藏板；校验字段白名单、长度、真实日期、身份唯一性、成员引用和图片项目归属。此字段加入未发布 schema 9，无新 Dexie 表，旧工程缺省不变；工程导入／导出都校验并保留记录。Repository 比较调用方读取的旧资料后单事务保存，旧版本写入拒绝；常规项目保存及画布快照保留数据库中的最新资料，不负责覆盖该字段。此处只有领域、存储与工程契约，收藏界面及分析文字证据尚待接通。
+
+2026-10-04 手动 CMF 使用已有 CMFSet／CMFVariant／CMFNode，无字段或版本升级。`design.saveCMFSet` 接收有限字段草稿，准备记录交给 Repository 原子保存；纹理仅引用本项目可用图片 Asset。编辑保持集合／子方案身份和创建时间，不改 Design、父关系或生成历史。移除集合成员仅解除 variantIds 关联，保留原记录与 Asset，避免破坏已有共享引用；删除卡片不删正式集合，placeOnBoard 是非持久化的重新放置意图。App 从独立记录派生画布色板与检查器，序列化仍保存原字段。
+
+2026-10-04 ViewSet 的放回画板入口现已接通：Action 通过非持久化的 placeOnBoard 意图请求新卡片，事务显式区分新建与编辑既有记录；既有记录必须存在且归属一致，保留原 createdAt。同一 Design 的多个 ViewSet 独立存储，可从检查器切换，不改文件格式或血缘。下段重新放置待办是历史记录，已完成。
+
+2026-10-04 手动 ViewSet 编辑复用现有实体和节点字段，不增加 schema／Dexie 版本。`design.saveViewSet` 准备可序列化记录，Repository 在同一事务内校验 Design／Board 归属、图片归属与本地 Blob 后保存 ViewSet、Node、Board 和项目时间；更新保留原 createdAt，不改 Design／血缘／Generation。视图关联仅保存 Asset ID，画布缩略图由运行时传入的 ViewSet 与 Blob URL 派生，不向节点塞图片数据。删除视图卡仍只删除表现，保留正式记录；重新放置入口尚待补齐。
+
+2026-10-04 手动视图／CMF 接入前置校验：继续使用已有 ViewSet／CMFSet／CMFVariant 字段及 schema 9／Dexie 7，不增加迁移。工程校验要求 ViewSet.views 为对象，槽位仅 front／rear／left／right／top／bottom／perspective，值必须引用已有 Asset；这里的左右视图区别于 AI 任务的 side。CMF 集合成员不可重复，必须存在且属于同一 Design；卡片的 viewSetId／cmfSetId 必须与自身 designId 一致。已有合法记录保持兼容；结构损坏、缺失引用和错属记录拒绝导入，不猜测或静默改绑。此处是数据完整性，不代表手动编辑界面已接通。
+
+素材视觉分析复用 `Generation.inputSnapshots` 和既有输入 Blob 表：`sourceNodeId` 可选，但仅 `ai.analyzeMaterials` 允许省略，且必须有非空 `sourceAssetId`；其他生成快照仍要求节点来源。分析 Action 在请求前原子保存运行记录与全部输入字节，之后状态更新不能改写快照。该增量属于未发布 schema 9，不增加表；旧节点型快照保持兼容。快照不依赖当前 Asset 字节，源素材变更后工程仍携带当时的分析证据。
+
+`Asset.knowledge` 是可选的本地素材知识记录，包含 `notes`（最多 4000 字符）、`tags`（最多 12 个，每个 1–40 字符，去首尾空格且大小写不重复）、`sourceUrl`（空字符串或最多 2048 字符的 HTTP(S) 地址，不允许用户名密码）。纳入未发布 schema 9，不增加 Dexie 表；旧 Asset 缺省不改变行为，工程导入拒绝未知字段和无效记录。它不是 Provider 指令或 Design 血缘，不自动发送模型或抓取网页。跨工程复制素材时保留知识记录，但仍移除工程专属 metadata／缩略图引用；副本之后独立编辑。
+
+`GenerationNode.patternTask` 区分图案生成 `{ kind: 'create', repeat: 'single' | 'tile' }` 与迁移 `{ kind: 'transfer', placement, scale: 'small' | 'medium' | 'large' }`，纳入未发布 schema 9；旧节点缺省不改变行为，不新增数据库表。生成图案可显式使用 `textOnly` 或已连接图片，不能因缺少图片自动降级；它保留图片来源但不继承参考产品的 Design 血缘。迁移草稿可保存空位置，执行要求非空位置（最多 500 字符）、一张产品主图和一张图案参考，只从主图继承血缘。两类任务不能组合蒙版、抠图、平面定位或多视角；结构化参数进入输入签名、请求与历史，工程校验拒绝未知字段／枚举和混合模式。连续纹样接缝与曲面贴合是模型效果，不是本地几何保证。
+
+`GenerationNode.localCmf` 保存 `color`／`material`／`finish` 三个字符串，每项最多 500 字符；纳入未发布 schema 9。空白草稿可保存，但执行前至少填写一项；必须与 `localEdit` 一起使用，不能与消除、抠图、多视角或纯文本模式混用。字段参与输入签名和运行历史，Action 将指定属性与保留几何／留空属性约束加入真实图像编辑请求，沿用同一蒙版和选区外像素保护。它不保证模型在选区内遵守材质或形状要求。
+
+`GenerationNode.textOnly` 显式表示文生创意，纳入未发布 schema 9；缺省保持必须有图片的旧语义，不依据缺图自动切换。纯文本模式不允许图片输入边，也不能组合蒙版、抠图、图案定位或多视角。Action 只调用 `image.generate`，参数和签名记录模式，输出仍为独立候选，无来源 Design 时采纳为 Concept。画布隐藏图片输入端口，命中检测、连接验证和工程校验同时拒绝向纯文本任务接图。
+
+`GenerationNode.patternPlacement` 保存图案中心、相对主图的宽高、旋转和不透明度。中心 0–1、宽高 0.01–2、角度 ±180°、不透明度 0–1，必须为有限数；本地合成仅生成一个候选，不能组合其他图像模式。真实执行要求一张主图和一张参考图，输入快照与输出边沿用既有候选链路，历史 Provider 标识为 `local-raster`，不读取凭据或请求 Provider。字段纳入未发布 schema 9；它不是曲面贴图或 AI 材质融合。
+
+`GenerationNode.removeBackground` 表示单主图透明抠图，不能与局部选区或多视角组合。该模式纳入 schema 9，影响候选输入签名；透明输出支持是 Provider 非敏感设置，不进入工程。结果透明度验证和原图 RGB 保护在 Action 的运行时图像适配层完成，Provider 不写项目。
+
+`GenerationNode.localEditMode = 'erase'` 显式表示消除，必须同时启用 `localEdit` 且不能组合多视角任务；不设置该字段保持普通局部编辑。该字段纳入尚未发布的 schema 9；旧工程未设置时语义不变。消除使用独立能力路由、同一蒙版和选区外保护，仍输出未采纳候选。
+
+当前工程 schema 9 / Dexie 7。`EditRegion.shape` 可选多边形顶点或画笔笔画，坐标归一化到主图；画笔半径以图片短边为基准。省略 shape 保留原矩形语义。8→9 迁移不改旧矩形；新格式由不支持的旧应用拒绝，防止静默退化成矩形。请求 PNG 蒙版与选区外像素保护共用二值栅格。最多 256 个多边形顶点、128 笔、每笔 1024 点且总共不超过 4096 点；无效几何在导入时拒绝，空选区和超出计算上限在请求前拒绝。
+
+工程 schema 8 / Dexie 6：`GroupNode.childNodeIds` 仅组织同一 Board 内的节点，不创建 Asset、Design 或血缘。成员仍保存世界坐标、稳定 ID，并可独立选择和移动。组标题拖动一次性提交成员位移；成员改变尺寸或位置时重算组框。解组或删除组框不删除内容；删除成员会清理其组引用。
+
+当前不支持嵌套分组、重复成员或跨画板分组；工程导入和快照保存均验证此约束。7→8 迁移保留旧节点；旧版预留的 `group` 卡片初始化为空成员，不能依据空间位置猜测成员关系。旧应用应拒绝 schema 8，不能静默丢失分组。复制组会重新映射节点及成员 ID；含待评审候选时需先采纳，避免复制候选身份。
+
 ---
 
 # 1. 设计原则

@@ -22,6 +22,107 @@ const config: ProviderConfig = {
 };
 
 describe('OpenAI-compatible Provider', () => {
+  it('sends every visual comparison image in order and never falls back after rejection', async () => {
+    const requests: FetchRequest[] = [];
+    const provider = new OpenAICompatibleProvider(async (_url, request) => {
+      requests.push(request);
+      return {
+        ok: false,
+        status: 400,
+        json: async () => ({ error: { message: 'unsupported images' } }),
+      };
+    });
+    const image = { mimeType: 'image/png', data: new Uint8Array([1]) };
+    const reference = { mimeType: 'image/png', data: new Uint8Array([2]) };
+    const context = { config, credentials: { apiKey: 'fake-key' } };
+    await expect(
+      provider.execute(
+        'vision.analyze',
+        {
+          prompt: 'Compare visible shape only, not market trends.',
+          image,
+          references: [reference],
+        },
+        context,
+      ),
+    ).rejects.toBeInstanceOf(AIProviderError);
+    expect(requests).toHaveLength(1);
+    const body = JSON.parse(requests[0]!.body as string);
+    expect(body.messages[0].content).toEqual([
+      { type: 'text', text: 'Compare visible shape only, not market trends.' },
+      { type: 'image_url', image_url: { url: 'data:image/png;base64,AQ==' } },
+      { type: 'image_url', image_url: { url: 'data:image/png;base64,Ag==' } },
+    ]);
+    expect(JSON.stringify(body)).not.toContain('fake-key');
+    await expect(
+      provider.execute(
+        'vision.analyze',
+        {
+          prompt: 'Compare',
+          image,
+          references: Array(8).fill(reference),
+        },
+        context,
+      ),
+    ).rejects.toMatchObject({ code: 'unsupported' });
+    expect(requests).toHaveLength(1);
+  });
+  it('requests transparent PNG for cutout only after capability confirmation', async () => {
+    const requests: FetchRequest[] = [];
+    const provider = new OpenAICompatibleProvider(async (_url, request) => {
+      requests.push(request);
+      return { ok: true, status: 200, json: async () => ({ data: [{ b64_json: 'AQI=' }] }) };
+    });
+    const request = { image: { mimeType: 'image/png', data: new Uint8Array([1]) }, count: 1 };
+    const context = { config, credentials: { apiKey: 'fake-key' } };
+    await expect(provider.execute('image.cutout', request, context)).rejects.toMatchObject({
+      code: 'unsupported',
+    });
+    expect(requests).toHaveLength(0);
+    await provider.execute('image.cutout', request, {
+      ...context,
+      config: { ...config, supportsTransparency: true },
+    });
+    const form = requests[0]!.body as FormData;
+    expect(form.get('background')).toBe('transparent');
+    expect(form.get('output_format')).toBe('png');
+    expect(form.get('response_format')).toBeNull();
+    expect(form.getAll('image[]')).toHaveLength(1);
+    expect(form.get('mask')).toBeNull();
+  });
+  it('routes object erasing with an obligatory mask and never retries rejected erasing', async () => {
+    const calls: FetchRequest[] = [];
+    const adapter = new OpenAICompatibleProvider(async (_url, request) => {
+      calls.push(request);
+      return { ok: true, status: 200, json: async () => ({ data: [{ b64_json: 'AQI=' }] }) };
+    });
+    const registry = new ProviderRegistry();
+    registry.register(adapter);
+    const router = new CapabilityRouter(registry);
+    const image = { mimeType: 'image/png', data: new Uint8Array([1, 2]) };
+    const request = { images: [image], mask: image, prompt: 'Remove the badge', count: 1 };
+    const context = {
+      config: { ...config, supportsMask: true },
+      credentials: { apiKey: 'fake-key' },
+    };
+    await expect(
+      router.execute('image.erase', { ...request, mask: undefined } as never, context),
+    ).rejects.toMatchObject({ code: 'unsupported' });
+    await expect(
+      router.execute('image.erase', request, { ...context, config }),
+    ).rejects.toMatchObject({ code: 'unsupported' });
+    expect(calls).toHaveLength(0);
+    await router.execute('image.erase', request, context);
+    const form = calls[0]!.body as FormData;
+    expect(form.get('mask')).toBeInstanceOf(Blob);
+    expect(form.get('prompt')).toContain('Do not add a replacement object');
+    expect(form.getAll('image[]')).toHaveLength(1);
+    const rejecting = vi.fn(async () => ({ ok: false, status: 422, json: async () => ({}) }));
+    await expect(
+      new OpenAICompatibleProvider(rejecting).execute('image.erase', request, context),
+    ).rejects.toMatchObject({ code: 'unsupported' });
+    expect(rejecting).toHaveBeenCalledOnce();
+  });
   it('aborts an in-flight HTTP request and removes the cancellation listener', async () => {
     const controller = new AbortController();
     const remove = vi.spyOn(controller.signal, 'removeEventListener');

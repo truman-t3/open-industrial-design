@@ -3,12 +3,24 @@ import {
   resolveAppLocale,
   translate,
   translateDemoLabel,
+  translateGenerationConnectionError,
   translateDesignStatus,
   translateGraphRelation,
   translateNodeType,
 } from './localization';
 
 describe('localization', () => {
+  it('localizes known connection errors while preserving English and unknown errors', () => {
+    expect(translateGenerationConnectionError('zh-CN', 'This source is already connected.')).toBe(
+      '这份素材已经连接，无需重复连接。',
+    );
+    expect(translateGenerationConnectionError('en', 'This source is already connected.')).toBe(
+      'This source is already connected.',
+    );
+    expect(translateGenerationConnectionError('zh-CN', 'Unknown validation error')).toBe(
+      'Unknown validation error',
+    );
+  });
   it('defaults Chinese browser tags to simplified Chinese', () => {
     expect(resolveAppLocale('zh-CN')).toBe('zh-CN');
     expect(resolveAppLocale('zh')).toBe('zh-CN');
@@ -24,6 +36,12 @@ describe('localization', () => {
   it('formats localized variables without storing them in project data', () => {
     expect(translate('zh-CN', 'workspace.nodeCount', { count: 3 })).toBe('3 个节点');
     expect(translate('en', 'workspace.nodeCount', { count: 3 })).toBe('3 Nodes');
+    expect(translate('zh-CN', 'generation.generatedVariantName', { name: '灯具 A' })).toBe(
+      '灯具 A · 方案变体',
+    );
+    expect(translate('en', 'generation.generatedVariantName', { name: 'Lamp A' })).toBe(
+      'Lamp A Variant',
+    );
   });
 
   it('localizes canvas presentation values without changing persisted values', () => {

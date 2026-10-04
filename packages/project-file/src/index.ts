@@ -15,13 +15,21 @@ import type {
   Project,
   SketchDocument,
   ViewSet,
+  ViewSetNode,
+  CMFNode,
 } from '@open-industrial-design/design-model';
 import {
   PROJECT_SCHEMA_VERSION,
+  validateCanvasGroups,
   validateGenerationInput,
   validateGenerationOutput,
   generationViewNames,
   isValidEditRegion,
+  isValidPatternPlacement,
+  isValidLocalCmf,
+  isValidPatternTask,
+  isValidMaterialKnowledge,
+  isValidResearchLibrary,
   materializeCandidateResults,
   type CandidateNode,
 } from '@open-industrial-design/design-model';
@@ -182,6 +190,11 @@ function assertEntityArray(value: unknown[], label: string, projectId: string) {
 }
 
 function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds: Set<string>) {
+  try {
+    validateCanvasGroups(snapshot.nodes);
+  } catch {
+    fail('invalid_project_data', 'Invalid Canvas group membership.');
+  }
   const { project } = snapshot;
   if (
     !project ||
@@ -191,6 +204,11 @@ function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds:
     fail('invalid_project_data', 'Project data is missing or has an unsupported schema version.');
   if (!Array.isArray(project.boardIds) || !isRecord(project.settings))
     fail('invalid_project_data', 'Project data is incomplete.');
+  if (
+    project.researchLibrary !== undefined &&
+    !isValidResearchLibrary(project.researchLibrary, snapshot.assets, project.id)
+  )
+    fail('invalid_project_data', 'Invalid research library or missing research image.');
 
   const boardIds = new Set(snapshot.boards.map((board) => board.id));
   if (!project.activeBoardId || !boardIds.has(project.activeBoardId))
@@ -208,6 +226,56 @@ function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds:
       fail('invalid_project_data', 'Node references a missing board.');
     if (node.type === 'generation') {
       const task = node as GenerationNode;
+      if (
+        task.patternTask !== undefined &&
+        (!isValidPatternTask(task.patternTask) ||
+          task.localEdit ||
+          task.localEditMode ||
+          task.localCmf ||
+          task.editRegion ||
+          task.removeBackground ||
+          task.patternPlacement ||
+          task.requestedViews ||
+          (task.patternTask.kind === 'transfer' && task.textOnly))
+      )
+        fail('invalid_project_data', 'Invalid pattern task.');
+      if (
+        task.localCmf !== undefined &&
+        (!isValidLocalCmf(task.localCmf) || !task.localEdit || task.localEditMode)
+      )
+        fail('invalid_project_data', 'Invalid local CMF operation.');
+      if (
+        task.textOnly !== undefined &&
+        (typeof task.textOnly !== 'boolean' ||
+          (task.textOnly &&
+            (task.localEdit ||
+              task.localEditMode ||
+              task.editRegion ||
+              task.removeBackground ||
+              task.patternPlacement ||
+              task.requestedViews)))
+      )
+        fail('invalid_project_data', 'Invalid text-only generation operation.');
+      if (
+        task.patternPlacement !== undefined &&
+        (!isValidPatternPlacement(task.patternPlacement) ||
+          task.count !== 1 ||
+          task.localEdit ||
+          task.removeBackground ||
+          task.requestedViews)
+      )
+        fail('invalid_project_data', 'Invalid pattern placement operation.');
+      if (
+        task.removeBackground !== undefined &&
+        (typeof task.removeBackground !== 'boolean' ||
+          (task.removeBackground && (task.localEdit || task.requestedViews)))
+      )
+        fail('invalid_project_data', 'Invalid background removal operation.');
+      if (
+        task.localEditMode !== undefined &&
+        (task.localEditMode !== 'erase' || !task.localEdit || task.requestedViews)
+      )
+        fail('invalid_project_data', 'Invalid local edit operation.');
       if (task.localEdit !== undefined && typeof task.localEdit !== 'boolean')
         fail('invalid_project_data', 'Local edit mode is invalid.');
       if (task.localEdit && task.requestedViews)
@@ -276,6 +344,8 @@ function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds:
 
   const assetIds = new Set(snapshot.assets.map((asset) => asset.id));
   snapshot.assets.forEach((asset) => {
+    if (asset.knowledge !== undefined && !isValidMaterialKnowledge(asset.knowledge))
+      fail('invalid_project_data', 'Invalid material knowledge.');
     if (asset.projectId !== project.id)
       fail('invalid_project_data', 'Asset belongs to another project.');
     if (asset.storage.type === 'local-file')
@@ -311,8 +381,17 @@ function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds:
   snapshot.viewSets.forEach((viewSet) => {
     if (!designIds.has(viewSet.designId))
       fail('invalid_project_data', 'ViewSet references a missing design.');
+    if (
+      !isRecord(viewSet.views) ||
+      Object.keys(viewSet.views).some(
+        (view) =>
+          !['front', 'rear', 'left', 'right', 'top', 'bottom', 'perspective'].includes(view),
+      ) ||
+      (viewSet.name !== undefined && typeof viewSet.name !== 'string')
+    )
+      fail('invalid_project_data', 'Invalid ViewSet fields.');
     Object.values(viewSet.views).forEach((assetId) => {
-      if (assetId && !assetIds.has(assetId))
+      if (typeof assetId !== 'string' || !assetIds.has(assetId))
         fail('missing_asset_blob', 'ViewSet references a missing asset.');
     });
   });
@@ -321,12 +400,46 @@ function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds:
   snapshot.cmfSets.forEach((set) => {
     if (!designIds.has(set.designId))
       fail('invalid_project_data', 'CMF set references a missing design.');
+    if (
+      !Array.isArray(set.variantIds) ||
+      new Set(set.variantIds).size !== set.variantIds.length ||
+      (set.name !== undefined && typeof set.name !== 'string') ||
+      set.variantIds.some((id) => {
+        const variant = snapshot.cmfVariants.find((item) => item.id === id);
+        return typeof id !== 'string' || !variant || variant.designId !== set.designId;
+      })
+    )
+      fail('invalid_project_data', 'Invalid CMF set membership.');
   });
   snapshot.cmfVariants.forEach((variant) => {
     if (!designIds.has(variant.designId))
       fail('invalid_project_data', 'CMF variant references a missing design.');
+    if (
+      ['name', 'material', 'finish', 'notes', 'textureAssetId'].some((key) => {
+        const value = variant[key as keyof CMFVariant];
+        return value !== undefined && typeof value !== 'string';
+      }) ||
+      (variant.color !== undefined &&
+        (!isRecord(variant.color) ||
+          Object.entries(variant.color).some(
+            ([key, value]) => !['name', 'hex'].includes(key) || typeof value !== 'string',
+          )))
+    )
+      fail('invalid_project_data', 'Invalid CMF variant fields.');
     if (variant.textureAssetId && !assetIds.has(variant.textureAssetId))
       fail('missing_asset_blob', 'CMF variant references a missing asset.');
+  });
+  snapshot.nodes.forEach((node) => {
+    if (node.type === 'viewset') {
+      const record = snapshot.viewSets.find((item) => item.id === (node as ViewSetNode).viewSetId);
+      if (!record || record.designId !== node.designId)
+        fail('invalid_project_data', 'ViewSet node references a missing or unrelated set.');
+    }
+    if (node.type === 'cmf') {
+      const record = snapshot.cmfSets.find((item) => item.id === (node as CMFNode).cmfSetId);
+      if (!record || record.designId !== node.designId)
+        fail('invalid_project_data', 'CMF node references a missing or unrelated set.');
+    }
   });
   assertEntityArray(snapshot.generations, 'generations', project.id);
   const snapshotIds = new Set<string>();
@@ -338,8 +451,12 @@ function assertSnapshotIntegrity(snapshot: ProjectArchiveSnapshot, assetBlobIds:
         !input ||
         typeof input.id !== 'string' ||
         !safeBlobIdPattern.test(input.id) ||
-        typeof input.sourceNodeId !== 'string' ||
-        !input.sourceNodeId ||
+        (input.sourceNodeId !== undefined &&
+          (typeof input.sourceNodeId !== 'string' || !input.sourceNodeId)) ||
+        (input.sourceNodeId === undefined &&
+          (generation.actionId !== 'ai.analyzeMaterials' ||
+            typeof input.sourceAssetId !== 'string' ||
+            !input.sourceAssetId)) ||
         !['base', 'reference', 'mask'].includes(input.role) ||
         typeof input.mimeType !== 'string' ||
         !input.mimeType.startsWith('image/') ||
@@ -485,6 +602,26 @@ function migrateRawArchive(raw: RawArchiveData, manifest: OidProjectManifest): R
       data = {
         ...data,
         project: isRecord(data.project) ? { ...data.project, schemaVersion: 7 } : data.project,
+      };
+    else if (version === 7)
+      data = {
+        ...data,
+        project: isRecord(data.project) ? { ...data.project, schemaVersion: 8 } : data.project,
+        nodes: data.nodes.map((node) =>
+          node.type === 'group'
+            ? {
+                ...node,
+                rotation: 0,
+                label: (node as BaseNode & { label?: string }).label ?? '',
+                childNodeIds: [],
+              }
+            : node,
+        ),
+      };
+    else if (version === 8)
+      data = {
+        ...data,
+        project: isRecord(data.project) ? { ...data.project, schemaVersion: 9 } : data.project,
       };
     else
       fail(
