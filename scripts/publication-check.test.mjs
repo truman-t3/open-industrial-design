@@ -43,11 +43,12 @@ test('publication and source lists include every application and package source 
   const root = fileURLToPath(new URL('../', import.meta.url));
   const roots = [
     'apps/web/src',
+    'apps/desktop/src-tauri/src',
     ...readdirSync(join(root, 'packages')).map((name) => `packages/${name}/src`),
   ];
   const files = roots.flatMap((dir) =>
     readdirSync(join(root, dir), { recursive: true, withFileTypes: true })
-      .filter((entry) => entry.isFile() && /\.(?:[cm]?[jt]sx?|css)$/.test(entry.name))
+      .filter((entry) => entry.isFile() && /\.(?:[cm]?[jt]sx?|css|rs)$/.test(entry.name))
       .map((entry) => join(entry.parentPath, entry.name).slice(root.length).replaceAll('\\', '/')),
   );
   for (const list of ['public-files.json', 'source-files.json']) {
@@ -81,6 +82,34 @@ test('publication screening reports locations, never matched secrets', () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('native sources and dependency manifests are screened without exposing matches', () => {
+  const root = mkdtempSync(join(tmpdir(), 'oid-native-publication-'));
+  try {
+    const fakeKey = 'ghp_' + 'x'.repeat(30);
+    const files = ['main.rs', 'Cargo.toml', 'Cargo.lock'];
+    for (const file of files) writeFileSync(join(root, file), `token = "${fakeKey}"\n`);
+    const report = inspectPublication(root, files);
+    assert.equal(report.issues.length, files.length);
+    assert.ok(report.issues.every((issue) => issue.code === 'credential-like'));
+    assert.ok(!JSON.stringify(report).includes(fakeKey));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('vendored integrity-checked bytes survive Windows checkout conversion', () => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const files = [
+    'vendor/fonts/liberation-2.1.5/DEBIAN-COPYRIGHT.txt',
+    'vendor/draco/1.5.5/draco_decoder.js',
+  ];
+  const attributes = execFileSync('git', ['-C', root, 'check-attr', 'text', '--', ...files], {
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  for (const file of files) assert.ok(attributes.includes(`${file}: text: unset`));
 });
 
 test('reference assets, internal records and linked parents block publication', () => {

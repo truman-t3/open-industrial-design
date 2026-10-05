@@ -1,2 +1,3 @@
 # Preserve all vendored upstream bytes used by runtime and license integrity checks.
 vendor/** -text
+licenses/** -text
