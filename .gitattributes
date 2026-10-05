@@ -1,2 +1,2 @@
-# Preserve upstream license bytes used by the font integrity check.
-vendor/fonts/liberation-2.1.5/DEBIAN-COPYRIGHT.txt -text
+# Preserve all vendored upstream bytes used by runtime and license integrity checks.
+vendor/** -text
