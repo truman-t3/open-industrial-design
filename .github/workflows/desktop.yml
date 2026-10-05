@@ -64,3 +64,20 @@ jobs:
           cargo test --locked --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo build --locked --release --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node ../../scripts/desktop/package-windows.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $portable = @(Get-ChildItem windows-package -Directory -Filter '*portable-x64')
+          if ($portable.Count -ne 1) { throw 'Expected one portable package' }
+          Compress-Archive -LiteralPath $portable[0].FullName -DestinationPath "windows-package/$($portable[0].Name).zip"
+      - name: Retain unsigned QA candidates (not a Release)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-desktop-qa
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            apps/desktop/windows-package/*.exe
+            apps/desktop/windows-package/*.zip
+            apps/desktop/windows-package/*.txt
+            apps/desktop/windows-package/Cargo.lock

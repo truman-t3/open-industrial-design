@@ -18,6 +18,11 @@
     "targets": ["nsis"],
     "icon": ["icons/icon.ico"],
     "license": "MPL-2.0",
+    "resources": {
+      "../native-review/NATIVE-NOTICES.txt": "NATIVE-NOTICES.txt",
+      "Cargo.lock": "Cargo.lock",
+      "../../../LICENSE": "LICENSE.txt"
+    },
     "shortDescription": "Local-first industrial design workspace",
     "windows": {
       "webviewInstallMode": { "type": "downloadBootstrapper", "silent": false },

@@ -31,3 +31,4 @@ artifacts/
 *.db
 credentials.json
 secrets.json
+apps/desktop/windows-package/

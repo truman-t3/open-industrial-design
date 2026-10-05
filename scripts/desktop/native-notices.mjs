@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, lstatSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, relative, isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { supplementNativeNotices } from './native-supplements.mjs';
 
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
@@ -108,9 +109,24 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       },
     ),
   );
-  const report = collectNativeNotices(metadata);
+  const report = supplementNativeNotices(collectNativeNotices(metadata));
   mkdirSync(output, { recursive: true });
   writeFileSync(join(output, 'native-notices.json'), JSON.stringify(report, null, 2) + '\n');
+  writeFileSync(
+    join(output, 'NATIVE-NOTICES.txt'),
+    [
+      'Open Industrial Design — native dependency notices',
+      'Source: https://github.com/truman-t3/open-industrial-design ; exact dependency versions: accompanying Cargo.lock.',
+      'Upstream crate source: https://crates.io/crates/<name>/<version> (use the name and version below).',
+      'WebView2 Runtime is a separately installed Microsoft component, not covered by the SDK loader notice.',
+      ...report.packages.map(
+        (item) =>
+          `\n${item.name} ${item.version}\n${item.repository ?? ''}\nDeclared license: ${item.declaredLicense}\n${item.notices.map((notice) => `${notice.source ?? notice.file}\n${notice.text}`).join('\n')}`,
+      ),
+    ].join('\n') + '\n',
+  );
+  if (report.packages.some((item) => item.warnings.length))
+    throw new Error('Native notice evidence incomplete; binary packaging blocked');
   console.log(
     `Native inventory: ${report.packages.length} packages; ${report.packages.filter((p) => p.warnings.length).length} require evidence review. Not distribution approval.`,
   );
