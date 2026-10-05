@@ -29,16 +29,13 @@ jobs:
         run: rustup toolchain install 1.90.0 --profile minimal --component rustfmt
       - name: Build web application
         run: pnpm build
-      - name: Test native storage and build Windows installer
+      - name: Collect Windows native dependency evidence
         working-directory: apps/desktop
         env:
           RUSTUP_TOOLCHAIN: 1.90.0
         run: |
           node ../../scripts/desktop/native-notices.mjs src-tauri/Cargo.toml native-review
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cargo test --locked --manifest-path src-tauri/Cargo.toml
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          pnpm exec tauri build -- --locked
       - name: Retain dependency lock for review; do not distribute unreviewed binaries
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -49,3 +46,11 @@ jobs:
           path: |
             apps/desktop/src-tauri/Cargo.lock
             apps/desktop/native-review/native-notices.json
+      - name: Test native storage and build Windows installer
+        working-directory: apps/desktop
+        env:
+          RUSTUP_TOOLCHAIN: 1.90.0
+        run: |
+          cargo test --locked --manifest-path src-tauri/Cargo.toml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm exec tauri build -- --locked

@@ -9,8 +9,12 @@ const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
 /** Inventory evidence only: declared SPDX strings are not a legal approval. */
 export function collectNativeNotices(metadata) {
+  const resolved = metadata.resolve && new Set(metadata.resolve.nodes.map((node) => node.id));
   const packages = metadata.packages
-    .filter((entry) => !metadata.workspace_members.includes(entry.id))
+    .filter(
+      (entry) =>
+        !metadata.workspace_members.includes(entry.id) && (!resolved || resolved.has(entry.id)),
+    )
     .map((entry) => {
       const root = dirname(entry.manifest_path);
       const candidates = new Set();
@@ -56,12 +60,21 @@ export function collectNativeNotices(metadata) {
       }
       if (!notices.length) warnings.push('no-notice-text-found');
       if (!entry.license) warnings.push('no-declared-license');
+      let vcs = null;
+      try {
+        const info = JSON.parse(readFileSync(join(root, '.cargo_vcs_info.json'), 'utf8'));
+        if (/^[a-f0-9]{40}$/.test(info.git?.sha1))
+          vcs = { commit: info.git.sha1, path: info.path_in_vcs ?? '' };
+      } catch {
+        /* Some published crates intentionally have no VCS metadata. */
+      }
       return {
         name: entry.name,
         version: entry.version,
         source: entry.source,
         declaredLicense: entry.license,
         repository: entry.repository,
+        vcs,
         notices,
         warnings,
       };
@@ -76,7 +89,18 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const metadata = JSON.parse(
     execFileSync(
       'cargo',
-      ['metadata', '--locked', '--format-version', '1', '--manifest-path', manifest],
+      [
+        'metadata',
+        '--locked',
+        '--format-version',
+        '1',
+        '--filter-platform',
+        'x86_64-pc-windows-msvc',
+        '--features',
+        'tauri/custom-protocol',
+        '--manifest-path',
+        manifest,
+      ],
       {
         encoding: 'utf8',
         maxBuffer: 32 * 1024 * 1024,
