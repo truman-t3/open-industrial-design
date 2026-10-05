@@ -5,12 +5,26 @@ edition = "2021"
 rust-version = "1.90"
 license = "MPL-2.0"
 publish = false
+default-run = "open-industrial-design-desktop"
+
+[features]
+installer = []
+
+[[bin]]
+name = "open-industrial-design-desktop"
+path = "src/main.rs"
+
+[[bin]]
+name = "oid-setup"
+path = "src/installer.rs"
+required-features = ["installer"]
 
 [build-dependencies]
 tauri-build = { version = "=2.7.1", features = [] }
 
 [dependencies]
 tauri = { version = "=2.12.1", features = [] }
+sha2 = "=0.10.9"
 
 [profile.release]
 strip = true

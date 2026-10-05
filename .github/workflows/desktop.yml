@@ -54,3 +54,13 @@ jobs:
           cargo test --locked --manifest-path src-tauri/Cargo.toml
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           pnpm exec tauri build -- --locked
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node ../../scripts/desktop/build-installer-ui.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $payloads = @(Get-ChildItem src-tauri/target/release/bundle/nsis -Filter '*.exe')
+          if ($payloads.Count -ne 1) { throw 'Expected one fixed NSIS payload' }
+          $env:OID_NSIS_PAYLOAD = $payloads[0].FullName
+          $env:OID_APP_SHA256 = (Get-FileHash src-tauri/target/release/open-industrial-design-desktop.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          cargo test --locked --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo build --locked --release --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup

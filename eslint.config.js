@@ -4,7 +4,14 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/coverage/**', '**/node_modules/**', 'vendor/**'],
+    ignores: [
+      '**/dist/**',
+      '**/coverage/**',
+      '**/node_modules/**',
+      'vendor/**',
+      'apps/desktop/installer-dist/**',
+      'apps/desktop/src-tauri/target/**',
+    ],
   },
   js.configs.recommended,
   tseslint.configs.recommended,
@@ -20,6 +27,10 @@ export default tseslint.config(
   {
     files: ['scripts/desktop/**/*.cjs'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: ['apps/desktop/installer/**/*.mjs'],
+    languageOptions: { globals: globals.browser },
   },
   {
     files: [

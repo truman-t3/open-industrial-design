@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Open Industrial Design Setup",
+  "version": "../../../package.json",
+  "identifier": "com.openindustrialdesign.setup",
+  "build": { "frontendDist": "../installer-dist" },
+  "app": {
+    "windows": [],
+    "withGlobalTauri": true,
+    "security": {
+      "capabilities": [
+        {
+          "identifier": "installer-events",
+          "windows": ["setup"],
+          "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+        }
+      ],
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'"
+    }
+  },
+  "bundle": { "active": false, "icon": ["icons/icon.ico"] }
+}

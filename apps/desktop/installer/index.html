@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Open Industrial Design · 安装</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <svg class="filters" aria-hidden="true">
+      <defs>
+        <filter id="blueprint" color-interpolation-filters="sRGB">
+          <feColorMatrix type="saturate" values="0" />
+          <feConvolveMatrix
+            order="3"
+            kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"
+            preserveAlpha="true"
+          />
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="2.5" />
+            <feFuncG type="linear" slope="2.5" />
+            <feFuncB type="linear" slope="2.5" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+    </svg>
+    <div class="shell">
+      <header>
+        <div class="brand"><img src="logo.png" alt="Open Industrial Design" /></div>
+        <nav aria-label="界面设置">
+          <select id="language" aria-label="Language">
+            <option value="zh">简体中文</option>
+            <option value="en">English</option></select
+          ><label class="motion"
+            ><input type="checkbox" id="motion" /><span id="motion-label">减少动效</span></label
+          >
+        </nav>
+      </header>
+      <main>
+        <figure aria-label="灯具从蓝图到成品的视觉演示">
+          <div class="drawing">
+            <img class="blueprint" src="lamp.png" alt="" /><img
+              class="render"
+              src="lamp.png"
+              alt="便携灯具概念设计"
+            />
+            <div class="scan"></div>
+          </div>
+          <div class="guide horizontal"></div>
+          <div class="guide vertical"></div>
+          <svg class="registration" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="9" />
+            <path d="M20 0V13M20 27V40M0 20H13M27 20H40" />
+          </svg>
+          <div class="draft-scale" aria-hidden="true"></div>
+          <figcaption class="design-stages" aria-hidden="true">
+            <span id="stage-idea">构思</span><i></i><span id="stage-form">成形</span><i></i
+            ><span id="stage-design">开始设计</span>
+          </figcaption>
+        </figure>
+        <section class="controls">
+          <h1 id="heading">从蓝图，<br />走向现实。</h1>
+          <p class="tagline" id="tagline">一个想法，不止一种可能。</p>
+          <div class="process">
+            <div class="progress-row">
+              <progress id="progress" max="100" value="0" aria-label="模拟安装进度"></progress
+              ><output id="percent">0%</output>
+            </div>
+            <p id="status" role="status" aria-live="polite">准备好，开始你的设计探索。</p>
+          </div>
+          <label class="destination-label" for="destination" id="destination-label"
+            >程序安装位置</label
+          >
+          <input id="destination" type="text" spellcheck="false" autocomplete="off" disabled />
+          <button id="primary" class="primary" disabled>正在连接安装程序</button>
+          <button id="cancel" class="quiet" hidden>取消</button>
+          <p class="detail" id="detail">只有安装并校验成功后，才能启动工作台。</p>
+          <details>
+            <summary id="license-label">许可与数据说明</summary>
+            <p id="data-notice"></p>
+            <pre id="license"></pre>
+          </details>
+        </section>
+      </main>
+      <footer>
+        <span></span>
+        <p id="notice">未签名测试版 · Open Industrial Design</p>
+        <span></span>
+      </footer>
+    </div>
+    <script type="module" src="app.mjs"></script>
+  </body>
+</html>
