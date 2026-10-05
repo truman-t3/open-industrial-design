@@ -1,6 +1,3 @@
-# Preserve all vendored upstream bytes used by runtime and license integrity checks.
-vendor/** -text
-licenses/** -text
-docs/prepublication-review.md -text
-DEMO_ASSETS_LICENSE.md -text
-TRADEMARKS.md -text
+# Source, license evidence and vendor assets contain audited byte hashes.
+# Preserve committed bytes on every platform; Prettier handles source formatting.
+* -text
