@@ -3,6 +3,16 @@ use std::{fs, io::{self, Write}, path::{Path, PathBuf}};
 
 const MARKER: &str = "Open Industrial Design Tauri data v1\n";
 
+/// The OS releases this lock even after a crash. Never delete the lock file:
+/// another process may already have it open while waiting for this process.
+pub fn lock(directory: &Path) -> io::Result<fs::File> {
+    let path = directory.join(".instance-lock");
+    refuse_links(&path)?;
+    let file = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(path)?;
+    file.try_lock().map_err(|_| io::Error::other("This workspace is already open in another window"))?;
+    Ok(file)
+}
+
 fn refuse_links(path: &Path) -> io::Result<()> {
     for ancestor in path.ancestors() {
         match fs::symlink_metadata(ancestor) {
@@ -59,6 +69,10 @@ mod tests {
         fs::create_dir(&root).unwrap();
         let data = root.join("data");
         let profile = prepare(&data).unwrap();
+        let first_lock = lock(&data).unwrap();
+        assert!(lock(&data).is_err());
+        drop(first_lock);
+        drop(lock(&data).unwrap());
         fs::write(profile.join("sentinel"), b"retained").unwrap();
         assert_eq!(prepare(&data).unwrap(), profile);
         assert_eq!(fs::read(profile.join("sentinel")).unwrap(), b"retained");

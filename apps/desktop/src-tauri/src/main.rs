@@ -18,6 +18,8 @@ fn main() {
                 app.path().app_local_data_dir()?.join("workspace")
             };
             let profile = storage::prepare(&data)?;
+            // Hold the OS lock for the entire app lifetime, including crashes.
+            app.manage(storage::lock(&data)?);
             WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
                 .title("Open Industrial Design")
                 .inner_size(1440.0, 960.0)
