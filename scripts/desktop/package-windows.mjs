@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
 import { readFileSync, copyFileSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -52,15 +51,5 @@ for (const folder of [output, portable]) {
     `Open Industrial Design ${version}\nUnsigned Community Alpha — QA candidate, not a verified public release.\n未签名测试候选包，尚未通过完整安装验收。\n\nBlueprint setup requires Microsoft WebView2. If unavailable, use standard-setup, which can install the runtime.\n蓝图安装器需要 WebView2；缺少该组件时请使用 standard-setup 安装器。\nPortable: extract to a writable dedicated folder; run the EXE. Data stays in Open Industrial Design Data beside it.\n便携版解压到可写独立文件夹运行；数据在旁边的 Open Industrial Design Data 中。升级请保留该数据文件夹。\nDo not bypass Windows security warnings. Verify provenance and hashes first.\n请勿绕过 Windows 安全拦截；先核对来源与哈希。\n\nSource / 源码: https://github.com/truman-t3/open-industrial-design/tree/${commit}\nNative dependencies: see Cargo.lock and NATIVE-NOTICES.txt. Web notices are embedded in the application.\n`,
   );
 }
-const lines = [];
-for (const dir of [output, portable])
-  for (const name of readdirSync(dir)) {
-    if (name.endsWith('.exe'))
-      lines.push(
-        `${createHash('sha256')
-          .update(readFileSync(join(dir, name)))
-          .digest('hex')}  ${dir === portable ? portable.split(/[\\/]/).at(-1) + '/' : ''}${name}`,
-      );
-  }
-writeFileSync(join(output, 'SHA256SUMS.txt'), lines.join('\n') + '\n');
+// Final checksums are created only after the portable ZIP is assembled.
 console.log(`Windows QA candidate assembled: ${version} ${commit}`);
