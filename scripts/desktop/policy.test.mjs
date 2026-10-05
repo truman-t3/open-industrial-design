@@ -6,6 +6,20 @@ import { tmpdir } from 'node:os';
 import { join, parse } from 'node:path';
 import policy from './policy.cjs';
 
+test('uninstaller explains retained data and keeps the preservation hook', () => {
+  const hooks = readFileSync(
+    new URL('../../apps/desktop/src-tauri/installer-hooks.nsh', import.meta.url),
+    'utf8',
+  );
+  assert.match(hooks, /!define MUI_UNCONFIRMPAGE_TEXT_TOP/);
+  assert.match(hooks, /工程与设置始终保留/);
+  assert.match(hooks, /checkbox below has no effect/);
+  assert.match(
+    hooks,
+    /!macro NSIS_HOOK_PREUNINSTALL\s+StrCpy \$DeleteAppDataCheckboxState 0\s+!macroend/,
+  );
+});
+
 test('desktop serves only its fixed origin and existing local assets', () => {
   const root = mkdtempSync(join(tmpdir(), 'oid-desktop-test-'));
   try {
