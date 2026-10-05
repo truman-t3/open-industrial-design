@@ -60,7 +60,15 @@ jobs:
           $payloads = @(Get-ChildItem src-tauri/target/release/bundle/nsis -Filter '*.exe')
           if ($payloads.Count -ne 1) { throw 'Expected one fixed NSIS payload' }
           $env:OID_NSIS_PAYLOAD = $payloads[0].FullName
-          $env:OID_APP_SHA256 = (Get-FileHash src-tauri/target/release/open-industrial-design-desktop.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          # Tauri patches the bundled EXE with its NSIS bundle type. The loose
+          # portable EXE is not the installed payload; verify the actual payload.
+          $inspection = Join-Path (Get-Location) 'src-tauri/target/nsis-inspection'
+          & 'C:/Program Files/7-Zip/7z.exe' x $payloads[0].FullName "-o$inspection" -y
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $installedPayload = @(Get-ChildItem -LiteralPath $inspection -Recurse -File -Filter 'open-industrial-design-desktop.exe')
+          if ($installedPayload.Count -ne 1) { throw 'Expected one bundled application payload' }
+          $env:OID_APP_SHA256 = (Get-FileHash -LiteralPath $installedPayload[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath 'native-review/installed-app.sha256' -Value $env:OID_APP_SHA256 -NoNewline
           cargo test --locked --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo build --locked --release --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup

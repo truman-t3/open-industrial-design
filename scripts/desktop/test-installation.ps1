@@ -8,7 +8,8 @@ New-Item -ItemType Directory -Path $fixtureRoot | Out-Null
 $destination = Join-Path $fixtureRoot 'Application With Spaces'
 $setup = @(Get-ChildItem -LiteralPath (Join-Path $desktopRoot 'windows-package') -Filter '*standard-setup.exe')
 if ($setup.Count -ne 1) { throw 'Expected exactly one standard installer.' }
-$expected = (Get-FileHash -LiteralPath (Join-Path $desktopRoot 'src-tauri/target/release/open-industrial-design-desktop.exe') -Algorithm SHA256).Hash
+$expected = [IO.File]::ReadAllText((Join-Path $desktopRoot 'native-review/installed-app.sha256')).Trim()
+if ($expected -notmatch '^[a-f0-9]{64}$') { throw 'Missing actual NSIS payload digest.' }
 $profile = Join-Path $env:LOCALAPPDATA 'com.openindustrialdesign.desktop/workspace'
 if (Test-Path -LiteralPath $profile) { throw 'Unexpected pre-existing app profile on clean runner.' }
 New-Item -ItemType Directory -Path $profile -Force | Out-Null
