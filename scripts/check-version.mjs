@@ -38,6 +38,15 @@ if (mismatches.length) {
   );
 }
 
-console.log(
-  `Verified Community Alpha version ${expected} across ${packageFiles.length} packages and manifest.`,
-);
+for (const path of ['apps/desktop/src-tauri/Cargo.toml', 'apps/desktop/src-tauri/Cargo.lock']) {
+  const content = await readFile(new URL(path, root), 'utf8');
+  const version = content.match(
+    /name = "open-industrial-design-desktop"\r?\nversion = "([^"]+)"/,
+  )?.[1];
+  if (version !== expected) throw new Error(`Desktop version mismatch: ${path}`);
+}
+const labels = await readFile(new URL('packages/core/src/localization.ts', root), 'utf8');
+const editions = [...labels.matchAll(/'home.edition': '([^']+)'/g)];
+if (editions.length !== 2 || editions.some((match) => !match[1].includes(expected)))
+  throw new Error('Home edition labels must show the current version in both languages');
+console.log(`Verified version ${expected} across packages, manifest, desktop and home labels.`);

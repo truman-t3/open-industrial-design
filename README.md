@@ -6,13 +6,13 @@
   </picture>
 </p>
 
-# Open Industrial Design v0.1.0-alpha.2
+# Open Industrial Design v0.1.0-beta.1
 
 <p align="center">
-  <a href="https://github.com/truman-t3/open-industrial-design/releases"><img src="https://img.shields.io/badge/version-0.1.0--alpha.2-2563eb" alt="Version 0.1.0-alpha.2"></a>
+  <a href="https://github.com/truman-t3/open-industrial-design/releases"><img src="https://img.shields.io/badge/version-0.1.0--beta.1-2563eb" alt="Version 0.1.0-beta.1"></a>
   <a href="https://github.com/truman-t3/open-industrial-design/actions/workflows/quality.yml"><img src="https://github.com/truman-t3/open-industrial-design/actions/workflows/quality.yml/badge.svg" alt="CI status"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MPL--2.0-blue" alt="Source license MPL-2.0"></a>
-  <a href="./docs/release-status.md"><img src="https://img.shields.io/badge/status-Community_Alpha-orange" alt="Community Alpha"></a>
+  <a href="./docs/release-status.md"><img src="https://img.shields.io/badge/status-Community_Beta-orange" alt="Community Beta"></a>
 </p>
 
 <p align="center">从设计意图开始，在进入 CAD 前探索、比较并保留产品方案。<br>Start with design intent: explore, compare, and preserve product ideas before CAD.</p>
@@ -23,11 +23,11 @@
 
 ## 中文介绍
 
-> **Community Alpha**：适合体验和反馈，重要项目请先导出备份。AI 使用自己的 API Key，费用由所选服务商收取；本项目不是 CAD，也不保证模型生成质量。
+> **Community Beta**：适合体验和反馈，重要项目请先导出备份。AI 使用自己的 API Key，费用由所选服务商收取；本项目不是 CAD，也不保证模型生成质量。
 
 **Open Industrial Design** 是面向工业设计师的本地优先、支持自带 API Key（BYOK）的设计探索工作台。它将参考图、草图、概念方案、变体、CMF、设计血缘和轻量 3D 评审组织在同一个项目中，服务于进入 CAD 之前的探索与决策。
 
-当前源码版本：**`0.1.0-alpha.2`**。已发布版本以 [Releases](https://github.com/truman-t3/open-industrial-design/releases) 为准；本轮变更见 [版本说明](./docs/alpha-0.1.0-alpha.2-release.md)。不提供托管服务或正式桌面安装包；仓库目录名中的旧版本后缀不是应用版本。
+当前源码版本：**`0.1.0-beta.1`**。已发布版本以 [Releases](https://github.com/truman-t3/open-industrial-design/releases) 为准；本轮变更见 [版本说明](./docs/beta-0.1-release.md)。提供未签名 Windows x64 安装版和便携版公测包，下载以 Releases 为准；不提供托管服务；仓库目录名中的旧版本后缀不是应用版本。
 
 ### 已有能力
 
@@ -78,7 +78,7 @@ pnpm dev
 
 ### 支持格式
 
-| 用途     | 当前 Alpha 支持                |
+| 用途     | 当前 Beta 支持                 |
 | -------- | ------------------------------ |
 | 参考素材 | 浏览器支持的图片文件           |
 | 草图     | Excalidraw 场景数据及 PNG 预览 |
@@ -87,7 +87,7 @@ pnpm dev
 
 ### 核验与分发
 
-`v0.1.0-alpha.2` 发布提交通过本地全量质量检查及 [GitHub CI](https://github.com/truman-t3/open-industrial-design/actions/runs/37218301389)。检查包含版本一致性、GLB 测试素材、格式、lint、类型、自动测试及生产构建。隔离 Chromium 核验覆盖示例、候选独立操作、连线、资料分析、草图保存、GLB 导入与截图、工程导出／导入／刷新恢复，详见[工作流验收](./docs/reference-workflow-adaptation.md)。生成回归使用模拟请求，不代表所有真实服务商或模型通过验收。
+发布前执行本地全量质量检查及对应提交的 [Windows CI](https://github.com/truman-t3/open-industrial-design/actions/workflows/desktop.yml)。检查包含版本一致性、GLB 测试素材、格式、lint、类型、自动测试及生产构建。隔离 Chromium 核验覆盖示例、候选独立操作、连线、资料分析、草图保存、GLB 导入与截图、工程导出／导入／刷新恢复，详见[工作流验收](./docs/reference-workflow-adaptation.md)。生成回归使用模拟请求，不代表所有真实服务商或模型通过验收。
 
 GitHub CI 使用只读仓库权限、固定版本的 Actions，不配置服务商密钥，也不自动部署或发布。CI 通过只代表技术检查通过，不代替分发资料审核。
 
@@ -105,7 +105,7 @@ pnpm run notices:check
 - 不包含专用本地 AI 超分辨率、AI 3D 生成、云同步、账号及多人协作。抠图使用兼容服务商生成候选并检查透明通道，不附带本地分割模型；图案平面贴放不等于 3D 表面映射。
 - 连接成功不保证多图、图像编辑或蒙版支持；取消请求不保证服务商免收费用，生成的多视角也不是经过几何校验的 CAD 视图。
 - 软件 WebGL 与隔离浏览器核验不等于所有真实 GPU、实体键鼠或原生中文输入法均已验收。编辑器按需加载，但大分块体积仍需优化。
-- 资料库由用户自行补充，不自动抓取网站，也不是实时市场趋势数据库。当前源码版本不包含正式桌面安装包。
+- 资料库由用户自行补充，不自动抓取网站，也不是实时市场趋势数据库。桌面包属于未签名 Beta 公测版，不是稳定版。
 
 ### 参与社区与许可
 
@@ -119,11 +119,11 @@ pnpm run notices:check
 
 ## English overview
 
-> **Community Alpha**: intended for evaluation and feedback. Export backups of important projects first. AI uses your own API key, with fees charged by your selected provider. This is not CAD and does not guarantee model output quality.
+> **Community Beta**: intended for evaluation and feedback. Export backups of important projects first. AI uses your own API key, with fees charged by your selected provider. This is not CAD and does not guarantee model output quality.
 
 **Open Industrial Design** is a local-first, bring-your-own-key (BYOK) exploration workspace for industrial designers. It keeps references, sketches, concepts, variants, CMF, design lineage and lightweight 3D review in one project, supporting exploration and decisions before CAD.
 
-Current source version: **`0.1.0-alpha.2`**. See [Releases](https://github.com/truman-t3/open-industrial-design/releases) for published versions and the [release notes](./docs/alpha-0.1.0-alpha.2-release.md) for this update. No hosted service or production desktop installer is provided; an older version suffix in the checkout directory is not the application version.
+Current source version: **`0.1.0-beta.1`**. See [Releases](https://github.com/truman-t3/open-industrial-design/releases) for published versions and the [release notes](./docs/beta-0.1-release.md) for this update. Unsigned Windows x64 installer and portable Beta packages are distributed through Releases. No hosted service is provided; an older version suffix in the checkout directory is not the application version.
 
 ### Capabilities
 
@@ -174,7 +174,7 @@ Data belongs to the current browser and origin (protocol, hostname and port). Ch
 
 ### Supported formats
 
-| Area           | Current Alpha support                  |
+| Area           | Current Beta support                   |
 | -------------- | -------------------------------------- |
 | References     | Browser-supported image files          |
 | Sketch         | Excalidraw scene data with PNG preview |
@@ -183,7 +183,7 @@ Data belongs to the current browser and origin (protocol, hostname and port). Ch
 
 ### Verification and distribution
 
-The `v0.1.0-alpha.2` release commit passed the full local quality gate and [GitHub CI](https://github.com/truman-t3/open-industrial-design/actions/runs/37218301389). Checks cover version consistency, the GLB fixture, formatting, lint, types, automated tests and production build. Isolated Chromium checks cover the demo, independent candidates, connections, research analysis, sketch save, GLB import/capture and project export/import/refresh recovery. See [workflow acceptance](./docs/reference-workflow-adaptation.md). Generation regressions use mocked requests and do not certify all real providers or models.
+Publication requires the full local quality gate and matching-commit [Windows CI](https://github.com/truman-t3/open-industrial-design/actions/workflows/desktop.yml). Checks cover version consistency, the GLB fixture, formatting, lint, types, automated tests and production build. Isolated Chromium checks cover the demo, independent candidates, connections, research analysis, sketch save, GLB import/capture and project export/import/refresh recovery. See [workflow acceptance](./docs/reference-workflow-adaptation.md). Generation regressions use mocked requests and do not certify all real providers or models.
 
 GitHub CI uses read-only repository permissions and pinned Actions, with no provider keys, automatic deployment or publishing. Passing CI is a technical check, not a substitute for distribution review.
 
@@ -201,7 +201,7 @@ The last command is a separate compiled-distribution notice check. Ordinary offl
 - No dedicated local AI super-resolution, AI 3D generation, cloud sync, accounts or collaboration. Cutout uses compatible-provider candidates with alpha-channel checks, not a bundled local segmentation model. Flat pattern placement is not 3D surface mapping.
 - Connection success does not guarantee multi-image, image-editing or mask support. Cancellation does not guarantee waived provider fees, and generated views are not geometrically verified CAD views.
 - Software WebGL and isolated-browser checks do not certify every real GPU, physical input device or native Chinese IME. Editors are lazy-loaded, but large chunks still need optimization.
-- The research library is user-curated, not an automatic crawler or live market-trends database. This source version does not include a production desktop installer.
+- The research library is user-curated, not an automatic crawler or live market-trends database. Desktop packages are unsigned Beta builds, not stable releases.
 
 ### Community and licensing
 

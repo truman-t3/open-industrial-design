@@ -130,7 +130,7 @@ test('source image set requires runtime images but permits omitted reference boa
   assert.equal(r.runtimeAssets[1].historicalSeparatelyInstalledPackage, 'draco3d@1.5.7');
   assert.equal(
     r.runtimeAssets[1].packageVersion,
-    '@open-industrial-design/three-viewer@0.1.0-alpha.2',
+    '@open-industrial-design/three-viewer@0.1.0-beta.1',
   );
 });
 

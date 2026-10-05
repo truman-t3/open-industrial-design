@@ -67,7 +67,7 @@ const copy = {
     retry: 'Retry installation',
     destination: 'Application location',
     license: 'License and data',
-    notice: 'Unsigned Alpha',
+    notice: 'Unsigned Beta',
     detail:
       'Writing the application cannot be interrupted. Uninstall later if needed; project data is retained.',
     data: 'Provided under MPL-2.0. Projects are stored in a separate user directory. This installer does not import, migrate or delete previous project data or API settings. This package is unsigned.',
