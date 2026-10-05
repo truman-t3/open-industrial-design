@@ -1,0 +1,18 @@
+[package]
+name = "open-industrial-design-desktop"
+version = "0.1.0-alpha.2"
+edition = "2021"
+rust-version = "1.90"
+license = "MPL-2.0"
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "=2.7.1", features = [] }
+
+[dependencies]
+tauri = { version = "=2.12.1", features = [] }
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

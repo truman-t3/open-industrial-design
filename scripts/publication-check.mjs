@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { regularFile } from './source-bundle.mjs';
 
 const textFile =
-  /\.(?:[cm]?[jt]sx?|json|ya?ml|md|txt|html|css|py)$|(?:^|\/)(LICENSE|DCO|\.gitignore)$/i;
+  /\.(?:[cm]?[jt]sx?|json|ya?ml|md|txt|html|css|py|rs|toml|lock)$|(?:^|\/)(LICENSE|DCO|\.gitignore)$/i;
 const patterns = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
   [

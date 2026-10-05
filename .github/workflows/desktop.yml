@@ -1,0 +1,47 @@
+name: Windows desktop verification
+
+on:
+  push:
+    branches: [codex/windows-desktop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24.14.0
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
+        with:
+          version: 11.19.0
+          run_install: false
+      - name: Install locked JS build dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Select Rust toolchain
+        run: rustup toolchain install 1.90.0 --profile minimal --component rustfmt
+      - name: Build web application
+        run: pnpm build
+      - name: Test native storage and build Windows installer
+        working-directory: apps/desktop
+        env:
+          RUSTUP_TOOLCHAIN: 1.90.0
+        run: |
+          cargo test --manifest-path src-tauri/Cargo.toml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm exec tauri build
+      - name: Retain dependency lock for review; do not distribute unreviewed binaries
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-desktop-lock
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            apps/desktop/src-tauri/Cargo.lock

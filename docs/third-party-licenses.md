@@ -1,5 +1,12 @@
 # Open Industrial Design Third-party Licenses — Planning Background
 
+## Desktop build additions (2026-10-05, not binary release approval)
+
+- `@tauri-apps/cli` 2.12.1: development-only Windows packaging tool; package metadata declares Apache-2.0 OR MIT.
+- Rust `tauri` 2.12.1 and `tauri-build` 2.7.1: desktop host and build support, exact direct pins; upstream workspace declares Apache-2.0 OR MIT. Upstream stable tag `tauri-v2.12.1` resolves to `30da1fd6e17de6107ecc850c95dfb16b5729f2dd`.
+- Existing web dependencies cannot create a native Windows host/installer. These additions stay in the desktop adapter; they do not replace domain data or add model services. Rust is not included in the browser bundle. Native executable size remains unmeasured until a verified build exists.
+- Transitive Cargo lock, full native notices, installer resources and final distribution audit remain pending. The initial Windows workflow deliberately uploads only the dependency lock, not binaries or a Release. The original project remains MPL-2.0.
+
 > 本文件是开发阶段许可审计背景。  
 > 不是法律意见。Community Alpha 0.1 的直接运行时 notices 见根目录 `THIRD_PARTY_NOTICES.md`；正式商业发布前仍建议再次进行完整 License Audit。
 

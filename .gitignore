@@ -1,4 +1,5 @@
 node_modules/
+apps/desktop/src-tauri/target/
 dist/
 coverage/
 .vite/
