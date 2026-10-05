@@ -21,6 +21,10 @@
   <a href="#中文介绍">简体中文</a> · <a href="#english-overview">English</a> · <a href="#快速开始">快速开始</a> / <a href="#quick-start">Quick start</a> · <a href="#示例流程">示例流程</a> / <a href="#example-workflow">Example</a> · <a href="https://github.com/truman-t3/open-industrial-design/releases">Releases</a>
 </p>
 
+![主画布全景 / Design exploration canvas](./docs/screenshots/design-canvas.png)
+
+<p align="center">参考与草图 → 设计任务 → 概念方案 → CMF、细节与场景分支<br>References and sketches → design tasks → concepts → CMF, detail and scene branches</p>
+
 ## 中文介绍
 
 > **Community Beta**：适合体验和反馈，重要项目请先导出备份。AI 使用自己的 API Key，费用由所选服务商收取；本项目不是 CAD，也不保证模型生成质量。
@@ -29,7 +33,7 @@
 
 当前源码版本：**`0.1.0-beta.1`**。已发布版本以 [Releases](https://github.com/truman-t3/open-industrial-design/releases) 为准；本轮变更见 [版本说明](./docs/beta-0.1-release.md)。提供未签名 Windows x64 安装版和便携版公测包，下载以 Releases 为准；不提供托管服务；仓库目录名中的旧版本后缀不是应用版本。
 
-### 已有能力
+### 核心功能
 
 - **个人资料库与竞品研究**：用户自行添加图片、链接、笔记和集合；选择资料后手动调用 AI 辅助分析，保留当次证据快照。不自动抓取网站或冒充实时趋势数据库。
 - **批量与图像编辑**：本地探索队列、个人提示词、选区蒙版、图案平面贴放和透明背景候选检查；生成质量及服务商能力仍需自行验证。
@@ -39,6 +43,28 @@
 - **草图与设计图谱**：保存 Excalidraw 可编辑草图、历史及静态预览；查看概念方案与变体的设计血缘，父设计 `parentDesignId` 是血缘依据。
 - **3D 评审**：导入 GLB／GLTF，旋转、平移、缩放、切换标准视角，捕捉预览；不是 CAD 建模器。
 - **本地项目与备份**：最近项目、多画板、自动保存、`Ctrl/Cmd + S` 立即保存、刷新恢复和 `.oidproj` 导入导出；包括格式校验、迁移及图片打包，API Key 不进入项目备份。
+
+### 核心界面
+
+上方全景展示主画布：输入、任务和结果通过连线组织，设计师可以沿不同分支继续探索。以下为真实软件界面的本地示例／验收截图，不是概念效果图。灯具图片由 Open Industrial Design / truman-t3 使用 AI 辅助制作，来源与许可见 [CC BY 4.0 署名说明](./DEMO_ASSETS_LICENSE.md)；截图中的品牌仍遵循[品牌规则](./TRADEMARKS.md)。界面可能随版本迭代调整。
+
+#### 候选对比与采纳
+
+先比较，再决定：主图对照、候选并排或全部结果网格；选中的候选可采纳为设计方案、保存为参考图或丢弃。下图使用重复的内置图片测试评审界面，不代表四次真实模型生成。
+
+![候选对比评审界面](./docs/screenshots/candidate-review.png)
+
+#### 设计图谱与决策
+
+查看概念与变体的来源，记录探索、候选和批准状态。批准是设计师的本地决策，不等于已经完成 CAD 或制造验证。
+
+![设计图谱与决策检查器](./docs/screenshots/design-graph.png)
+
+#### 个人资料库
+
+自行整理图片、链接、笔记和收藏板，为后续设计研究提供输入。下图是虚构品牌和 example.com 链接组成的测试资料，不是自动采集的竞品报告。
+
+![个人资料库与收藏板](./docs/screenshots/research-library.png)
 
 ### 示例流程
 
@@ -97,7 +123,7 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-最后一项是独立的成品分发资料检查。普通离线构建默认输出 `dist/licenses` 草稿；发布者可指定已公开的完整提交 SHA，匿名下载并逐文件核验对应源码后生成分发声明，步骤见 [发布状态](./docs/release-status.md)。当前 Release 仅提供源码，不附加编译成品。**源码发布不等于网页成品或安装包已通过分发验收。**
+最后一项是独立的成品分发资料检查。普通离线构建默认输出 `dist/licenses` 草稿；发布者可指定已公开的完整提交 SHA，匿名下载并逐文件核验对应源码后生成分发声明，步骤见 [发布状态](./docs/release-status.md)。[v0.1.0-beta.1](https://github.com/truman-t3/open-industrial-design/releases/tag/v0.1.0-beta.1) 已提供 Windows x64 蓝图安装器、标准安装器、便携 ZIP 和 SHA256 校验文件；核验范围及已知限制见[版本说明](./docs/beta-0.1-release.md)。
 
 ### 当前限制
 
@@ -125,7 +151,7 @@ pnpm run notices:check
 
 Current source version: **`0.1.0-beta.1`**. See [Releases](https://github.com/truman-t3/open-industrial-design/releases) for published versions and the [release notes](./docs/beta-0.1-release.md) for this update. Unsigned Windows x64 installer and portable Beta packages are distributed through Releases. No hosted service is provided; an older version suffix in the checkout directory is not the application version.
 
-### Capabilities
+### Core features
 
 - **Personal library and competitor research**: add your own images, links, notes and collections; select evidence for manual AI-assisted analysis and preserve its snapshot. No automatic website crawling or purported live trends database.
 - **Batch exploration and image editing**: local exploration queues, personal prompts, selection masks, flat pattern placement and transparent-background candidate checks. Provider support and generation quality still require verification.
@@ -135,6 +161,28 @@ Current source version: **`0.1.0-beta.1`**. See [Releases](https://github.com/tr
 - **Sketch and design graph**: save editable Excalidraw scenes, history and static previews; inspect concept/variant lineage, with `parentDesignId` as its source of truth.
 - **3D review**: import GLB/GLTF, orbit, pan, zoom, switch standard views and capture previews. This is not a CAD modeller.
 - **Local projects and backups**: recent projects, multiple boards, autosave, `Ctrl/Cmd + S` save flush, refresh recovery and `.oidproj` export/import, including validation, migration and image packaging. API keys stay out of project backups.
+
+### Core interfaces
+
+The overview at the top shows the design canvas: connected inputs, tasks and results let you explore multiple branches. These are actual application screenshots from local demos and acceptance checks, not UI mockups. Lamp imagery is AI-assisted work by Open Industrial Design / truman-t3; see the [CC BY 4.0 attribution terms](./DEMO_ASSETS_LICENSE.md). Branding remains subject to the [brand rules](./TRADEMARKS.md). Interface details may change between versions.
+
+#### Candidate comparison and adoption
+
+Compare before committing: use source comparison, side-by-side candidates or the results grid, then adopt a design, save a reference or discard a candidate. This screenshot uses repeated bundled images to test the review interface; it does not show four real model generations.
+
+![Candidate comparison and review](./docs/screenshots/candidate-review.png)
+
+#### Design graph and decisions
+
+Trace concepts and variants and record exploring, candidate and approved states. Approval records a designer's local decision, not completed CAD or manufacturing validation.
+
+![Design lineage and decision inspector](./docs/screenshots/design-graph.png)
+
+#### Personal research library
+
+Organize your own images, links, notes and collections as inputs for design research. This screenshot contains fictional brand data and an example.com link, not an automatically collected competitor report.
+
+![Personal research library and collections](./docs/screenshots/research-library.png)
 
 ### Example workflow
 
@@ -193,7 +241,7 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-The last command is a separate compiled-distribution notice check. Ordinary offline builds produce a `dist/licenses` draft. Publishers can specify a public full commit SHA and verify its anonymously downloaded source file by file before generating distribution notices; see [release status](./docs/release-status.md). Current Releases provide source only, with no compiled assets. **Source publication does not mean a compiled web app or installer has passed distribution acceptance.**
+The last command is a separate compiled-distribution notice check. Ordinary offline builds produce a `dist/licenses` draft. Publishers can specify a public full commit SHA and verify its anonymously downloaded source file by file before generating distribution notices; see [release status](./docs/release-status.md). [v0.1.0-beta.1](https://github.com/truman-t3/open-industrial-design/releases/tag/v0.1.0-beta.1) provides Windows x64 blueprint and standard installers, a portable ZIP and SHA256 checksums. See the [release notes](./docs/beta-0.1-release.md) for verification scope and known limitations.
 
 ### Current limitations
 
