@@ -70,6 +70,8 @@ jobs:
           $portable = @(Get-ChildItem windows-package -Directory -Filter '*portable-x64')
           if ($portable.Count -ne 1) { throw 'Expected one portable package' }
           Compress-Archive -LiteralPath $portable[0].FullName -DestinationPath "windows-package/$($portable[0].Name).zip"
+      - name: Verify isolated install, reinstall and uninstall preserves synthetic data
+        run: ./scripts/desktop/test-installation.ps1
       - name: Retain unsigned QA candidates (not a Release)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

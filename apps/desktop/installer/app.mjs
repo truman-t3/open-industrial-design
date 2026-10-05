@@ -87,6 +87,20 @@ function render() {
   const t = copy[language],
     active = ['running', 'cancelling'].includes(state.phase);
   document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+  document.title = `Open Industrial Design · ${language === 'zh' ? '安装' : 'Setup'}`;
+  document
+    .querySelector('nav')
+    .setAttribute('aria-label', language === 'zh' ? '界面设置' : 'Interface settings');
+  document
+    .querySelector('figure')
+    .setAttribute(
+      'aria-label',
+      language === 'zh'
+        ? '灯具从蓝图到成品的视觉演示'
+        : 'Lamp concept from blueprint to rendered design',
+    );
+  document.querySelector('img.render').alt =
+    language === 'zh' ? '便携灯具概念设计' : 'Portable lamp concept design';
   document.body.dataset.phase = active ? 'installing' : state.phase;
   document.body.style.setProperty('--reveal', state.phase === 'complete' ? '100%' : '0%');
   $('heading').innerHTML = t.heading;

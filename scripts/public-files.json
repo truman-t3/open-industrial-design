@@ -273,6 +273,7 @@
   "scripts/desktop/native-notices.test.mjs",
   "scripts/desktop/native-supplements.mjs",
   "scripts/desktop/package-windows.mjs",
+  "scripts/desktop/test-installation.ps1",
   "scripts/desktop/main.cjs",
   "scripts/desktop/policy.cjs",
   "scripts/desktop/policy.test.mjs",

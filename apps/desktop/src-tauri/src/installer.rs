@@ -18,8 +18,13 @@ fn target(path: &str) -> Result<PathBuf, String> {
         return Err("invalid-target".into());
     }
     let path = PathBuf::from(path);
-    if !path.is_absolute() || path.file_name().is_none() || path.parent().is_none() {
+    if !path.is_absolute() || path.file_name().is_none() || path.parent().is_none()
+        || path.components().any(|part| matches!(part, std::path::Component::ParentDir | std::path::Component::CurDir)) {
         return Err("invalid-target".into());
+    }
+    if let Ok(meta) = fs::symlink_metadata(path.join(".oid-install")) {
+        use std::os::windows::fs::MetadataExt;
+        if !meta.is_file() || meta.file_attributes() & 0x400 != 0 { return Err("invalid-target".into()); }
     }
     for part in path.ancestors() {
         if let Ok(meta) = fs::symlink_metadata(part) {
@@ -138,7 +143,7 @@ mod tests {
     use super::*;
     #[test]
     fn rejects_roots_network_paths_and_argument_injection() {
-        for value in ["C:\\", "relative", "\\\\server\\share", "C:\\app\" /evil", "C:\\app\n/evil"] {
+        for value in ["C:\\", "relative", "\\\\server\\share", "C:\\app\" /evil", "C:\\app\n/evil", "C:\\app\\..\\other"] {
             assert!(target(value).is_err(), "{value}");
         }
     }
