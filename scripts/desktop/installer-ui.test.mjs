@@ -45,7 +45,7 @@ function host() {
   bridge.core = {
     invoke: async (name, args) => {
       bridge.calls.push([name, args]);
-      if (name === 'configuration') return ['G:\\Installation fixture', '0.1.0-alpha.2'];
+      if (name === 'configuration') return ['G:\\Installation fixture', '0.1.0-beta.1'];
       if (name === 'install') {
         bridge.runId = args.runId;
         return new Promise((resolve, reject) => {
@@ -63,6 +63,21 @@ test('browser preview cannot install or claim a successful installation', async 
     assert.equal(document.getElementById('primary').disabled, true);
     assert.match(document.getElementById('status').textContent, /浏览器预览不会安装/);
     assert.equal(document.body.dataset.phase, 'idle');
+  });
+});
+
+test('version stays prominent while unsigned disclosure remains in safety details in both languages', async () => {
+  await screen(host(), async (document) => {
+    assert.match(document.getElementById('notice').textContent, /Beta 公测版 0\.1\.0-beta\.1/);
+    assert.doesNotMatch(document.getElementById('notice').textContent, /未签名/);
+    const disclosure = document.getElementById('data-notice');
+    assert.ok(disclosure.closest('details'));
+    assert.match(disclosure.textContent, /未经代码签名/);
+    const language = document.getElementById('language');
+    language.value = 'en';
+    language.dispatchEvent(new document.defaultView.Event('change'));
+    assert.match(document.getElementById('notice').textContent, /Public Beta 0\.1\.0-beta\.1/);
+    assert.match(disclosure.textContent, /unsigned/);
   });
 });
 test('installer UI waits for native success, ignores other runs and does not invent progress', async () => {

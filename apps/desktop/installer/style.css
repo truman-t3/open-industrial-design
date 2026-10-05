@@ -5,7 +5,7 @@
   font-size: 13px;
   margin-bottom: 8px;
 }
-/* Keep the install action and unsigned notice visible at native minimum size.
+/* Keep the install action and version visible at native minimum size.
    Expanded legal text scrolls inside the controls, not beneath the window. */
 @media (min-width: 761px) {
   .shell {
