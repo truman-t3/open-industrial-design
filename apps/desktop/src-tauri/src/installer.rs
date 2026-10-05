@@ -167,7 +167,7 @@ mod tests {
 fn main() {
     let shared: Shared = Arc::new(Mutex::new(Run::default()));
     let closing = shared.clone();
-    tauri::Builder::default().manage(shared)
+    let outcome = tauri::Builder::default().manage(shared)
         .invoke_handler(tauri::generate_handler![configuration, install, cancel_install, launch_installed])
         .setup(|app| {
             WebviewWindowBuilder::new(app, "setup", WebviewUrl::App("index.html".into()))
@@ -181,6 +181,40 @@ fn main() {
                 if closing.lock().unwrap().busy { api.prevent_close(); }
             }
         })
-        .run(tauri::generate_context!("installer.conf.json"))
-        .expect("Installer could not start; use the standard installer if WebView2 is unavailable");
+        .run(tauri::generate_context!("installer.conf.json"));
+    if outcome.is_err() { offer_standard_installer(); }
+}
+
+// This native fallback does not require WebView2. Nothing installs until the
+// user explicitly chooses Yes, then completes the standard installer wizard.
+fn offer_standard_installer() {
+    #[link(name = "user32")]
+    unsafe extern "system" {
+        fn MessageBoxW(window: *mut std::ffi::c_void, text: *const u16, caption: *const u16, kind: u32) -> i32;
+    }
+    let text: Vec<u16> = "蓝图界面无法启动，可能缺少 WebView2。是否打开标准安装向导？它可协助安装所需组件。\n\nThe blueprint screen could not start. Open the standard setup wizard to check/install required components?".encode_utf16().chain(Some(0)).collect();
+    let title: Vec<u16> = "Open Industrial Design Setup".encode_utf16().chain(Some(0)).collect();
+    // MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2: the safe default is No.
+    if unsafe { MessageBoxW(std::ptr::null_mut(), text.as_ptr(), title.as_ptr(), 0x124) } != 6 { return; }
+    let directory = std::env::temp_dir().join(format!("oid-fallback-{}-{}", std::process::id(),
+        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    let payload = directory.join("setup.exe");
+    let result: std::io::Result<()> = (|| {
+        fs::create_dir(&directory)?;
+        let mut file = fs::OpenOptions::new().write(true).create_new(true).open(&payload)?;
+        file.write_all(PAYLOAD)?;
+        file.sync_all()?;
+        drop(file);
+        if Sha256::digest(fs::read(&payload)?) != Sha256::digest(PAYLOAD) {
+            return Err(std::io::Error::other("Payload verification failed"));
+        }
+        if !Command::new(&payload).status()?.success() { return Err(std::io::Error::other("Setup failed")); }
+        Ok(())
+    })();
+    let _ = fs::remove_file(payload);
+    let _ = fs::remove_dir(directory);
+    if result.is_err() {
+        let text: Vec<u16> = "安装未完成，原有工程未被删除。请使用下载包中的 standard-setup 安装器重试。\n\nSetup did not finish. Existing projects were not deleted. Retry with standard-setup from the download package.".encode_utf16().chain(Some(0)).collect();
+        unsafe { MessageBoxW(std::ptr::null_mut(), text.as_ptr(), title.as_ptr(), 0x10); }
+    }
 }

@@ -88,7 +88,7 @@ test('native sources and dependency manifests are screened without exposing matc
   const root = mkdtempSync(join(tmpdir(), 'oid-native-publication-'));
   try {
     const fakeKey = 'ghp_' + 'x'.repeat(30);
-    const files = ['main.rs', 'Cargo.toml', 'Cargo.lock'];
+    const files = ['main.rs', 'Cargo.toml', 'Cargo.lock', 'installer.ps1'];
     for (const file of files) writeFileSync(join(root, file), `token = "${fakeKey}"\n`);
     const report = inspectPublication(root, files);
     assert.equal(report.issues.length, files.length);
