@@ -143,7 +143,7 @@ mod tests {
     use super::*;
     #[test]
     fn embeds_installer_configuration_not_workbench() {
-        let context = tauri::generate_context!("installer.conf.json");
+        let context: tauri::Context<tauri::Wry> = tauri::generate_context!("installer.conf.json");
         assert_eq!(context.config().identifier, "com.openindustrialdesign.setup");
         assert!(context.config().app.with_global_tauri);
         assert!(context.config().app.windows.is_empty());
