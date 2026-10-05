@@ -104,6 +104,9 @@ test('vendored integrity-checked bytes survive Windows checkout conversion', () 
   const files = [
     'vendor/fonts/liberation-2.1.5/DEBIAN-COPYRIGHT.txt',
     'vendor/draco/1.5.5/draco_decoder.js',
+    ...JSON.parse(
+      readFileSync(join(root, 'licenses/release-assets.json'), 'utf8'),
+    ).distributionReview.files.map((entry) => entry.file),
   ];
   const attributes = execFileSync('git', ['-C', root, 'check-attr', 'text', '--', ...files], {
     encoding: 'utf8',

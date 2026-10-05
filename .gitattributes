@@ -1,3 +1,6 @@
 # Preserve all vendored upstream bytes used by runtime and license integrity checks.
 vendor/** -text
 licenses/** -text
+docs/prepublication-review.md -text
+DEMO_ASSETS_LICENSE.md -text
+TRADEMARKS.md -text
