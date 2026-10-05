@@ -34,10 +34,13 @@ jobs:
         env:
           RUSTUP_TOOLCHAIN: 1.90.0
         run: |
-          cargo test --manifest-path src-tauri/Cargo.toml
+          node ../../scripts/desktop/native-notices.mjs src-tauri/Cargo.toml native-review
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          pnpm exec tauri build
+          cargo test --locked --manifest-path src-tauri/Cargo.toml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm exec tauri build -- --locked
       - name: Retain dependency lock for review; do not distribute unreviewed binaries
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: windows-desktop-lock
@@ -45,3 +48,4 @@ jobs:
           if-no-files-found: error
           path: |
             apps/desktop/src-tauri/Cargo.lock
+            apps/desktop/native-review/native-notices.json

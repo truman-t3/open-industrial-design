@@ -21,6 +21,7 @@
     "windows": {
       "webviewInstallMode": { "type": "downloadBootstrapper", "silent": false },
       "nsis": {
+        "installerHooks": "installer-hooks.nsh",
         "installMode": "currentUser",
         "languages": ["SimpChinese", "English"],
         "displayLanguageSelector": true

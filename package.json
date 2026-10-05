@@ -13,7 +13,7 @@
     "version:check": "node scripts/check-version.mjs",
     "source:bundle": "node scripts/source-bundle.mjs",
     "source:test": "node --test scripts/source-bundle.test.mjs",
-    "desktop:test": "node --test scripts/desktop/policy.test.mjs scripts/desktop/installer-state.test.mjs",
+    "desktop:test": "node --test scripts/desktop/policy.test.mjs scripts/desktop/installer-state.test.mjs scripts/desktop/native-notices.test.mjs",
     "publication:check": "node scripts/publication-check.mjs",
     "publication:test": "node --test scripts/publication-check.test.mjs",
     "notices:test": "node --test scripts/license-notices.test.mjs scripts/release-assets.test.mjs scripts/runtime-notice-evidence.test.mjs scripts/local-runtime-assets.test.mjs scripts/package-provenance.test.mjs",
