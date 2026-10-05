@@ -142,6 +142,13 @@ fn launch_installed(state: tauri::State<'_, Shared>) -> Result<(), String> {
 mod tests {
     use super::*;
     #[test]
+    fn embeds_installer_configuration_not_workbench() {
+        let context = tauri::generate_context!("installer.conf.json");
+        assert_eq!(context.config().identifier, "com.openindustrialdesign.setup");
+        assert!(context.config().app.with_global_tauri);
+        assert!(context.config().app.windows.is_empty());
+    }
+    #[test]
     fn rejects_roots_network_paths_and_argument_injection() {
         for value in ["C:\\", "relative", "\\\\server\\share", "C:\\app\" /evil", "C:\\app\n/evil", "C:\\app\\..\\other"] {
             assert!(target(value).is_err(), "{value}");

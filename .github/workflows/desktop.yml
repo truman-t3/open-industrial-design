@@ -69,6 +69,9 @@ jobs:
           if ($installedPayload.Count -ne 1) { throw 'Expected one bundled application payload' }
           $env:OID_APP_SHA256 = (Get-FileHash -LiteralPath $installedPayload[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
           Set-Content -LiteralPath 'native-review/installed-app.sha256' -Value $env:OID_APP_SHA256 -NoNewline
+          # generate_context's path chooses a directory, not an alternate JSON
+          # basename. Apply the setup config explicitly to build.rs and codegen.
+          $env:TAURI_CONFIG = Get-Content -LiteralPath 'src-tauri/installer.conf.json' -Raw
           cargo test --locked --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo build --locked --release --manifest-path src-tauri/Cargo.toml --features installer,tauri/custom-protocol --bin oid-setup
