@@ -1,6 +1,6 @@
 [package]
 name = "open-industrial-design-desktop"
-version = "0.1.0-beta.2"
+version = "0.1.0-beta.3"
 edition = "2021"
 rust-version = "1.90"
 license = "MPL-2.0"

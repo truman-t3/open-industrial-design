@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   Arrow,
   Circle,
@@ -7,7 +7,7 @@ import {
   Layer,
   Rect,
   Stage,
-  Text,
+  Text as KonvaText,
   Transformer,
 } from 'react-konva';
 import type Konva from 'konva';
@@ -53,6 +53,19 @@ import {
 } from './interaction';
 
 export type { CanvasInteractionMode } from './interaction';
+
+// Canvas text does not inherit the DOM font stack. Keep Chinese labels sans-serif
+// on Windows too, without shipping or fetching another font family.
+function Text(props: ComponentProps<typeof KonvaText>) {
+  return (
+    <KonvaText
+      fontFamily={
+        'Inter, "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif'
+      }
+      {...props}
+    />
+  );
+}
 export { findFreeNodePosition, findDesignCanvasNode } from './interaction';
 export { revealCanvasNode } from './viewport';
 
@@ -1241,7 +1254,7 @@ export function CanvasWorkspace({
                 {headerHeight ? (
                   <Text
                     fill="#374151"
-                    fontSize={10}
+                    fontSize={13}
                     fontStyle="bold"
                     letterSpacing={0.2}
                     text={
@@ -1267,9 +1280,7 @@ export function CanvasWorkspace({
                         ? node.height - (compactDesignPreview ? 39 : lineage ? 42 : 31)
                         : headerHeight + 15
                     }
-                    fontSize={
-                      node.type === 'text' ? (node.fontSize ?? 20) : compactDesignPreview ? 11 : 13
-                    }
+                    fontSize={node.type === 'text' ? (node.fontSize ?? 20) : 13}
                     fontStyle={
                       node.type === 'concept' || node.type === 'variant' ? 'bold' : 'normal'
                     }

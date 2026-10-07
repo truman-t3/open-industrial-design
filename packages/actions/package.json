@@ -1,6 +1,6 @@
 {
   "name": "@open-industrial-design/actions",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "private": true,
   "type": "module",
   "exports": "./src/index.ts",

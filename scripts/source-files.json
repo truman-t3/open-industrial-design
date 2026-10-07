@@ -7,6 +7,7 @@
   "apps/web/src/release-check.ts",
   "apps/web/src/release-check.test.ts",
   "docs/beta-0.1.0-beta.2-release.md",
+  "docs/beta-0.1.0-beta.3-release.md",
   ".gitattributes",
   ".github/ISSUE_TEMPLATE/bug_report.md",
   ".github/ISSUE_TEMPLATE/feature_request.md",

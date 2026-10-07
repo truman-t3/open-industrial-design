@@ -10,9 +10,9 @@ describe('connection visual hierarchy', () => {
     expect(connectionIsActive('a', 'b', [], 'result', 'other')).toBe(false);
     expect(connectionIsActive('a', 'b', [])).toBe(false);
   });
-  it('retains dashed lineage and neutral overview instead of making every branch blue', () => {
+  it('separates pale workflow paths from dashed lineage and saturated selection', () => {
     expect(connectionAppearance('workflow', false)).toMatchObject({
-      stroke: '#a8b3c2',
+      stroke: '#8aaaf0',
       opacity: 0.75,
     });
     expect(connectionAppearance('workflow', true)).toMatchObject({ stroke: '#2563ff', opacity: 1 });

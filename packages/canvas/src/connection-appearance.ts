@@ -1,6 +1,6 @@
 /** Styling only: selection never changes workflow or design lineage. */
 export function connectionAppearance(kind: 'workflow' | 'lineage', active: boolean) {
-  const color = active ? '#2563ff' : '#a8b3c2';
+  const color = active ? '#2563ff' : kind === 'workflow' ? '#8aaaf0' : '#a8b3c2';
   return {
     stroke: color,
     fill: color,

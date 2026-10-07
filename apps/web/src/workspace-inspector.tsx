@@ -1004,13 +1004,15 @@ export function WorkspaceInspector({
             <UiIcon name={nodeIcon(node?.type)} size={16} />
           </span>
           <div>
-            <span>
-              {workspace === 'graph'
-                ? t('inspector.lineage')
-                : workspace === 'viewer'
-                  ? t('inspector.review3d')
-                  : t('inspector.selection')}
-            </span>
+            {node || selectedDesign ? (
+              <span>
+                {workspace === 'graph'
+                  ? t('inspector.lineage')
+                  : workspace === 'viewer'
+                    ? t('inspector.review3d')
+                    : t('inspector.selection')}
+              </span>
+            ) : null}
             <h1>{title}</h1>
           </div>
         </div>

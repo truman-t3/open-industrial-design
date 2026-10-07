@@ -622,6 +622,26 @@ export function App() {
   const [canvasFocused, setCanvasFocused] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [canvasToolsExpanded, setCanvasToolsExpanded] = useState(false);
+  useEffect(() => {
+    if (!canvasToolsExpanded) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest('.workspace-toolbar-actions')) {
+        setCanvasToolsExpanded(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !document.querySelector('dialog[open]')) {
+        setCanvasToolsExpanded(false);
+        document.querySelector<HTMLButtonElement>('.workspace-toolbar-toggle')?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', closeOutside);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [canvasToolsExpanded]);
   const [researchOpen, setResearchOpen] = useState(false);
   const [queueInitialIds, setQueueInitialIds] = useState<string[]>([]);
   const [queueProgress, setQueueProgress] = useState<CanvasBatchProgress>();
@@ -3368,129 +3388,137 @@ export function App() {
                       type="button"
                       className="workspace-toolbar-toggle"
                       aria-expanded={canvasToolsExpanded}
+                      aria-controls="workspace-more-tools"
                       onClick={() => setCanvasToolsExpanded((value) => !value)}
                     >
+                      <UiIcon name="more" size={14} />
                       {t(canvasToolsExpanded ? 'workspace.lessTools' : 'workspace.moreTools')}
                     </button>
-                    <button
-                      type="button"
-                      disabled={generationBusy}
-                      onClick={() => setMaterialsOpen(true)}
+                    <div
+                      id="workspace-more-tools"
+                      className="workspace-more-tools"
+                      hidden={!canvasToolsExpanded}
                     >
-                      {t('materials.title')}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={generationBusy}
-                      onClick={() => setResearchOpen(true)}
-                    >
-                      {t('research.title')}
-                    </button>
-                    {researchOpen ? (
-                      <ResearchLibraryDialog
-                        providers={providerConfigs}
-                        onAnalyze={analyzeMaterials}
-                        loadAnalyses={() => generationStorage.listMaterialAnalyses(project.id)}
-                        loadAnalysisBlob={loadAnalysisBlob}
-                        onImport={importResearchImage}
-                        load={loadResearch}
-                        save={saveResearch}
-                        loadBlob={loadMaterialBlob}
-                        onPlace={placeMaterial}
-                        onClose={() => setResearchOpen(false)}
-                      />
-                    ) : null}
-                    {materialsOpen ? (
-                      <MaterialLibrary
-                        providers={providerConfigs}
-                        onAnalyze={analyzeMaterials}
-                        loadAnalyses={() => generationStorage.listMaterialAnalyses(project.id)}
-                        loadAnalysisBlob={loadAnalysisBlob}
-                        onSave={saveMaterialKnowledge}
-                        projectId={project.id}
-                        search={searchLocalMaterials}
-                        load={loadMaterialBlob}
-                        onPlace={placeMaterial}
-                        onClose={() => setMaterialsOpen(false)}
-                      />
-                    ) : null}
-                    <button
-                      onClick={() =>
-                        setNamingIntent({ kind: 'new-concept', value: t('workspace.newConcept') })
-                      }
-                      type="button"
-                    >
-                      <UiIcon name="plus" size={14} />
-                      {t('workspace.newConcept')}
-                    </button>
-                    <button onClick={createGenerationCard} type="button">
-                      <UiIcon name="plus" size={14} />
-                      {t('workspace.newGeneration')}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={generationBusy}
-                      onClick={() => setBatchOpen(true)}
-                    >
-                      {t('generation.batch.title')}
-                    </button>
-                    {batchOpen ? (
-                      <ExplorationBatch
-                        sources={nodes
-                          .filter((node) =>
-                            [
-                              'reference',
-                              'image',
-                              'sketch',
-                              'concept',
-                              'variant',
-                              'candidate',
-                            ].includes(node.type),
-                          )
-                          .map((node) => ({
-                            id: node.id,
-                            label: generationInputLabel(node, generationCandidates, locale),
-                          }))}
-                        selectedIds={selectedIds}
-                        onPrepare={prepareExplorationBatch}
-                        onClose={() => setBatchOpen(false)}
-                      />
-                    ) : null}
-                    <button
-                      type="button"
-                      disabled={generationBusy}
-                      onClick={() => {
-                        setQueueProgress(undefined);
-                        setQueueReport('');
-                        setQueueOpen(true);
-                      }}
-                    >
-                      {t('generation.queue.title')}
-                    </button>
-                    {queueOpen ? (
-                      <ExplorationQueue
-                        inputSummaries={queueInputSummaries(
-                          nodes,
-                          edges,
-                          generationCandidates,
-                          locale,
-                        )}
-                        tasks={nodes.filter(
-                          (node): node is GenerationNode => node.type === 'generation',
-                        )}
-                        initialIds={queueInitialIds}
-                        providers={providerConfigs}
-                        providerId={selectedProviderId ?? ''}
-                        ready={providerReadiness === 'ready'}
-                        onProviderChange={setSelectedProviderId}
-                        busy={generationBusy}
-                        progress={queueProgress}
-                        report={queueReport}
-                        onRun={(tasks) => runCanvasGeneration(undefined, tasks)}
-                        onCancel={() => generationRequestRef.current?.controller.abort()}
-                        onClose={() => setQueueOpen(false)}
-                      />
-                    ) : null}
+                      <button
+                        type="button"
+                        disabled={generationBusy}
+                        onClick={() => setMaterialsOpen(true)}
+                      >
+                        {t('materials.title')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={generationBusy}
+                        onClick={() => setResearchOpen(true)}
+                      >
+                        {t('research.title')}
+                      </button>
+                      {researchOpen ? (
+                        <ResearchLibraryDialog
+                          providers={providerConfigs}
+                          onAnalyze={analyzeMaterials}
+                          loadAnalyses={() => generationStorage.listMaterialAnalyses(project.id)}
+                          loadAnalysisBlob={loadAnalysisBlob}
+                          onImport={importResearchImage}
+                          load={loadResearch}
+                          save={saveResearch}
+                          loadBlob={loadMaterialBlob}
+                          onPlace={placeMaterial}
+                          onClose={() => setResearchOpen(false)}
+                        />
+                      ) : null}
+                      {materialsOpen ? (
+                        <MaterialLibrary
+                          providers={providerConfigs}
+                          onAnalyze={analyzeMaterials}
+                          loadAnalyses={() => generationStorage.listMaterialAnalyses(project.id)}
+                          loadAnalysisBlob={loadAnalysisBlob}
+                          onSave={saveMaterialKnowledge}
+                          projectId={project.id}
+                          search={searchLocalMaterials}
+                          load={loadMaterialBlob}
+                          onPlace={placeMaterial}
+                          onClose={() => setMaterialsOpen(false)}
+                        />
+                      ) : null}
+                      <button
+                        onClick={() =>
+                          setNamingIntent({ kind: 'new-concept', value: t('workspace.newConcept') })
+                        }
+                        type="button"
+                      >
+                        <UiIcon name="plus" size={14} />
+                        {t('workspace.newConcept')}
+                      </button>
+                      <button onClick={createGenerationCard} type="button">
+                        <UiIcon name="plus" size={14} />
+                        {t('workspace.newGeneration')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={generationBusy}
+                        onClick={() => setBatchOpen(true)}
+                      >
+                        {t('generation.batch.title')}
+                      </button>
+                      {batchOpen ? (
+                        <ExplorationBatch
+                          sources={nodes
+                            .filter((node) =>
+                              [
+                                'reference',
+                                'image',
+                                'sketch',
+                                'concept',
+                                'variant',
+                                'candidate',
+                              ].includes(node.type),
+                            )
+                            .map((node) => ({
+                              id: node.id,
+                              label: generationInputLabel(node, generationCandidates, locale),
+                            }))}
+                          selectedIds={selectedIds}
+                          onPrepare={prepareExplorationBatch}
+                          onClose={() => setBatchOpen(false)}
+                        />
+                      ) : null}
+                      <button
+                        type="button"
+                        disabled={generationBusy}
+                        onClick={() => {
+                          setQueueProgress(undefined);
+                          setQueueReport('');
+                          setQueueOpen(true);
+                        }}
+                      >
+                        {t('generation.queue.title')}
+                      </button>
+                      {queueOpen ? (
+                        <ExplorationQueue
+                          inputSummaries={queueInputSummaries(
+                            nodes,
+                            edges,
+                            generationCandidates,
+                            locale,
+                          )}
+                          tasks={nodes.filter(
+                            (node): node is GenerationNode => node.type === 'generation',
+                          )}
+                          initialIds={queueInitialIds}
+                          providers={providerConfigs}
+                          providerId={selectedProviderId ?? ''}
+                          ready={providerReadiness === 'ready'}
+                          onProviderChange={setSelectedProviderId}
+                          busy={generationBusy}
+                          progress={queueProgress}
+                          report={queueReport}
+                          onRun={(tasks) => runCanvasGeneration(undefined, tasks)}
+                          onCancel={() => generationRequestRef.current?.controller.abort()}
+                          onClose={() => setQueueOpen(false)}
+                        />
+                      ) : null}
+                    </div>
                     <button
                       aria-label={t('workspace.undo')}
                       className="workspace-surface__icon-button"
