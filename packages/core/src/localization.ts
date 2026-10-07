@@ -182,7 +182,7 @@ const englishMessages = {
   'common.save': 'Save',
   'common.unknown': 'Unknown',
   'common.untitledProject': 'Untitled Project',
-  'home.edition': 'Community Beta 0.1.0-beta.3 · Local-first',
+  'home.edition': 'Community Beta 0.1.0-beta.4 · Local-first',
   'generation.downloadImage': 'Download this image',
   'home.title': 'Start with the design intent.',
   'home.description':
@@ -1015,7 +1015,7 @@ const simplifiedChineseMessages: Record<MessageKey, string> = {
   'common.save': '保存',
   'common.unknown': '未知',
   'common.untitledProject': '未命名项目',
-  'home.edition': '社区公测版 0.1.0-beta.3 · 本地优先',
+  'home.edition': '社区公测版 0.1.0-beta.4 · 本地优先',
   'generation.downloadImage': '下载此图片',
   'home.title': '从设计意图开始。',
   'home.description': '在一个本地项目中组织参考图、草图、设计血缘、材料和 3D 评审。',

@@ -29,7 +29,7 @@ test('desktop icon contains matching high-DPI and small PNG frames', () => {
   );
   assert.equal(icon.readUInt16LE(0), 0);
   assert.equal(icon.readUInt16LE(2), 1);
-  const sizes = [16, 24, 32, 48, 64, 128, 256];
+  const sizes = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256];
   assert.equal(icon.readUInt16LE(4), sizes.length);
   let expectedOffset = 6 + sizes.length * 16;
   for (const [index, size] of sizes.entries()) {

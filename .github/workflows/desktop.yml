@@ -29,6 +29,8 @@ jobs:
         run: rustup toolchain install 1.90.0 --profile minimal --component rustfmt
       - name: Build web application
         run: pnpm build
+      - name: Verify reproducible Windows icon framing
+        run: ./scripts/desktop/build-icon.ps1 -Check
       - name: Verify exact public source and embed distribution notices
         run: node scripts/build-license-notices.mjs --source-commit=${{ github.sha }}
       - name: Collect Windows native dependency evidence

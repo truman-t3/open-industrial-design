@@ -6,10 +6,10 @@
   </picture>
 </p>
 
-# Open Industrial Design v0.1.0-beta.3
+# Open Industrial Design v0.1.0-beta.4
 
 <p align="center">
-  <a href="https://github.com/truman-t3/open-industrial-design/releases"><img src="https://img.shields.io/badge/version-0.1.0--beta.3-2563eb" alt="Version 0.1.0-beta.3"></a>
+  <a href="https://github.com/truman-t3/open-industrial-design/releases"><img src="https://img.shields.io/badge/version-0.1.0--beta.4-2563eb" alt="Version 0.1.0-beta.4"></a>
   <a href="https://github.com/truman-t3/open-industrial-design/actions/workflows/quality.yml"><img src="https://github.com/truman-t3/open-industrial-design/actions/workflows/quality.yml/badge.svg" alt="CI status"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MPL--2.0-blue" alt="Source license MPL-2.0"></a>
   <a href="./docs/release-status.md"><img src="https://img.shields.io/badge/status-Community_Beta-orange" alt="Community Beta"></a>
@@ -27,13 +27,13 @@
 
 ## 中文介绍
 
-本次更新：[v0.1.0-beta.3 工作台界面精修](./docs/beta-0.1.0-beta.3-release.md)。首页或项目菜单中的“关于与更新”可手动检查新版；图片下载与完整工程备份分开，不自动安装更新。
+本次更新：[v0.1.0-beta.4 Windows 图标适配](./docs/beta-0.1.0-beta.4-release.md)。首页或项目菜单中的“关于与更新”可手动检查新版；图片下载与完整工程备份分开，不自动安装更新。
 
 > **Community Beta**：适合体验和反馈，重要项目请先导出备份。AI 使用自己的 API Key，费用由所选服务商收取；本项目不是 CAD，也不保证模型生成质量。
 
 **Open Industrial Design** 是面向工业设计师的本地优先、需用户自备 API Key（BYOK）的设计探索工作台。软件不内置 API Key，也不提供共享额度。它将参考图、草图、概念方案、变体、CMF、设计血缘和轻量 3D 评审组织在同一个项目中，服务于进入 CAD 之前的探索与决策。
 
-当前源码版本：**`0.1.0-beta.3`**。已发布版本以 [Releases](https://github.com/truman-t3/open-industrial-design/releases) 为准；本轮变更见 [版本说明](./docs/beta-0.1.0-beta.3-release.md)。提供未签名 Windows x64 安装版和便携版公测包，下载以 Releases 为准；不提供托管服务；仓库目录名中的旧版本后缀不是应用版本。
+当前源码版本：**`0.1.0-beta.4`**。已发布版本以 [Releases](https://github.com/truman-t3/open-industrial-design/releases) 为准；本轮变更见 [版本说明](./docs/beta-0.1.0-beta.4-release.md)。提供未签名 Windows x64 安装版和便携版公测包，下载以 Releases 为准；不提供托管服务；仓库目录名中的旧版本后缀不是应用版本。
 
 ### 核心功能
 
@@ -125,7 +125,7 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-最后一项是独立的成品分发资料检查。普通离线构建默认输出 `dist/licenses` 草稿；发布者可指定已公开的完整提交 SHA，匿名下载并逐文件核验对应源码后生成分发声明，步骤见 [发布状态](./docs/release-status.md)。[v0.1.0-beta.3](https://github.com/truman-t3/open-industrial-design/releases/tag/v0.1.0-beta.3) 已提供 Windows x64 蓝图安装器、标准安装器、便携 ZIP 和 SHA256 校验文件；核验范围及已知限制见[版本说明](./docs/beta-0.1.0-beta.3-release.md)。
+最后一项是独立的成品分发资料检查。普通离线构建默认输出 `dist/licenses` 草稿；发布者可指定已公开的完整提交 SHA，匿名下载并逐文件核验对应源码后生成分发声明，步骤见 [发布状态](./docs/release-status.md)。[v0.1.0-beta.4](https://github.com/truman-t3/open-industrial-design/releases/tag/v0.1.0-beta.4) 已提供 Windows x64 蓝图安装器、标准安装器、便携 ZIP 和 SHA256 校验文件；核验范围及已知限制见[版本说明](./docs/beta-0.1.0-beta.4-release.md)。
 
 ### 当前限制
 
@@ -147,13 +147,13 @@ pnpm run notices:check
 
 ## English overview
 
-Latest changes: [v0.1.0-beta.3 workspace visual refinement](./docs/beta-0.1.0-beta.3-release.md). Use About & updates on Home or in the project menu to check manually. Individual image downloads and complete project backups are separate; updates are not installed automatically.
+Latest changes: [v0.1.0-beta.4 Windows icon refinement](./docs/beta-0.1.0-beta.4-release.md). Use About & updates on Home or in the project menu to check manually. Individual image downloads and complete project backups are separate; updates are not installed automatically.
 
 > **Community Beta**: intended for evaluation and feedback. Export backups of important projects first. AI uses your own API key, with fees charged by your selected provider. This is not CAD and does not guarantee model output quality.
 
 **Open Industrial Design** is a local-first, bring-your-own-key (BYOK) exploration workspace for industrial designers. Users supply their own API keys; no keys or shared credits are included. It keeps references, sketches, concepts, variants, CMF, design lineage and lightweight 3D review in one project, supporting exploration and decisions before CAD.
 
-Current source version: **`0.1.0-beta.3`**. See [Releases](https://github.com/truman-t3/open-industrial-design/releases) for published versions and the [release notes](./docs/beta-0.1.0-beta.3-release.md) for this update. Unsigned Windows x64 installer and portable Beta packages are distributed through Releases. No hosted service is provided; an older version suffix in the checkout directory is not the application version.
+Current source version: **`0.1.0-beta.4`**. See [Releases](https://github.com/truman-t3/open-industrial-design/releases) for published versions and the [release notes](./docs/beta-0.1.0-beta.4-release.md) for this update. Unsigned Windows x64 installer and portable Beta packages are distributed through Releases. No hosted service is provided; an older version suffix in the checkout directory is not the application version.
 
 ### Core features
 
@@ -245,7 +245,7 @@ pnpm run publication:check -- --public
 pnpm run notices:check
 ```
 
-The last command is a separate compiled-distribution notice check. Ordinary offline builds produce a `dist/licenses` draft. Publishers can specify a public full commit SHA and verify its anonymously downloaded source file by file before generating distribution notices; see [release status](./docs/release-status.md). [v0.1.0-beta.3](https://github.com/truman-t3/open-industrial-design/releases/tag/v0.1.0-beta.3) provides Windows x64 blueprint and standard installers, a portable ZIP and SHA256 checksums. See the [release notes](./docs/beta-0.1.0-beta.3-release.md) for verification scope and known limitations.
+The last command is a separate compiled-distribution notice check. Ordinary offline builds produce a `dist/licenses` draft. Publishers can specify a public full commit SHA and verify its anonymously downloaded source file by file before generating distribution notices; see [release status](./docs/release-status.md). [v0.1.0-beta.4](https://github.com/truman-t3/open-industrial-design/releases/tag/v0.1.0-beta.4) provides Windows x64 blueprint and standard installers, a portable ZIP and SHA256 checksums. See the [release notes](./docs/beta-0.1.0-beta.4-release.md) for verification scope and known limitations.
 
 ### Current limitations
 
