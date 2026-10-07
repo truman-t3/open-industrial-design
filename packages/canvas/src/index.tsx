@@ -281,6 +281,7 @@ export function CanvasWorkspace({
   const [stageSize, setStageSize] = useState({ height: 720, width: 960 });
   const [connectionDraft, setConnectionDraft] = useState<ConnectionDraft | null>(null);
   const [spacePanning, setSpacePanning] = useState(false);
+  const temporaryPan = useRef<{ x: number; y: number; viewport: Viewport } | null>(null);
   const effectiveInteractionMode = spacePanning ? 'pan' : interactionMode;
   const [dragPosition, setDragPosition] = useState<{ id: string; x: number; y: number } | null>(
     null,
@@ -484,6 +485,32 @@ export function CanvasWorkspace({
   const isConnecting = connectionDraft !== null;
   const isDraggingNode = dragPosition !== null || dragCandidatePosition !== null;
   useEffect(() => {
+    const move = (event: MouseEvent) => {
+      const start = temporaryPan.current;
+      if (!start) return;
+      event.preventDefault();
+      setViewport({
+        ...start.viewport,
+        x: start.viewport.x + event.clientX - start.x,
+        y: start.viewport.y + event.clientY - start.y,
+      });
+    };
+    const stop = () => {
+      if (!temporaryPan.current) return;
+      temporaryPan.current = null;
+      if (containerRef.current) containerRef.current.style.cursor = '';
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    window.addEventListener('blur', stop);
+    return () => {
+      stop();
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', stop);
+      window.removeEventListener('blur', stop);
+    };
+  }, [setViewport]);
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const shortcut = resolveCanvasShortcut(event, selectedIds.length, isConnecting);
       if (shortcut.preventDefault) event.preventDefault();
@@ -615,6 +642,25 @@ export function CanvasWorkspace({
       className={`konva-canvas${effectiveInteractionMode === 'pan' ? ' konva-canvas--pan' : ''}`}
       aria-label={translate(locale, 'canvas.workspace')}
       ref={containerRef}
+      onMouseDownCapture={(event) => {
+        if (event.button !== 1 && !(event.button === 0 && spacePanning)) return;
+        if (isConnecting || isDraggingNode) return;
+        if (
+          event.target instanceof Element &&
+          event.target.closest('input, textarea, select, button, [contenteditable="true"], nav')
+        )
+          return;
+        event.preventDefault();
+        event.stopPropagation();
+        temporaryPan.current = { x: event.clientX, y: event.clientY, viewport: { ...viewport } };
+        event.currentTarget.style.cursor = 'grabbing';
+      }}
+      onAuxClickCapture={(event) => {
+        if (event.button === 1) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }}
     >
       <Stage
         draggable={interactionPolicy.stageDraggable && !connectionDraft && !dragPosition}
@@ -904,12 +950,11 @@ export function CanvasWorkspace({
                     .filter((source): source is CanvasNode => Boolean(source))
                     .slice(0, 2)
                 : [];
-            // Adopted results keep their compact candidate-card dimensions. Preserve the
-            // image-first presentation instead of squeezing the preview below a full header.
+            // Image cards prioritize their preview; task cards retain their explicit header.
+            // Keep this purely presentational: saved node geometry and lineage stay intact.
             const compactDesignPreview =
               Boolean(previewUrl) &&
-              (node.type === 'concept' || node.type === 'variant') &&
-              node.height <= 170;
+              ['reference', 'image', 'sketch', 'concept', 'variant'].includes(node.type);
             const headerHeight = node.type === 'text' || compactDesignPreview ? 0 : 38;
             return (
               <Group

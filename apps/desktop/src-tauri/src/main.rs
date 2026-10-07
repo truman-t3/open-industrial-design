@@ -27,6 +27,13 @@ fn main() {
                 .data_directory(profile)
                 .disable_drag_drop_handler()
                 .on_navigation(|url| {
+                    // Only this fixed official download page may leave the desktop shell.
+                    if url.as_str() == "https://github.com/truman-t3/open-industrial-design/releases" {
+                        let _ = std::process::Command::new("explorer.exe")
+                            .arg("https://github.com/truman-t3/open-industrial-design/releases")
+                            .spawn();
+                        return false;
+                    }
                     (url.scheme() == "http" && url.host_str() == Some("tauri.localhost"))
                         || (url.scheme() == "tauri" && url.host_str() == Some("localhost"))
                 })

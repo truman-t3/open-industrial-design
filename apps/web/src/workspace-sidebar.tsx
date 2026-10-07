@@ -1,7 +1,6 @@
 import { translateDemoLabel } from '@open-industrial-design/core';
 import type { Board, Project } from '@open-industrial-design/design-model';
 import { useLocalization } from '@open-industrial-design/ui';
-import { BrandLogo } from './brand';
 import { UiIcon } from './ui-icons';
 
 export interface WorkspaceSidebarProps {
@@ -27,9 +26,6 @@ export function WorkspaceSidebar({
   const projectName = translateDemoLabel(locale, project.name);
   return (
     <nav aria-label={t('workspace.project')} className="workspace-sidebar">
-      <div className="workspace-sidebar__brand">
-        <BrandLogo className="brand-logo brand-logo--workspace-wordmark" variant="light" />
-      </div>
       <button className="workspace-sidebar__home" onClick={onGoHome} type="button">
         <UiIcon name="home" />
         {t('workspace.home')}

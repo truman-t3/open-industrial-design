@@ -284,7 +284,7 @@
     },
     {
       "id": "draco-remote-decoder",
-      "packageVersion": "@open-industrial-design/three-viewer@0.1.0-beta.1",
+      "packageVersion": "@open-industrial-design/three-viewer@0.1.0-beta.2",
       "urlPrefix": "https://www.gstatic.com/draco/versioned/decoders/1.5.5/",
       "condition": "Historical drei CDN origin retained only as provenance; drei and draco3d have been removed. Current Three GLTFLoader uses local, byte-verified Draco 1.5.5.",
       "applicationPath": "runtime/draco/1.5.5/",

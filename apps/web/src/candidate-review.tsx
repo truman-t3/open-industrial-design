@@ -171,6 +171,15 @@ export function CandidateReview({
       ) : null}
       {generation.status ? <p role="status">{generation.status}</p> : null}
       <footer>
+        {candidate && generation.previewUrls[candidate.id] ? (
+          <a
+            className="candidate-review__download"
+            href={generation.previewUrls[candidate.id]}
+            download={`candidate-${candidate.id}.${candidate.mimeType === 'image/jpeg' ? 'jpg' : candidate.mimeType === 'image/webp' ? 'webp' : 'png'}`}
+          >
+            {t('generation.downloadImage')}
+          </a>
+        ) : null}
         {candidate ? (
           <strong>{t('generation.reviewTarget', { name: label(candidate.id) })}</strong>
         ) : null}

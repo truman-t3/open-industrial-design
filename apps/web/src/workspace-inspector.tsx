@@ -24,6 +24,7 @@ import { useLocalization } from '@open-industrial-design/ui';
 import { UiIcon, type UiIconName } from './ui-icons';
 import { continuationToolGroups, generationTools, generationViews } from './generation-tools';
 import { CandidateReview } from './candidate-review';
+import { candidateBatches } from './candidate-batches';
 import { PromptLibrary } from './prompt-library';
 import { RegionEditor } from './region-editor';
 import { PatternEditor } from './pattern-editor';
@@ -1456,67 +1457,94 @@ export function WorkspaceInspector({
             <p className="inspector-generation__hint">{t('generation.review')}</p>
           ) : null}
           <div className="inspector-generation__candidates">
-            {generation.candidates.map((candidate, index) => (
-              <article
-                aria-label={t('generation.candidateNumber', { number: index + 1 })}
-                aria-current={generation.selectedCandidateId === candidate.id ? 'true' : undefined}
-                className={
-                  generation.selectedCandidateId === candidate.id
-                    ? 'inspector-generation__candidate is-selected'
-                    : 'inspector-generation__candidate'
+            {candidateBatches(generation.candidates).map((batch, batchIndex) => (
+              <details
+                key={batch.id}
+                className="candidate-batch"
+                open={
+                  batchIndex === 0 ||
+                  batch.items.some(
+                    ({ candidate }) => candidate.id === generation.selectedCandidateId,
+                  )
                 }
-                key={candidate.id}
               >
-                <strong>{t('generation.candidateNumber', { number: index + 1 })}</strong>
-                {candidate.view ? <strong>{t(`generation.view.${candidate.view}`)}</strong> : null}
-                {generation.selectedCandidateId === candidate.id ? (
-                  <strong className="inspector-generation__selected-label">
-                    {t('generation.selectedOnCanvas')}
-                  </strong>
-                ) : null}
-                {generation.previewUrls[candidate.id] ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setReview({ nodeId: generation.node.id, candidateId: candidate.id })
+                <summary>
+                  {batchIndex === 0
+                    ? locale === 'zh-CN'
+                      ? '最近一批'
+                      : 'Latest batch'
+                    : locale === 'zh-CN'
+                      ? '历史批次'
+                      : 'Previous batch'}{' '}
+                  · {batch.items.length}
+                </summary>
+                {batch.items.map(({ candidate, index }) => (
+                  <article
+                    aria-label={t('generation.candidateNumber', { number: index + 1 })}
+                    aria-current={
+                      generation.selectedCandidateId === candidate.id ? 'true' : undefined
                     }
-                    aria-label={`${t('generation.viewCandidate')} · ${t('generation.candidateNumber', { number: index + 1 })}`}
+                    className={
+                      generation.selectedCandidateId === candidate.id
+                        ? 'inspector-generation__candidate is-selected'
+                        : 'inspector-generation__candidate'
+                    }
+                    key={candidate.id}
                   >
-                    <img
-                      alt={t('generation.candidateNumber', { number: index + 1 })}
-                      src={generation.previewUrls[candidate.id]}
-                    />
-                  </button>
-                ) : (
-                  <p>{t('generation.previewUnavailable')}</p>
-                )}
-                {candidate.inputSignature !== generation.signature ? (
-                  <small>{t('generation.stale')}</small>
-                ) : null}
-                <div>
-                  <button
-                    disabled={Boolean(generation.busyCandidateId)}
-                    onClick={() => generation.onKeep(candidate.id, 'design')}
-                    type="button"
-                  >
-                    {t('generation.keepDesign')}
-                  </button>
-                  <button
-                    disabled={Boolean(generation.busyCandidateId)}
-                    onClick={() => generation.onKeep(candidate.id, 'reference')}
-                    type="button"
-                  >
-                    {t('generation.keepReference')}
-                  </button>
-                  <button
-                    disabled={Boolean(generation.busyCandidateId)}
-                    onClick={() => generation.onDiscard(candidate.id)}
-                    type="button"
-                  >
-                    {t('common.discard')}
-                  </button>
-                </div>
-              </article>
+                    <strong>{t('generation.candidateNumber', { number: index + 1 })}</strong>
+                    {candidate.view ? (
+                      <strong>{t(`generation.view.${candidate.view}`)}</strong>
+                    ) : null}
+                    {generation.selectedCandidateId === candidate.id ? (
+                      <strong className="inspector-generation__selected-label">
+                        {t('generation.selectedOnCanvas')}
+                      </strong>
+                    ) : null}
+                    {generation.previewUrls[candidate.id] ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setReview({ nodeId: generation.node.id, candidateId: candidate.id })
+                        }
+                        aria-label={`${t('generation.viewCandidate')} · ${t('generation.candidateNumber', { number: index + 1 })}`}
+                      >
+                        <img
+                          alt={t('generation.candidateNumber', { number: index + 1 })}
+                          src={generation.previewUrls[candidate.id]}
+                        />
+                      </button>
+                    ) : (
+                      <p>{t('generation.previewUnavailable')}</p>
+                    )}
+                    {candidate.inputSignature !== generation.signature ? (
+                      <small>{t('generation.stale')}</small>
+                    ) : null}
+                    <div>
+                      <button
+                        disabled={Boolean(generation.busyCandidateId)}
+                        onClick={() => generation.onKeep(candidate.id, 'design')}
+                        type="button"
+                      >
+                        {t('generation.keepDesign')}
+                      </button>
+                      <button
+                        disabled={Boolean(generation.busyCandidateId)}
+                        onClick={() => generation.onKeep(candidate.id, 'reference')}
+                        type="button"
+                      >
+                        {t('generation.keepReference')}
+                      </button>
+                      <button
+                        disabled={Boolean(generation.busyCandidateId)}
+                        onClick={() => generation.onDiscard(candidate.id)}
+                        type="button"
+                      >
+                        {t('common.discard')}
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </details>
             ))}
           </div>
           {review?.nodeId === generation.node.id && generation.candidates.length ? (

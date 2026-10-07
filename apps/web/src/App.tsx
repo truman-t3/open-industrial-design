@@ -4,6 +4,8 @@ import { prepareEditMask, protectLocalEdit, protectCutout, composePattern } from
 import { defaultPatternPlacement } from '@open-industrial-design/design-model';
 import { downloadOidProject, type ProjectDownload } from './project-download';
 import { createDemoCopyArchive, fitDemoCopyViewport } from './demo-copy';
+import { partitionDemoProjects } from './demo-projects';
+import { AboutDialog } from './about-dialog';
 import { findGenerationTool, generationInputLabel, queueInputSummaries } from './generation-tools';
 import { ExplorationBatch, ExplorationQueue } from './exploration-batch';
 import { MaterialLibrary } from './material-library';
@@ -617,6 +619,9 @@ export function App() {
   const [batchOpen, setBatchOpen] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const [materialsOpen, setMaterialsOpen] = useState(false);
+  const [canvasFocused, setCanvasFocused] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [canvasToolsExpanded, setCanvasToolsExpanded] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
   const [queueInitialIds, setQueueInitialIds] = useState<string[]>([]);
   const [queueProgress, setQueueProgress] = useState<CanvasBatchProgress>();
@@ -1361,6 +1366,11 @@ export function App() {
     const createdAt = Date.now();
     const projectName = locale === 'zh-CN' ? '便携灯具探索示例' : 'Portable Lamp Exploration';
     try {
+      const { primary } = partitionDemoProjects(await repository.getRecentProjects());
+      if (primary) {
+        openProject(primary);
+        return;
+      }
       const images = await Promise.all(
         demoImages.map(async (image) => ({
           ...image,
@@ -3061,6 +3071,7 @@ export function App() {
   return appView === 'home' ? (
     <>
       <ProjectHome
+        onAbout={() => setAboutOpen(true)}
         importBusy={archiveBusy}
         onImportProject={() => importInputRef.current?.click()}
         demoOpening={demoOpening}
@@ -3099,6 +3110,7 @@ export function App() {
         </p>
       ) : null}
       {namingDialog}
+      {aboutOpen ? <AboutDialog onClose={() => setAboutOpen(false)} /> : null}
     </>
   ) : (
     <>
@@ -3109,7 +3121,15 @@ export function App() {
         aria-busy={canvasMutationBusy}
       >
         <header className="top-bar">
-          <BrandLogo className="brand-logo brand-logo--workspace" variant="icon" />
+          <button
+            type="button"
+            className="workspace-brand"
+            onClick={() => void goHome()}
+            aria-label={t('workspace.home')}
+            title={t('workspace.home')}
+          >
+            <BrandLogo className="brand-logo brand-logo--workspace" variant="icon" />
+          </button>
           <div className="project-title">
             <strong>{translateDemoLabel(locale, project.name)}</strong>
             <span aria-hidden="true" className="project-title__separator">
@@ -3208,6 +3228,9 @@ export function App() {
                 <button onClick={() => setProviderSettingsOpen(true)} type="button">
                   {t('workspace.providerSettings')}
                 </button>
+                <button onClick={() => setAboutOpen(true)} type="button">
+                  {locale === 'zh-CN' ? '关于与更新' : 'About & updates'}
+                </button>
                 <button onClick={() => setCommandPaletteOpen(true)} type="button">
                   {t('workspace.commands')}
                 </button>
@@ -3289,7 +3312,9 @@ export function App() {
             ) : null}
           </section>
         ) : (
-          <div className="workspace">
+          <div
+            className={`workspace${canvasFocused && workspaceMode === 'canvas' ? ' workspace--focused' : ''}`}
+          >
             <WorkspaceSidebar
               boards={boards}
               onCreateBoard={() =>
@@ -3309,14 +3334,26 @@ export function App() {
             <div className="workspace-surface">
               <div className="workspace-surface__toolbar">
                 <div className="workspace-surface__heading">
+                  {workspaceMode === 'canvas' ? (
+                    <button
+                      type="button"
+                      aria-pressed={canvasFocused}
+                      onClick={() => setCanvasFocused((value) => !value)}
+                    >
+                      {t(canvasFocused ? 'workspace.exitFocus' : 'workspace.focusCanvas')}
+                    </button>
+                  ) : null}
                   <span>
                     {workspaceMode === 'canvas' ? t('workspace.canvas') : t('workspace.graph')}
                   </span>
                   <strong>{translateDemoLabel(locale, board.name)}</strong>
                 </div>
                 {workspaceMode === 'canvas' ? (
-                  <div>
+                  <div
+                    className={`workspace-toolbar-actions${canvasToolsExpanded ? ' workspace-toolbar-actions--expanded' : ''}`}
+                  >
                     <button
+                      className="workspace-toolbar-import"
                       disabled={generationBusy || !hydrated}
                       onClick={() => {
                         imageImportKindRef.current = 'reference';
@@ -3326,6 +3363,14 @@ export function App() {
                     >
                       <UiIcon name="image" size={14} />
                       {t('workspace.importReference')}
+                    </button>
+                    <button
+                      type="button"
+                      className="workspace-toolbar-toggle"
+                      aria-expanded={canvasToolsExpanded}
+                      onClick={() => setCanvasToolsExpanded((value) => !value)}
+                    >
+                      {t(canvasToolsExpanded ? 'workspace.lessTools' : 'workspace.moreTools')}
                     </button>
                     <button
                       type="button"
@@ -3478,6 +3523,38 @@ export function App() {
                     setContextMenuPosition({ x: event.clientX, y: event.clientY });
                   }}
                 >
+                  {selectedIds.length === 1 &&
+                  explorationSource &&
+                  ['reference', 'image', 'sketch', 'concept', 'variant', 'candidate'].includes(
+                    explorationSource.type,
+                  ) &&
+                  Boolean(
+                    ('assetId' in explorationSource && explorationSource.assetId) ||
+                    ('previewAssetId' in explorationSource && explorationSource.previewAssetId) ||
+                    ('candidateId' in explorationSource && explorationSource.candidateId),
+                  ) ? (
+                    <nav
+                      className="canvas-quick-actions"
+                      aria-label={t('generation.continueExploration')}
+                    >
+                      {['form', 'cmf', 'local', 'scene'].map((id) => {
+                        const tool = findGenerationTool(id)!;
+                        return (
+                          <button
+                            type="button"
+                            key={id}
+                            disabled={generationBusy || !hydrated}
+                            onClick={() => {
+                              setCanvasFocused(false);
+                              void continueExploration(id);
+                            }}
+                          >
+                            {t(tool.label)}
+                          </button>
+                        );
+                      })}
+                    </nav>
+                  ) : null}
                   <nav className="canvas-floating-tools" aria-label={t('workspace.canvas')}>
                     {(
                       [
@@ -4184,6 +4261,7 @@ export function App() {
         ) : null}
       </main>
       {namingDialog}
+      {aboutOpen ? <AboutDialog onClose={() => setAboutOpen(false)} /> : null}
     </>
   );
 }

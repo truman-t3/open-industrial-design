@@ -693,7 +693,7 @@ export function ResearchLibraryDialog({
           </details>
         ))}
       </section>
-      <div className="material-library__grid">
+      <div className="material-library__grid research-library__gallery">
         {visible.slice(0, limit).map((entry) => {
           const material = materials.find((item) => item.asset.id === entry.assetId);
           const blobId =

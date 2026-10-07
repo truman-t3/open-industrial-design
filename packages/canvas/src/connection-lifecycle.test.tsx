@@ -242,6 +242,34 @@ describe('Canvas connection lifecycle', () => {
     expect(container.querySelector('[data-stage]')?.getAttribute('data-draggable')).toBe('false');
   });
 
+  it.each([false, true])('pans over a node without moving it (Space=%s)', (space) => {
+    if (space) act(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' })));
+    const before = { ...useCanvasRuntimeStore.getState().viewport };
+    act(() =>
+      container.querySelector('[data-node="source"]')!.dispatchEvent(
+        new MouseEvent('mousedown', {
+          bubbles: true,
+          cancelable: true,
+          button: space ? 0 : 1,
+          clientX: 40,
+          clientY: 50,
+        }),
+      ),
+    );
+    act(() => window.dispatchEvent(new MouseEvent('mousemove', { clientX: 140, clientY: 110 })));
+    expect(useCanvasRuntimeStore.getState().viewport).toEqual({
+      ...before,
+      x: before.x + 100,
+      y: before.y + 60,
+    });
+    expect(onNodesChange).not.toHaveBeenCalled();
+    act(() => window.dispatchEvent(new MouseEvent('mouseup')));
+    const stopped = { ...useCanvasRuntimeStore.getState().viewport };
+    act(() => window.dispatchEvent(new MouseEvent('mousemove', { clientX: 240, clientY: 210 })));
+    expect(useCanvasRuntimeStore.getState().viewport).toEqual(stopped);
+    act(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: ' ' })));
+  });
+
   it('does not start panning from an input, button, or while connecting', () => {
     for (const tag of ['input', 'button']) {
       const target = document.createElement(tag);

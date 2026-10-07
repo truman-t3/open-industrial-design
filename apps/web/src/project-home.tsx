@@ -2,6 +2,7 @@ import { translateDemoLabel } from '@open-industrial-design/core';
 import { LanguageSelector, useLocalization } from '@open-industrial-design/ui';
 import type { Project } from '@open-industrial-design/design-model';
 import { BrandLogo } from './brand';
+import { partitionDemoProjects } from './demo-projects';
 
 export interface ProjectHomeProps {
   projects: readonly Project[];
@@ -9,6 +10,7 @@ export interface ProjectHomeProps {
   demoOpening?: boolean;
   importBusy?: boolean;
   onImportProject?(): void;
+  onAbout?(): void;
   coverUrls?: Record<string, string>;
   onCreateProject(): void;
   onDeleteProject(project: Project): void;
@@ -31,6 +33,7 @@ export function ProjectHome({
   demoOpening = false,
   importBusy = false,
   onImportProject,
+  onAbout,
   coverUrls = {},
   onCreateProject,
   onDeleteProject,
@@ -40,6 +43,7 @@ export function ProjectHome({
 }: ProjectHomeProps) {
   const { locale, t } = useLocalization();
   const displayProjectName = (project: Project) => translateDemoLabel(locale, project.name);
+  const { visible, previous } = partitionDemoProjects(projects);
   return (
     <main aria-label={t('home.newProject')} className="project-home">
       <header className="project-home__header">
@@ -48,6 +52,11 @@ export function ProjectHome({
           <div className="project-home__header-actions">
             <LanguageSelector compact />
             <span className="project-home__edition">{t('home.edition')}</span>
+            {onAbout ? (
+              <button type="button" onClick={onAbout}>
+                {locale === 'zh-CN' ? '关于与更新' : 'About & updates'}
+              </button>
+            ) : null}
           </div>
         </div>
       </header>
@@ -111,7 +120,7 @@ export function ProjectHome({
           ) : null}
           {projects.length ? (
             <div className="project-list">
-              {projects.map((project) => (
+              {visible.map((project) => (
                 <article className="project-row" key={project.id}>
                   <button
                     aria-label={`${t('home.openProject')}: ${displayProjectName(project)}`}
@@ -151,6 +160,30 @@ export function ProjectHome({
                 </article>
               ))}
             </div>
+          ) : null}
+          {previous.length ? (
+            <details className="project-home__previous-demos">
+              <summary>
+                {locale === 'zh-CN'
+                  ? `旧示例副本（${previous.length}）`
+                  : `Previous demo copies (${previous.length})`}
+              </summary>
+              <p>
+                {locale === 'zh-CN'
+                  ? '保留历史修改，不再自动创建副本。确认不需要后可逐个删除。'
+                  : 'Your previous edits are preserved. New copies are no longer created automatically. Delete unneeded copies individually.'}
+              </p>
+              {previous.map((project) => (
+                <div key={project.id}>
+                  <button type="button" onClick={() => onOpenProject(project)}>
+                    {displayProjectName(project)}
+                  </button>
+                  <button type="button" onClick={() => onDeleteProject(project)}>
+                    {t('common.delete')}
+                  </button>
+                </div>
+              ))}
+            </details>
           ) : null}
         </div>
       </section>

@@ -1,4 +1,12 @@
 [
+  "apps/web/src/about-dialog.tsx",
+  "apps/web/src/candidate-batches.ts",
+  "apps/web/src/candidate-batches.test.ts",
+  "apps/web/src/demo-projects.ts",
+  "apps/web/src/demo-projects.test.ts",
+  "apps/web/src/release-check.ts",
+  "apps/web/src/release-check.test.ts",
+  "docs/beta-0.1.0-beta.2-release.md",
   ".gitattributes",
   ".github/ISSUE_TEMPLATE/bug_report.md",
   ".github/ISSUE_TEMPLATE/feature_request.md",
