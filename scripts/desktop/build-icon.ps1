@@ -33,8 +33,23 @@ try {
       $graphics.Clear([Drawing.Color]::Transparent)
       $graphics.InterpolationMode = [Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
       $graphics.PixelOffsetMode = [Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-      # One clear edge pixel at small sizes; 95% fill for larger sizes.
-      $extent = [Math]::Min($size - 2, [Math]::Round($size * 0.95))
+      # Desktop tile gives the narrow transparent mark a stable visual mass.
+      # Keep a clear outer pixel; use the original artwork without recoloring.
+      $graphics.SmoothingMode = [Drawing.Drawing2D.SmoothingMode]::AntiAlias
+      $inset = [Math]::Max(1, [Math]::Round($size * 0.035))
+      $side = $size - 2 * $inset
+      $diameter = [single]($side * 0.40)
+      $tile = [Drawing.Drawing2D.GraphicsPath]::new()
+      $brush = [Drawing.SolidBrush]::new([Drawing.Color]::FromArgb(255,240,243,255))
+      try {
+        $tile.AddArc($inset,$inset,$diameter,$diameter,180,90)
+        $tile.AddArc($inset+$side-$diameter,$inset,$diameter,$diameter,270,90)
+        $tile.AddArc($inset+$side-$diameter,$inset+$side-$diameter,$diameter,$diameter,0,90)
+        $tile.AddArc($inset,$inset+$side-$diameter,$diameter,$diameter,90,90)
+        $tile.CloseFigure()
+        $graphics.FillPath($brush,$tile)
+      } finally { $brush.Dispose(); $tile.Dispose() }
+      $extent = [Math]::Round($size * 0.76)
       $scale = $extent / [Math]::Max($crop.Width, $crop.Height)
       $w = [int][Math]::Round($crop.Width * $scale); $h = [int][Math]::Round($crop.Height * $scale)
       $dest = [Drawing.Rectangle]::new([int][Math]::Floor(($size-$w)/2), [int][Math]::Floor(($size-$h)/2), $w, $h)
@@ -52,9 +67,16 @@ try {
         throw "Visible artwork touches the $size-pixel frame edge"
       }
       $visibleExtent = [Math]::Max($visibleRight-$visibleLeft+1, $visibleBottom-$visibleTop+1)
-      if ($visibleExtent -lt [Math]::Min($size-2, [Math]::Floor($size*0.93))) {
+      if ($visibleExtent -lt [Math]::Min($size-2, [Math]::Floor($size*0.91))) {
         throw "Too much transparent padding in the $size-pixel frame"
       }
+      $opaquePixels = 0
+      for ($py = 0; $py -lt $size; $py++) {
+        for ($px = 0; $px -lt $size; $px++) {
+          if ($bitmap.GetPixel($px,$py).A -gt 224) { $opaquePixels++ }
+        }
+      }
+      if ($opaquePixels / ($size*$size) -lt 0.65) { throw "Desktop tile lacks visual mass at $size px" }
       $bitmap.Save($stream, [Drawing.Imaging.ImageFormat]::Png)
       $frames += [pscustomobject]@{ Size=$size; Bytes=$stream.ToArray() }
     } finally { $stream.Dispose(); $graphics.Dispose(); $bitmap.Dispose() }
