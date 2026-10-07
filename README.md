@@ -21,6 +21,12 @@
   <a href="#中文介绍">简体中文</a> · <a href="#english-overview">English</a> · <a href="#快速开始">快速开始</a> / <a href="#quick-start">Quick start</a> · <a href="#示例流程">示例流程</a> / <a href="#example-workflow">Example</a> · <a href="https://github.com/truman-t3/open-industrial-design/releases">Releases</a>
 </p>
 
+**Windows 下载 / Download:** [安装版 / Installer](https://github.com/truman-t3/open-industrial-design/releases/download/v0.1.0-beta.4/Open-Industrial-Design-0.1.0-beta.4-blueprint-setup.exe) · [便携版 / Portable ZIP](https://github.com/truman-t3/open-industrial-design/releases/download/v0.1.0-beta.4/Open-Industrial-Design-0.1.0-beta.4-portable-x64.zip) · [三分钟上手 / Three-minute guide](./docs/community-alpha-quickstart.md)
+
+无需 API Key 即可整理参考图、编辑画布、查看示例和备份工程。AI 功能需自备 Key，软件不附送密钥或额度。Windows x64 Beta 包尚未代码签名；下载与校验文件仅以 [官方 Releases](https://github.com/truman-t3/open-industrial-design/releases/latest) 为准。
+
+No API key is needed to organize references, edit the canvas, explore the demo or back up projects. AI requires your own key; no keys or credits are included. Windows x64 Beta packages are unsigned. Use [official Releases](https://github.com/truman-t3/open-industrial-design/releases/latest) for downloads and checksums.
+
 ![主画布全景 / Design exploration canvas](./docs/screenshots/design-canvas.png)
 
 <p align="center">参考与草图 → 设计任务 → 概念方案 → CMF、细节与场景分支<br>References and sketches → design tasks → concepts → CMF, detail and scene branches</p>
@@ -84,6 +90,8 @@
 4. **保留决策**：采纳为方案、变体或参考图，查看设计血缘，并导出 `.oidproj` 备份。
 
 ### 快速开始
+
+**体验软件无需安装开发工具：** 使用顶部 Windows 安装版，或完整解压便携 ZIP 后启动其中的 EXE。先按[三分钟上手](./docs/community-alpha-quickstart.md)体验无 AI 流程。下面的命令仅供源码开发者使用。
 
 已核验环境：Node.js **24.14.0**、pnpm **11.19.0**。
 
@@ -204,6 +212,8 @@ Source: Open Industrial Design / truman-t3, AI-assisted. Use under [CC BY 4.0 wi
 4. **Preserve decisions**: adopt a concept, variant or reference, inspect design lineage and export an `.oidproj` backup.
 
 ### Quick start
+
+**No developer tools are needed to try the app:** use the Windows installer above, or fully extract the portable ZIP and launch its EXE. Start with the [three-minute guide](./docs/community-alpha-quickstart.md) without AI. The commands below are for source developers.
 
 Verified environment: Node.js **24.14.0**, pnpm **11.19.0**.
 

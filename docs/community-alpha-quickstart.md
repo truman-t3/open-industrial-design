@@ -1,15 +1,41 @@
-# Community Alpha 使用与备份指南
+# 三分钟上手与备份 / Three-minute start and backup
 
-当前版本：`0.1.0-alpha.1`。本指南适用于本地浏览器工作台，不是桌面安装包或云端服务。
+适用于 Community Beta；当前公开安装包为 `0.1.0-beta.4`。文件名因旧链接兼容保留，不代表仍为 Alpha。下载与版本以 [官方 Releases](https://github.com/truman-t3/open-industrial-design/releases/latest) 为准。
 
-## 启动与打开
+## 三分钟体验：先不用 API Key
+
+安装与下载耗时不计入三分钟；不要使用重要工程做首次测试。
+
+1. **准备**：Windows x64 用户下载 `blueprint-setup.exe` 安装版，或完整解压 `portable-x64.zip` 再运行其中的 EXE，不能只复制 EXE。软件尚未代码签名；遇到系统警告先核对官方来源和 SHA256SUMS，不关闭系统安全防护。
+2. **0:00–1:00，看懂流程**：点击“打开示例项目”，沿参考／草图 → 任务 → 概念方案 → CMF、细节、场景分支查看。示例图片是预置 AI 辅助素材，不是刚刚生成。
+3. **1:00–2:00，动手整理**：单击一张图片并拖动；按住空格拖动画布，或用中键平移。用“查看全部”回到全景。无需配置 AI 即可完成这些操作。
+4. **2:00–3:00，保留成果**：按 `Ctrl+S`，确认“已保存”；从项目菜单导出 `.oidproj`，确认文件落盘。退出并重新打开软件，检查最近项目仍在。下载单张图片不能代替工程备份。
+
+需要 AI 时再配置可信服务商、支持相应能力的模型和自己的 API Key。软件不附送 Key 或共享额度，调用可能收费；不要为体验示例盲目配置或反复生成。
+
+反馈时请提供应用版本、Windows 版本、显示缩放比例、复现步骤、预期与实际结果，以及脱敏截图。使用 [Issues](https://github.com/truman-t3/open-industrial-design/issues) 的现有模板；不上传密钥或私人工程，漏洞走 [安全反馈](../SECURITY.md)。
+
+## Three-minute start: no API key required
+
+Download and installation time are excluded. Do not use important projects for your first test.
+
+1. **Prepare:** download the Windows x64 `blueprint-setup.exe`, or fully extract `portable-x64.zip` and run its EXE. Do not copy the EXE alone. Packages are unsigned: verify the official source and SHA256SUMS if Windows warns; do not disable security protections.
+2. **0:00–1:00, understand the flow:** choose “Open demo project” and follow references/sketches → tasks → concept → CMF, detail and scene branches. Images are preloaded AI-assisted examples, not a live generation.
+3. **1:00–2:00, organize:** select and drag an image. Hold Space and drag, or use the middle mouse button, to pan. Use the fit-all control to restore the overview. None of this requires AI setup.
+4. **2:00–3:00, preserve:** press `Ctrl+S`, check the saved state, export `.oidproj` from the project menu and confirm the file exists. Restart and reopen the recent project. An individual image download is not a project backup.
+
+Configure a trusted provider, capable model and your own key only when you need AI. No keys or credits are included; providers may charge for requests. Keep portable data with the app, and export important projects before moving or upgrading it. Browser and desktop data do not automatically migrate between environments.
+
+Report app/Windows versions, display scaling, reproduction steps, expected/actual behavior and redacted screenshots using [Issues](https://github.com/truman-t3/open-industrial-design/issues). Never post keys or private projects; see [Security](../SECURITY.md) for vulnerabilities. The detailed Chinese reference below covers browser development, AI and backup behavior.
+
+## 源码浏览器版：启动与打开
 
 打开下载或克隆后的仓库根目录（包含 `package.json`）。目录名不代表当前应用版本。已核验环境为 Node.js 24.14.0、pnpm 11.19.0。
 
 首次安装与开发启动，在仓库目录执行：
 
 ```powershell
-pnpm.cmd install --frozen-lockfile
+pnpm.cmd install --frozen-lockfile --ignore-scripts
 pnpm.cmd dev
 ```
 
@@ -53,7 +79,7 @@ Key 可以只用于当前会话或记在本地浏览器。记住 Key 不等于�
 
 导入同一项目 ID 的备份会替换对应项目数据，操作前先导出当前版本。导入后检查画板、图片、候选、连线和设计血缘，再刷新确认恢复；不要为了核验删除唯一工程。
 
-当前工程文件 schema 为 7，本地数据库版本为 5，二者不是应用版本。旧格式通过迁移读取；更新、损坏、缺少 Blob 或带禁用密钥字段的文件应明确拒绝。压缩文件上限 100 MiB，单条目 50 MiB，解压总量 250 MiB。
+工程格式版本不是应用版本；不要手动修改版本字段。支持的旧格式通过迁移读取，不受支持的新版或损坏文件应拒绝导入而不是覆盖现有工程。以应用实际校验提示为准。
 
 ## 常见问题与边界
 
@@ -65,6 +91,6 @@ Key 可以只用于当前会话或记在本地浏览器。记住 Key 不等于�
 | 局部修改效果不对       | 保留原图，区分模型效果与选区保护；不自动重跑 |
 | 导入失败               | 文件完整性、格式版本、大小限制和缺失资源提示 |
 
-草图用于设计探索，3D 用于 GLB/GLTF 评审，不是 CAD 或 AI 3D 建模。多视角图片不保证几何一致。图案精准贴附、独立高清放大、智能抠图、云协作等对标功能尚未实现；模型效果和大包体积优化留待后续，不以任务模板冒充专用能力。
+草图用于设计探索，3D 用于 GLB/GLTF 评审，不是 CAD 或 AI 3D 建模。多视角图片不保证几何一致。已有本地图案平面贴放及依赖兼容 Provider 的透明抠图候选检查，不等于 3D 曲面贴图或本地分割模型。专用本地 AI 超分辨率、AI 3D 和云协作不包含在当前 Beta 中。
 
-发布前核验见 [Alpha 发布门槛](./alpha-0.1-release.md)、[收尾清单](./release-checklist.md)；后续执行范围见 [发布状态](./release-status.md)。
+当前公开包说明见 [Beta 4](./beta-0.1.0-beta.4-release.md)；后续执行范围见 [发布状态](./release-status.md)。
