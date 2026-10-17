@@ -2140,6 +2140,91 @@ describe('DexieProjectRepository', () => {
       node: { ...node, previewAssetId: previewAsset.id },
     });
     expect(await (await storage.getAssetBlobById(previewAsset.id))?.text()).toBe('preview');
+    await storage.saveViewerState({ ...node, camera: { ...node.camera, position: [5, 4, 3] } });
+    expect((await database.nodes.get(node.id)) as unknown).toMatchObject({
+      previewAssetId: previewAsset.id,
+      camera: { position: [5, 4, 3] },
+    });
+    await database.designs.put({
+      id: 'design',
+      projectId: 'project',
+      createdAt: 1,
+      updatedAt: 1,
+      name: 'Lamp',
+      kind: 'concept',
+      status: 'exploring',
+    });
+    await database.designs.put({
+      id: 'foreign',
+      projectId: 'other',
+      createdAt: 1,
+      updatedAt: 1,
+      name: 'Other',
+      kind: 'concept',
+      status: 'exploring',
+    });
+    await expect(storage.saveModelDesign(node.id, 'foreign')).rejects.toThrow();
+    await storage.saveModelDesign(node.id, 'design');
+    const secondAsset = {
+      ...previewAsset,
+      id: 'second-preview',
+      storage: { type: 'indexeddb' as const, blobId: 'second-preview' },
+    };
+    const imageNode = {
+      ...node,
+      id: 'image',
+      type: 'image' as const,
+      assetId: secondAsset.id,
+      designId: 'design',
+    };
+    const capture = {
+      asset: secondAsset,
+      blob: new Blob(['second']),
+      node: { ...node, previewAssetId: secondAsset.id },
+      imageNode,
+    };
+    // Fail at the final write to prove the preview, Blob, node and board all roll back.
+    const failProject = vi
+      .spyOn(database.projects, 'update')
+      .mockRejectedValueOnce(new Error('disk failed'));
+    await expect(storage.saveCapture(capture)).rejects.toThrow('disk failed');
+    failProject.mockRestore();
+    expect(await database.assets.get(secondAsset.id)).toBeUndefined();
+    expect(await database.assetBlobs.get(secondAsset.id)).toBeUndefined();
+    expect(await database.nodes.get(imageNode.id)).toBeUndefined();
+    expect((await database.boards.get('board'))?.nodeIds).toEqual([node.id]);
+    expect((await database.nodes.get(node.id)) as unknown).toMatchObject({
+      previewAssetId: previewAsset.id,
+    });
+    await storage.saveCapture(capture);
+    expect((await database.nodes.get(imageNode.id))?.designId).toBe('design');
+    expect((await database.boards.get('board'))?.nodeIds).toEqual([node.id, imageNode.id]);
+    await storage.saveViewerState(node);
+    expect(await database.nodes.get(node.id)).toMatchObject({
+      designId: 'design',
+      previewAssetId: secondAsset.id,
+    });
+    await storage.saveModelDesign(node.id);
+    expect((await database.nodes.get(node.id))?.designId).toBeUndefined();
+    expect((await database.nodes.get(imageNode.id))?.designId).toBe('design');
+    await expect(
+      storage.saveImportedModel({ asset: modelAsset, blob: new Blob(['overwrite']), node }),
+    ).rejects.toThrow('already exists');
+    expect(await (await storage.getAssetBlob(modelAsset))?.text()).toBe('model');
+    const archiveStorage = new DexieProjectArchiveStorage(database);
+    const archive = await archiveStorage.readProjectArchive('project');
+    const packed = await createOidProjectArchive({
+      ...archive.snapshot,
+      assetBlobs: archive.assetBlobs,
+      candidateBlobs: archive.candidateBlobs,
+      generationInputBlobs: archive.generationInputBlobs,
+    });
+    const restored = await importOidProjectArchive(packed);
+    expect(restored.nodes.find((item) => item.id === imageNode.id)?.designId).toBe('design');
+    await database.nodes.delete(node.id);
+    await expect(storage.saveViewerState(node)).rejects.toThrow('no longer available');
+    expect(await database.nodes.get(node.id)).toBeUndefined();
+
     await database.delete();
   });
 });

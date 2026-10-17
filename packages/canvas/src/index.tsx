@@ -965,6 +965,8 @@ export function CanvasWorkspace({
                 : [];
             // Image cards prioritize their preview; task cards retain their explicit header.
             // Keep this purely presentational: saved node geometry and lineage stay intact.
+            const overview = viewport.zoom < 0.8;
+            const overviewLabelSize = Math.min(22, 11 / viewport.zoom);
             const compactDesignPreview =
               Boolean(previewUrl) &&
               ['reference', 'image', 'sketch', 'concept', 'variant'].includes(node.type);
@@ -1046,13 +1048,14 @@ export function CanvasWorkspace({
                     <Text
                       text={node.direction || translate(locale, 'generation.ready')}
                       x={12}
-                      y={48}
+                      y={overview ? 72 : 48}
                       width={node.width - 24}
-                      height={30}
-                      fontSize={12}
+                      height={overview ? 90 : 30}
+                      fontSize={overview ? overviewLabelSize : 12}
                       fill="#526071"
                       visible={
-                        viewport.zoom < 0.8 || !generationRun || !selectedIds.includes(node.id)
+                        (overview && node.textOnly) ||
+                        (!overview && (!generationRun || !selectedIds.includes(node.id)))
                       }
                     />
                     <Text
@@ -1060,7 +1063,7 @@ export function CanvasWorkspace({
                       visible={!node.textOnly}
                       x={16}
                       y={82}
-                      fontSize={11}
+                      fontSize={overview ? overviewLabelSize : 11}
                       fill="#526071"
                     />
                     <Circle
@@ -1088,7 +1091,7 @@ export function CanvasWorkspace({
                       visible={!node.textOnly}
                       x={16}
                       y={112}
-                      fontSize={11}
+                      fontSize={overview ? overviewLabelSize : 11}
                       fill="#526071"
                     />
                     <Circle
@@ -1139,6 +1142,7 @@ export function CanvasWorkspace({
                     ))}
                     {!nodeCandidates.length ? (
                       <Group
+                        visible={!overview}
                         y={node.height - 36}
                         x={12}
                         onClick={(event) => {
@@ -1243,7 +1247,9 @@ export function CanvasWorkspace({
                 ) : previewUrl ? (
                   <StaticPreview
                     height={
-                      compactDesignPreview ? node.height - 49 : node.height - headerHeight - 44
+                      compactDesignPreview
+                        ? node.height - (overview ? 62 : 49)
+                        : node.height - headerHeight - 44
                     }
                     url={previewUrl}
                     width={node.width - (compactDesignPreview ? 16 : 20)}
@@ -1254,8 +1260,10 @@ export function CanvasWorkspace({
                 {headerHeight ? (
                   <Text
                     fill="#374151"
-                    fontSize={13}
+                    fontSize={overview ? overviewLabelSize : 13}
                     fontStyle="bold"
+                    height={overview ? 56 : 24}
+                    ellipsis
                     letterSpacing={0.2}
                     text={
                       node.type === 'generation' ? title : translate(locale, appearance.labelKey)
@@ -1273,14 +1281,23 @@ export function CanvasWorkspace({
                         : (viewSet?.name ?? title)
                     }
                     width={node.width - 24}
-                    height={previewUrl || viewSet ? 18 : node.height - headerHeight - 38}
+                    height={
+                      previewUrl || viewSet ? (overview ? 48 : 18) : node.height - headerHeight - 38
+                    }
                     x={12}
                     y={
                       previewUrl || viewSet
-                        ? node.height - (compactDesignPreview ? 39 : lineage ? 42 : 31)
+                        ? node.height -
+                          (overview ? 54 : compactDesignPreview ? 39 : lineage ? 42 : 31)
                         : headerHeight + 15
                     }
-                    fontSize={node.type === 'text' ? (node.fontSize ?? 20) : 13}
+                    fontSize={
+                      node.type === 'text'
+                        ? (node.fontSize ?? 20)
+                        : overview
+                          ? overviewLabelSize
+                          : 13
+                    }
                     fontStyle={
                       node.type === 'concept' || node.type === 'variant' ? 'bold' : 'normal'
                     }
@@ -1288,7 +1305,7 @@ export function CanvasWorkspace({
                     verticalAlign="middle"
                   />
                 ) : null}
-                {lineage ? (
+                {lineage && !overview ? (
                   <Text
                     fill="#6b7280"
                     fontSize={10}
@@ -1386,7 +1403,7 @@ export function CanvasWorkspace({
                   x={8}
                   y={8}
                   width={card.width - 16}
-                  height={card.height - 36}
+                  height={card.height - (viewport.zoom < 0.8 ? 48 : 36)}
                   fill="#f1f3f5"
                   cornerRadius={4}
                   listening={false}
@@ -1394,7 +1411,7 @@ export function CanvasWorkspace({
                 <StaticPreview
                   url={candidate.previewUrl}
                   width={card.width - 16}
-                  height={card.height - 36}
+                  height={card.height - (viewport.zoom < 0.8 ? 48 : 36)}
                   x={8}
                   y={8}
                 />
@@ -1407,9 +1424,9 @@ export function CanvasWorkspace({
                         })
                   }
                   x={10}
-                  y={card.height - 21}
+                  y={card.height - (viewport.zoom < 0.8 ? 36 : 21)}
                   width={card.width - 20}
-                  fontSize={11}
+                  fontSize={viewport.zoom < 0.8 ? Math.min(22, 11 / viewport.zoom) : 11}
                   fill="#374151"
                 />
               </Group>

@@ -989,6 +989,105 @@ export function WorkspaceInspector({
       </aside>
     );
   }
+  const generationControls = generation ? (
+    <section className="generation-run" aria-label={t('generation.setup')}>
+      <label className="inspector-generation__field generation-run__count">
+        <span>{t('generation.count')}</span>
+        <select
+          disabled={Boolean(generation.node.requestedViews || generation.node.patternPlacement)}
+          onChange={(event) => generation.onUpdate({ count: Number(event.target.value) })}
+          value={generation.node.count}
+        >
+          {[1, 2, 3, 4].map((count) => (
+            <option key={count} value={count}>
+              {count}
+            </option>
+          ))}
+        </select>
+      </label>
+      {!generation.node.patternPlacement ? (
+        <>
+          <label className="inspector-generation__field generation-run__provider">
+            <span>{t('ai.provider')}</span>
+            <select
+              onChange={(event) => generation.onProviderChange(event.target.value)}
+              value={generation.selectedProviderId}
+            >
+              <option value="">{t('ai.chooseProvider')}</option>
+              {generation.providers.map((provider) => (
+                <option key={provider.id} value={provider.id}>
+                  {provider.name} · {provider.model}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="inspector-generation__settings button--ghost"
+            onClick={generation.onProviderSettings}
+            type="button"
+          >
+            {t('ai.manageProvider')}
+          </button>
+          <p className="inspector-generation__hint generation-run__billing">
+            {t('generation.billing')}
+          </p>
+        </>
+      ) : (
+        <p>{t('generation.pattern.local')}</p>
+      )}
+      <button
+        className="button--primary inspector-generation__run"
+        disabled={
+          generation.busy ||
+          (!generation.node.patternPlacement && generation.readiness !== 'ready') ||
+          (generation.node.patternPlacement &&
+            (orderedInputs.length !== 2 ||
+              !mainInput ||
+              !orderedInputs.some((item) => item.role === 'reference'))) ||
+          (!generation.node.textOnly && generation.inputCount === 0) ||
+          (generation.node.patternTask?.kind === 'transfer' &&
+            (!generation.node.patternTask.placement.trim() ||
+              orderedInputs.length !== 2 ||
+              !mainInput ||
+              !orderedInputs.some((item) => item.role === 'reference'))) ||
+          !generation.node.direction.trim() ||
+          generation.node.requestedViews?.length === 0 ||
+          (generation.node.localCmf &&
+            !Object.values(generation.node.localCmf).some((value) => value.trim())) ||
+          (generation.node.removeBackground &&
+            (!generation.providers.find((item) => item.id === generation.selectedProviderId)
+              ?.supportsTransparency ||
+              generation.inputs.length !== 1 ||
+              !mainInput)) ||
+          (generation.node.localEdit && (!validRegion || !maskSupported))
+        }
+        onClick={generation.onRun}
+        type="button"
+      >
+        <UiIcon name="sparkles" size={16} />
+        {generation.busy
+          ? t('generation.running')
+          : generation.node.patternPlacement
+            ? t('generation.pattern.run')
+            : t('generation.run')}
+      </button>
+      {generation.busy && generation.onCancel ? (
+        <button onClick={generation.onCancel} type="button">
+          {t('generation.cancel')}
+        </button>
+      ) : null}
+      {!generation.node.patternPlacement && generation.readiness !== 'ready' ? (
+        <p className="inspector-generation__hint generation-run__setup-hint">
+          {t('generation.providerRequired')}
+        </p>
+      ) : null}
+      {generation.status ? (
+        <p className="inspector-generation__hint" role="status">
+          {generation.status}
+        </p>
+      ) : null}
+    </section>
+  ) : null;
   const title =
     (node?.type === 'generation' ? node.label : undefined) ??
     (selectedDesign ? translateDemoLabel(locale, selectedDesign.name) : undefined) ??
@@ -997,7 +1096,10 @@ export function WorkspaceInspector({
       : undefined) ??
     (node?.type ? translateNodeType(locale, node.type) : t('inspector.title'));
   return (
-    <aside aria-label={t('inspector.title')} className="inspector">
+    <aside
+      aria-label={t('inspector.title')}
+      className={generation ? 'inspector inspector--generation' : 'inspector'}
+    >
       <header className="inspector__header">
         <div className="inspector__identity">
           <span aria-hidden="true" className="inspector__type-badge">
@@ -1017,736 +1119,667 @@ export function WorkspaceInspector({
           </div>
         </div>
       </header>
-      {!node && !selectedDesign ? (
-        <div className="inspector__empty">
-          <strong>{t('inspector.noneTitle')}</strong>
-          <p>{t('inspector.noneDescription')}</p>
-        </div>
-      ) : null}
-      {node?.type === 'sketch' && onEditSketch ? (
-        <section className="inspector-generation">
-          {'sketchDocumentId' in node &&
-          typeof node.sketchDocumentId === 'string' &&
-          node.sketchDocumentId ? (
-            <>
-              <button type="button" disabled={dnaBusy || node.locked} onClick={onEditSketch}>
-                {t('sketch.edit')}
-              </button>
-              <p className="inspector-generation__hint">{t('sketch.sharedHint')}</p>
-            </>
-          ) : (
-            <p className="inspector-generation__hint">{t('sketch.staticHint')}</p>
-          )}
-        </section>
-      ) : null}
-      {generation ? (
-        <section className="inspector-generation" aria-label={t('node.generation')}>
-          <p className="inspector-generation__hint">
-            {t(generation.node.textOnly ? 'generation.tool.textHint' : 'generation.selectSource')}
-          </p>
-          <div className="inspector-generation__inputs">
-            <strong>{t('generation.connected', { count: generation.inputCount })}</strong>
-            {orderedInputs.map((input) => (
-              <div className="inspector-generation__input" key={input.id}>
-                {input.previewUrl ? (
-                  <img alt="" src={input.previewUrl} />
-                ) : (
-                  <UiIcon name="image" size={20} />
-                )}
-                <span>
-                  {input.role === 'base' ? t('generation.base') : t('generation.reference')} ·{' '}
-                  {translateDemoLabel(locale, input.label)}
-                </span>
-                <button
-                  aria-label={t('generation.disconnect', { name: input.label })}
-                  onClick={() => generation.onDisconnect(input.id)}
-                  type="button"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+      <div
+        className="inspector__body"
+        key={generation?.node.id ?? node?.id ?? selectedDesign?.id ?? 'empty'}
+      >
+        {!node && !selectedDesign ? (
+          <div className="inspector__empty">
+            <strong>{t('inspector.noneTitle')}</strong>
+            <p>{t('inspector.noneDescription')}</p>
           </div>
-          <h2>{t('generation.intent')}</h2>
-          <PromptLibrary
-            key={generation.node.id}
-            direction={generation.node.direction}
-            notes={generation.node.notes}
-            disabled={generation.busy}
-            onApply={generation.onUpdate}
-          />
-          <button
-            className="inspector-generation__tool-picker"
-            ref={toolPickerButton}
-            type="button"
-            aria-label={t('generation.tool.change')}
-            aria-expanded={toolPickerOpen}
-            aria-controls="generation-tool-picker"
-            disabled={generation.busy}
-            onClick={() => setToolPickerNodeId(toolPickerOpen ? undefined : generation.node.id)}
-          >
-            <strong>{activeTool ? t(activeTool.label) : t('generation.tool.custom')}</strong>
-            <span>{t('generation.tool.change')}</span>
-          </button>
-          {toolPickerOpen ? (
-            <div
-              id="generation-tool-picker"
-              className="inspector-generation__tools"
-              role="group"
-              aria-label={t('generation.tool.label')}
-              onKeyDown={(event) => {
-                if (event.key !== 'Escape') return;
-                event.preventDefault();
-                event.stopPropagation();
-                setToolPickerNodeId(undefined);
-                toolPickerButton.current?.focus({ preventScroll: true });
-              }}
-            >
-              {generationTools.map((tool) => (
-                <button
-                  key={tool.id}
-                  type="button"
-                  disabled={generation.busy || (tool.id === 'text' && generation.inputCount > 0)}
-                  aria-pressed={activeTool?.id === tool.id}
-                  title={t(tool.hint)}
-                  onClick={() => {
-                    generation.onUpdate({
-                      label: t(tool.label),
-                      direction: t(tool.prompt),
-                      textOnly:
-                        tool.id === 'text' ||
-                        (tool.id === 'pattern-create' && generation.inputCount === 0)
-                          ? true
-                          : undefined,
-                      patternTask:
-                        tool.id === 'pattern-create'
-                          ? { kind: 'create', repeat: 'single' }
-                          : tool.id === 'pattern-transfer'
-                            ? { kind: 'transfer', placement: '', scale: 'medium' }
-                            : undefined,
-                      requestedViews: tool.id === 'view' ? ['perspective'] : undefined,
-                      localEdit: ['local', 'erase', 'local-cmf'].includes(tool.id)
-                        ? true
-                        : undefined,
-                      localCmf:
-                        tool.id === 'local-cmf'
-                          ? { color: '', material: '', finish: '' }
-                          : undefined,
-                      localEditMode: tool.id === 'erase' ? 'erase' : undefined,
-                      removeBackground: tool.id === 'cutout' ? true : undefined,
-                      patternPlacement:
-                        tool.id === 'pattern' ? { ...defaultPatternPlacement } : undefined,
-                      editRegion: undefined,
-                      ...(['view', 'pattern'].includes(tool.id) ? { count: 1 } : {}),
-                    });
-                    setToolPickerNodeId(undefined);
-                    toolPickerButton.current?.focus({ preventScroll: true });
-                  }}
-                >
-                  {t(tool.label)}
+        ) : null}
+        {node?.type === 'sketch' && onEditSketch ? (
+          <section className="inspector-generation">
+            {'sketchDocumentId' in node &&
+            typeof node.sketchDocumentId === 'string' &&
+            node.sketchDocumentId ? (
+              <>
+                <button type="button" disabled={dnaBusy || node.locked} onClick={onEditSketch}>
+                  {t('sketch.edit')}
                 </button>
-              ))}
-            </div>
-          ) : null}
-          {activeTool ? <p className="inspector-generation__hint">{t(activeTool.hint)}</p> : null}
-          {generation.inputCount > 0 &&
-          (toolPickerOpen || generation.node.patternTask?.kind === 'create') ? (
-            <p className="inspector-generation__hint">{t('generation.text.disconnect')}</p>
-          ) : null}
-          {generation.node.patternPlacement ? (
-            <PatternEditor
-              base={mainInput?.previewUrl}
-              pattern={orderedInputs.find((item) => item.role === 'reference')?.previewUrl}
-              value={generation.node.patternPlacement}
-              disabled={generation.busy}
-              onChange={(patternPlacement) => generation.onUpdate({ patternPlacement })}
-            />
-          ) : null}
-          {generation.node.patternTask?.kind === 'create' ? (
-            <>
-              <label className="inspector-generation__field">
-                <span>{t('generation.patternTask.input')}</span>
-                <select
-                  aria-label={t('generation.patternTask.input')}
-                  disabled={generation.busy}
-                  value={generation.node.textOnly ? 'text' : 'images'}
-                  onChange={(event) =>
-                    generation.onUpdate({ textOnly: event.target.value === 'text' })
-                  }
-                >
-                  <option value="text" disabled={generation.inputCount > 0}>
-                    {t('generation.patternTask.text')}
-                  </option>
-                  <option value="images">{t('generation.patternTask.images')}</option>
-                </select>
-              </label>
-              <label className="inspector-generation__field">
-                <span>{t('generation.patternTask.repeat')}</span>
-                <select
-                  aria-label={t('generation.patternTask.repeat')}
-                  disabled={generation.busy}
-                  value={generation.node.patternTask.repeat}
-                  onChange={(event) =>
-                    generation.onUpdate({
-                      patternTask: {
-                        kind: 'create',
-                        repeat: event.target.value as 'single' | 'tile',
-                      },
-                    })
-                  }
-                >
-                  <option value="single">{t('generation.patternTask.single')}</option>
-                  <option value="tile">{t('generation.patternTask.tile')}</option>
-                </select>
-              </label>
-            </>
-          ) : generation.node.patternTask?.kind === 'transfer' ? (
-            <>
-              <p className="inspector-generation__hint">{t('generation.patternTask.required')}</p>
-              <label className="inspector-generation__field">
-                <span>{t('generation.patternTask.placement')}</span>
-                <input
-                  aria-label={t('generation.patternTask.placement')}
-                  disabled={generation.busy}
-                  maxLength={500}
-                  value={generation.node.patternTask.placement}
-                  onChange={(event) =>
-                    generation.onUpdate({
-                      patternTask: {
-                        ...(generation.node.patternTask as Extract<
-                          GenerationNode['patternTask'],
-                          { kind: 'transfer' }
-                        >),
-                        placement: event.target.value,
-                      },
-                    })
-                  }
-                />
-              </label>
-              <label className="inspector-generation__field">
-                <span>{t('generation.patternTask.scale')}</span>
-                <select
-                  aria-label={t('generation.patternTask.scale')}
-                  disabled={generation.busy}
-                  value={generation.node.patternTask.scale}
-                  onChange={(event) =>
-                    generation.onUpdate({
-                      patternTask: {
-                        ...(generation.node.patternTask as Extract<
-                          GenerationNode['patternTask'],
-                          { kind: 'transfer' }
-                        >),
-                        scale: event.target.value as 'small' | 'medium' | 'large',
-                      },
-                    })
-                  }
-                >
-                  {(['small', 'medium', 'large'] as const).map((scale) => (
-                    <option value={scale} key={scale}>
-                      {t(`generation.patternTask.${scale}`)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </>
-          ) : null}
-          {generation.node.removeBackground &&
-          (!generation.providers.find((item) => item.id === generation.selectedProviderId)
-            ?.supportsTransparency ||
-            generation.inputs.length !== 1 ||
-            !mainInput) ? (
-            <p role="status">{t('generation.cutout.required')}</p>
-          ) : null}
-          {generation.node.localEdit ? (
-            <>
-              {generation.node.localCmf ? (
-                <div className="inspector-generation__cmf">
-                  {(['color', 'material', 'finish'] as const).map((field) => (
-                    <label className="inspector-generation__field" key={field}>
-                      <span>{t(`generation.localCmf.${field}`)}</span>
-                      <input
-                        aria-label={t(`generation.localCmf.${field}`)}
-                        maxLength={500}
-                        disabled={generation.busy}
-                        value={generation.node.localCmf![field]}
-                        onChange={(event) =>
-                          generation.onUpdate({
-                            localCmf: { ...generation.node.localCmf!, [field]: event.target.value },
-                          })
-                        }
-                      />
-                    </label>
-                  ))}
-                  <p className="inspector-generation__hint">
-                    {t('generation.localCmf.fieldsHint')}
-                  </p>
-                </div>
-              ) : null}
-              <p className="inspector-generation__hint">{t('generation.mask.protectionHint')}</p>
-              {mainInput?.previewUrl && mainInput.sourceAssetId ? (
-                <RegionEditor
-                  key={`${generation.node.id}:${mainInput.sourceNodeId}:${mainInput.sourceAssetId}`}
-                  source={{
-                    sourceNodeId: mainInput.sourceNodeId,
-                    sourceAssetId: mainInput.sourceAssetId,
-                    previewUrl: mainInput.previewUrl,
-                  }}
-                  region={validRegion}
-                  disabled={generation.busy}
-                  onChange={(editRegion) => generation.onUpdate({ editRegion })}
-                />
-              ) : (
-                <p>{t('generation.mask.mainRequired')}</p>
-              )}
-              {!maskSupported ? <p role="status">{t('generation.mask.providerRequired')}</p> : null}
-            </>
-          ) : null}
-          {activeTool?.id === 'view' ? (
-            <div
-              className="inspector-generation__tools"
-              role="group"
-              aria-label={t('generation.view.label')}
-            >
-              {generationViews.map((view) => (
-                <button
-                  key={view}
-                  type="button"
-                  disabled={generation.busy}
-                  aria-pressed={generation.node.requestedViews?.includes(view) ?? false}
-                  onClick={() => {
-                    const current = generation.node.requestedViews ?? [];
-                    const next = current.includes(view)
-                      ? current.filter((item) => item !== view)
-                      : [...current, view];
-                    if (!next.length || next.length > 4) return;
-                    generation.onUpdate({ requestedViews: next, count: next.length });
-                  }}
-                >
-                  {t(`generation.view.${view}`)}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          <p className="inspector-generation__hint">{t('generation.tool.limit')}</p>
-          {generation.node.requestedViews ? (
-            <p className="inspector-generation__notice">
-              {t('generation.view.batch', { count: generation.node.requestedViews.length })}
-            </p>
-          ) : null}
-          <details className="inspector-section">
-            <summary>{t('generation.tool.label')}</summary>
-            <div>
-              {generationTools.map((tool) => (
-                <p key={tool.id}>
-                  <strong>{t(tool.label)}</strong>
-                  <br />
-                  {t(tool.hint)}
-                </p>
-              ))}
-            </div>
-          </details>
-          <label className="inspector-generation__field">
-            <span>{t('generation.direction')}</span>
-            <textarea
-              aria-label={t('generation.direction')}
-              onChange={(event) => generation.onUpdate({ direction: event.target.value })}
-              rows={3}
-              value={generation.node.direction}
-            />
-          </label>
-          <label className="inspector-generation__field">
-            <span>{t('generation.notes')}</span>
-            <textarea
-              aria-label={t('generation.notes')}
-              onChange={(event) => generation.onUpdate({ notes: event.target.value })}
-              rows={3}
-              value={generation.node.notes}
-            />
-          </label>
-          <h2>{t('generation.setup')}</h2>
-          <label className="inspector-generation__field">
-            <span>{t('generation.count')}</span>
-            <select
-              disabled={Boolean(generation.node.requestedViews || generation.node.patternPlacement)}
-              onChange={(event) => generation.onUpdate({ count: Number(event.target.value) })}
-              value={generation.node.count}
-            >
-              {[1, 2, 3, 4].map((count) => (
-                <option key={count} value={count}>
-                  {count}
-                </option>
-              ))}
-            </select>
-          </label>
-          {!generation.node.patternPlacement ? (
-            <>
-              <label className="inspector-generation__field">
-                <span>{t('ai.provider')}</span>
-                <select
-                  onChange={(event) => generation.onProviderChange(event.target.value)}
-                  value={generation.selectedProviderId}
-                >
-                  <option value="">{t('ai.chooseProvider')}</option>
-                  {generation.providers.map((provider) => (
-                    <option key={provider.id} value={provider.id}>
-                      {provider.name} · {provider.model}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                className="inspector-generation__settings"
-                onClick={generation.onProviderSettings}
-                type="button"
-              >
-                {t('ai.manageProvider')}
-              </button>
-              <p className="inspector-generation__hint">{t('generation.billing')}</p>
-            </>
-          ) : (
-            <p>{t('generation.pattern.local')}</p>
-          )}
-          <button
-            className="button--primary inspector-generation__run"
-            disabled={
-              generation.busy ||
-              (!generation.node.patternPlacement && generation.readiness !== 'ready') ||
-              (generation.node.patternPlacement &&
-                (orderedInputs.length !== 2 ||
-                  !mainInput ||
-                  !orderedInputs.some((item) => item.role === 'reference'))) ||
-              (!generation.node.textOnly && generation.inputCount === 0) ||
-              (generation.node.patternTask?.kind === 'transfer' &&
-                (!generation.node.patternTask.placement.trim() ||
-                  orderedInputs.length !== 2 ||
-                  !mainInput ||
-                  !orderedInputs.some((item) => item.role === 'reference'))) ||
-              !generation.node.direction.trim() ||
-              generation.node.requestedViews?.length === 0 ||
-              (generation.node.localCmf &&
-                !Object.values(generation.node.localCmf).some((value) => value.trim())) ||
-              (generation.node.removeBackground &&
-                (!generation.providers.find((item) => item.id === generation.selectedProviderId)
-                  ?.supportsTransparency ||
-                  generation.inputs.length !== 1 ||
-                  !mainInput)) ||
-              (generation.node.localEdit && (!validRegion || !maskSupported))
-            }
-            onClick={generation.onRun}
-            type="button"
-          >
-            {generation.busy
-              ? t('generation.running')
-              : generation.node.patternPlacement
-                ? t('generation.pattern.run')
-                : t('generation.run')}
-          </button>
-          {generation.busy && generation.onCancel ? (
-            <button onClick={generation.onCancel} type="button">
-              {t('generation.cancel')}
-            </button>
-          ) : null}
-          {!generation.node.patternPlacement && generation.readiness !== 'ready' ? (
-            <p className="inspector-generation__notice">{t('generation.providerRequired')}</p>
-          ) : null}
-          {generation.status ? (
-            <p className="inspector-generation__hint" role="status">
-              {generation.status}
-            </p>
-          ) : null}
-          {generation.candidates.length ? <h2>{t('generation.candidates')}</h2> : null}
-          {generation.candidates.length ? (
-            <p className="inspector-generation__hint">{t('generation.review')}</p>
-          ) : null}
-          <div className="inspector-generation__candidates">
-            {candidateBatches(generation.candidates).map((batch, batchIndex) => (
-              <details
-                key={batch.id}
-                className="candidate-batch"
-                open={
-                  batchIndex === 0 ||
-                  batch.items.some(
-                    ({ candidate }) => candidate.id === generation.selectedCandidateId,
-                  )
-                }
-              >
-                <summary>
-                  {batchIndex === 0
-                    ? locale === 'zh-CN'
-                      ? '最近一批'
-                      : 'Latest batch'
-                    : locale === 'zh-CN'
-                      ? '历史批次'
-                      : 'Previous batch'}{' '}
-                  · {batch.items.length}
-                </summary>
-                {batch.items.map(({ candidate, index }) => (
-                  <article
-                    aria-label={t('generation.candidateNumber', { number: index + 1 })}
-                    aria-current={
-                      generation.selectedCandidateId === candidate.id ? 'true' : undefined
-                    }
-                    className={
-                      generation.selectedCandidateId === candidate.id
-                        ? 'inspector-generation__candidate is-selected'
-                        : 'inspector-generation__candidate'
-                    }
-                    key={candidate.id}
-                  >
-                    <strong>{t('generation.candidateNumber', { number: index + 1 })}</strong>
-                    {candidate.view ? (
-                      <strong>{t(`generation.view.${candidate.view}`)}</strong>
-                    ) : null}
-                    {generation.selectedCandidateId === candidate.id ? (
-                      <strong className="inspector-generation__selected-label">
-                        {t('generation.selectedOnCanvas')}
-                      </strong>
-                    ) : null}
-                    {generation.previewUrls[candidate.id] ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setReview({ nodeId: generation.node.id, candidateId: candidate.id })
-                        }
-                        aria-label={`${t('generation.viewCandidate')} · ${t('generation.candidateNumber', { number: index + 1 })}`}
-                      >
-                        <img
-                          alt={t('generation.candidateNumber', { number: index + 1 })}
-                          src={generation.previewUrls[candidate.id]}
-                        />
-                      </button>
-                    ) : (
-                      <p>{t('generation.previewUnavailable')}</p>
-                    )}
-                    {candidate.inputSignature !== generation.signature ? (
-                      <small>{t('generation.stale')}</small>
-                    ) : null}
-                    <div>
-                      <button
-                        disabled={Boolean(generation.busyCandidateId)}
-                        onClick={() => generation.onKeep(candidate.id, 'design')}
-                        type="button"
-                      >
-                        {t('generation.keepDesign')}
-                      </button>
-                      <button
-                        disabled={Boolean(generation.busyCandidateId)}
-                        onClick={() => generation.onKeep(candidate.id, 'reference')}
-                        type="button"
-                      >
-                        {t('generation.keepReference')}
-                      </button>
-                      <button
-                        disabled={Boolean(generation.busyCandidateId)}
-                        onClick={() => generation.onDiscard(candidate.id)}
-                        type="button"
-                      >
-                        {t('common.discard')}
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </details>
-            ))}
-          </div>
-          {review?.nodeId === generation.node.id && generation.candidates.length ? (
-            <CandidateReview
-              key={review.candidateId}
-              generation={generation}
-              initialId={review.candidateId}
-              onClose={() => setReview(undefined)}
-            />
-          ) : null}
-        </section>
-      ) : null}
-      {exploration ? (
-        <DetailSection open title={t('generation.continueExploration')}>
-          <p>{t('generation.manualStepHint')}</p>
-          <ExplorationToolButtons busy={exploration.busy} onChoose={exploration.onChoose} />
-          {exploration.status ? <p role="status">{exploration.status}</p> : null}
-        </DetailSection>
-      ) : null}
-      {node ? (
-        <DetailSection open title={t('inspector.basic')}>
-          {node.type === 'text' && onSaveText ? (
-            <TextNoteEditor
-              key={`${node.id}:${node.updatedAt}`}
-              node={node}
-              busy={dnaBusy}
-              onSave={onSaveText}
-            />
-          ) : null}
-          {node.type === 'group' ? (
-            <label className="inspector-group-name">
-              {t('workspace.groupName')}
-              <input
-                key={`${node.id}:${node.label}`}
-                defaultValue={node.label}
-                maxLength={80}
-                disabled={node.locked || !onRenameGroup}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') event.currentTarget.blur();
-                }}
-                onBlur={(event) => {
-                  const label = event.currentTarget.value.trim() || t('node.group');
-                  if (label !== node.label) onRenameGroup?.(node.id, label);
-                }}
+                <p className="inspector-generation__hint">{t('sketch.sharedHint')}</p>
+              </>
+            ) : (
+              <p className="inspector-generation__hint">{t('sketch.staticHint')}</p>
+            )}
+          </section>
+        ) : null}
+        {generation ? (
+          <section className="inspector-generation" aria-label={t('node.generation')}>
+            <label className="inspector-generation__field">
+              <span>{t('generation.direction')}</span>
+              <textarea
+                aria-label={t('generation.direction')}
+                className="generation-direction"
+                onChange={(event) => generation.onUpdate({ direction: event.target.value })}
+                rows={3}
+                value={generation.node.direction}
               />
             </label>
-          ) : null}
-          <dl>
-            <div>
-              <dt>{t('inspector.type')}</dt>
-              <dd>{translateNodeType(locale, node.type)}</dd>
+            <div className="inspector-generation__inputs">
+              <strong>{t('generation.connected', { count: generation.inputCount })}</strong>
+              {orderedInputs.map((input) => (
+                <div className="inspector-generation__input" key={input.id}>
+                  {input.previewUrl ? (
+                    <img alt="" src={input.previewUrl} />
+                  ) : (
+                    <UiIcon name="image" size={20} />
+                  )}
+                  <span>
+                    {input.role === 'base' ? t('generation.base') : t('generation.reference')} ·{' '}
+                    {translateDemoLabel(locale, input.label)}
+                  </span>
+                  <button
+                    className="button--ghost button--icon button--danger"
+                    aria-label={t('generation.disconnect', { name: input.label })}
+                    title={t('generation.disconnect', { name: input.label })}
+                    onClick={() => generation.onDisconnect(input.id)}
+                    type="button"
+                  >
+                    <UiIcon name="close" />
+                  </button>
+                </div>
+              ))}
             </div>
-            <div>
-              <dt>{t('inspector.position')}</dt>
-              <dd>
-                {Math.round(node.x)}, {Math.round(node.y)}
-              </dd>
+
+            <PromptLibrary
+              key={generation.node.id}
+              direction={generation.node.direction}
+              notes={generation.node.notes}
+              disabled={generation.busy}
+              onApply={generation.onUpdate}
+            />
+            <button
+              className="inspector-generation__tool-picker button--ghost"
+              ref={toolPickerButton}
+              type="button"
+              aria-label={t('generation.tool.change')}
+              aria-expanded={toolPickerOpen}
+              aria-controls="generation-tool-picker"
+              disabled={generation.busy}
+              onClick={() => setToolPickerNodeId(toolPickerOpen ? undefined : generation.node.id)}
+            >
+              <strong>{activeTool ? t(activeTool.label) : t('generation.tool.custom')}</strong>
+              <span>{t('generation.tool.change')}</span>
+            </button>
+            {toolPickerOpen ? (
+              <div
+                id="generation-tool-picker"
+                className="inspector-generation__tools"
+                role="group"
+                aria-label={t('generation.tool.label')}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Escape') return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setToolPickerNodeId(undefined);
+                  toolPickerButton.current?.focus({ preventScroll: true });
+                }}
+              >
+                {generationTools.map((tool) => (
+                  <button
+                    key={tool.id}
+                    type="button"
+                    disabled={generation.busy || (tool.id === 'text' && generation.inputCount > 0)}
+                    aria-pressed={activeTool?.id === tool.id}
+                    title={t(tool.hint)}
+                    onClick={() => {
+                      generation.onUpdate({
+                        label: t(tool.label),
+                        direction: t(tool.prompt),
+                        textOnly:
+                          tool.id === 'text' ||
+                          (tool.id === 'pattern-create' && generation.inputCount === 0)
+                            ? true
+                            : undefined,
+                        patternTask:
+                          tool.id === 'pattern-create'
+                            ? { kind: 'create', repeat: 'single' }
+                            : tool.id === 'pattern-transfer'
+                              ? { kind: 'transfer', placement: '', scale: 'medium' }
+                              : undefined,
+                        requestedViews: tool.id === 'view' ? ['perspective'] : undefined,
+                        localEdit: ['local', 'erase', 'local-cmf'].includes(tool.id)
+                          ? true
+                          : undefined,
+                        localCmf:
+                          tool.id === 'local-cmf'
+                            ? { color: '', material: '', finish: '' }
+                            : undefined,
+                        localEditMode: tool.id === 'erase' ? 'erase' : undefined,
+                        removeBackground: tool.id === 'cutout' ? true : undefined,
+                        patternPlacement:
+                          tool.id === 'pattern' ? { ...defaultPatternPlacement } : undefined,
+                        editRegion: undefined,
+                        ...(['view', 'pattern'].includes(tool.id) ? { count: 1 } : {}),
+                      });
+                      setToolPickerNodeId(undefined);
+                      toolPickerButton.current?.focus({ preventScroll: true });
+                    }}
+                  >
+                    {t(tool.label)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {activeTool ? <p className="inspector-generation__hint">{t(activeTool.hint)}</p> : null}
+            {generation.inputCount > 0 &&
+            (toolPickerOpen || generation.node.patternTask?.kind === 'create') ? (
+              <p className="inspector-generation__hint">{t('generation.text.disconnect')}</p>
+            ) : null}
+            {generation.node.patternPlacement ? (
+              <PatternEditor
+                base={mainInput?.previewUrl}
+                pattern={orderedInputs.find((item) => item.role === 'reference')?.previewUrl}
+                value={generation.node.patternPlacement}
+                disabled={generation.busy}
+                onChange={(patternPlacement) => generation.onUpdate({ patternPlacement })}
+              />
+            ) : null}
+            {generation.node.patternTask?.kind === 'create' ? (
+              <>
+                <label className="inspector-generation__field">
+                  <span>{t('generation.patternTask.input')}</span>
+                  <select
+                    aria-label={t('generation.patternTask.input')}
+                    disabled={generation.busy}
+                    value={generation.node.textOnly ? 'text' : 'images'}
+                    onChange={(event) =>
+                      generation.onUpdate({ textOnly: event.target.value === 'text' })
+                    }
+                  >
+                    <option value="text" disabled={generation.inputCount > 0}>
+                      {t('generation.patternTask.text')}
+                    </option>
+                    <option value="images">{t('generation.patternTask.images')}</option>
+                  </select>
+                </label>
+                <label className="inspector-generation__field">
+                  <span>{t('generation.patternTask.repeat')}</span>
+                  <select
+                    aria-label={t('generation.patternTask.repeat')}
+                    disabled={generation.busy}
+                    value={generation.node.patternTask.repeat}
+                    onChange={(event) =>
+                      generation.onUpdate({
+                        patternTask: {
+                          kind: 'create',
+                          repeat: event.target.value as 'single' | 'tile',
+                        },
+                      })
+                    }
+                  >
+                    <option value="single">{t('generation.patternTask.single')}</option>
+                    <option value="tile">{t('generation.patternTask.tile')}</option>
+                  </select>
+                </label>
+              </>
+            ) : generation.node.patternTask?.kind === 'transfer' ? (
+              <>
+                <p className="inspector-generation__hint">{t('generation.patternTask.required')}</p>
+                <label className="inspector-generation__field">
+                  <span>{t('generation.patternTask.placement')}</span>
+                  <input
+                    aria-label={t('generation.patternTask.placement')}
+                    disabled={generation.busy}
+                    maxLength={500}
+                    value={generation.node.patternTask.placement}
+                    onChange={(event) =>
+                      generation.onUpdate({
+                        patternTask: {
+                          ...(generation.node.patternTask as Extract<
+                            GenerationNode['patternTask'],
+                            { kind: 'transfer' }
+                          >),
+                          placement: event.target.value,
+                        },
+                      })
+                    }
+                  />
+                </label>
+                <label className="inspector-generation__field">
+                  <span>{t('generation.patternTask.scale')}</span>
+                  <select
+                    aria-label={t('generation.patternTask.scale')}
+                    disabled={generation.busy}
+                    value={generation.node.patternTask.scale}
+                    onChange={(event) =>
+                      generation.onUpdate({
+                        patternTask: {
+                          ...(generation.node.patternTask as Extract<
+                            GenerationNode['patternTask'],
+                            { kind: 'transfer' }
+                          >),
+                          scale: event.target.value as 'small' | 'medium' | 'large',
+                        },
+                      })
+                    }
+                  >
+                    {(['small', 'medium', 'large'] as const).map((scale) => (
+                      <option value={scale} key={scale}>
+                        {t(`generation.patternTask.${scale}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </>
+            ) : null}
+            {generation.node.removeBackground &&
+            (!generation.providers.find((item) => item.id === generation.selectedProviderId)
+              ?.supportsTransparency ||
+              generation.inputs.length !== 1 ||
+              !mainInput) ? (
+              <p role="status">{t('generation.cutout.required')}</p>
+            ) : null}
+            {generation.node.localEdit ? (
+              <>
+                {generation.node.localCmf ? (
+                  <div className="inspector-generation__cmf">
+                    {(['color', 'material', 'finish'] as const).map((field) => (
+                      <label className="inspector-generation__field" key={field}>
+                        <span>{t(`generation.localCmf.${field}`)}</span>
+                        <input
+                          aria-label={t(`generation.localCmf.${field}`)}
+                          maxLength={500}
+                          disabled={generation.busy}
+                          value={generation.node.localCmf![field]}
+                          onChange={(event) =>
+                            generation.onUpdate({
+                              localCmf: {
+                                ...generation.node.localCmf!,
+                                [field]: event.target.value,
+                              },
+                            })
+                          }
+                        />
+                      </label>
+                    ))}
+                    <p className="inspector-generation__hint">
+                      {t('generation.localCmf.fieldsHint')}
+                    </p>
+                  </div>
+                ) : null}
+                <p className="inspector-generation__hint">{t('generation.mask.protectionHint')}</p>
+                {mainInput?.previewUrl && mainInput.sourceAssetId ? (
+                  <RegionEditor
+                    key={`${generation.node.id}:${mainInput.sourceNodeId}:${mainInput.sourceAssetId}`}
+                    source={{
+                      sourceNodeId: mainInput.sourceNodeId,
+                      sourceAssetId: mainInput.sourceAssetId,
+                      previewUrl: mainInput.previewUrl,
+                    }}
+                    region={validRegion}
+                    disabled={generation.busy}
+                    onChange={(editRegion) => generation.onUpdate({ editRegion })}
+                  />
+                ) : (
+                  <p>{t('generation.mask.mainRequired')}</p>
+                )}
+                {!maskSupported ? (
+                  <p role="status">{t('generation.mask.providerRequired')}</p>
+                ) : null}
+              </>
+            ) : null}
+            {activeTool?.id === 'view' ? (
+              <div
+                className="inspector-generation__tools"
+                role="group"
+                aria-label={t('generation.view.label')}
+              >
+                {generationViews.map((view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    disabled={generation.busy}
+                    aria-pressed={generation.node.requestedViews?.includes(view) ?? false}
+                    onClick={() => {
+                      const current = generation.node.requestedViews ?? [];
+                      const next = current.includes(view)
+                        ? current.filter((item) => item !== view)
+                        : [...current, view];
+                      if (!next.length || next.length > 4) return;
+                      generation.onUpdate({ requestedViews: next, count: next.length });
+                    }}
+                  >
+                    {t(`generation.view.${view}`)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {generation.node.requestedViews ? (
+              <p className="inspector-generation__notice">
+                {t('generation.view.batch', { count: generation.node.requestedViews.length })}
+              </p>
+            ) : null}
+            <details className="inspector-section">
+              <summary>{t('generation.tool.label')}</summary>
+              <div>
+                <p>
+                  {t(
+                    generation.node.textOnly
+                      ? 'generation.tool.textHint'
+                      : 'generation.selectSource',
+                  )}
+                </p>
+                <p>{t('generation.tool.limit')}</p>
+                {generationTools.map((tool) => (
+                  <p key={tool.id}>
+                    <strong>{t(tool.label)}</strong>
+                    <br />
+                    {t(tool.hint)}
+                  </p>
+                ))}
+              </div>
+            </details>
+            <DetailSection title={t('generation.notes')}>
+              <label className="inspector-generation__field">
+                <span>{t('generation.notes')}</span>
+                <textarea
+                  aria-label={t('generation.notes')}
+                  onChange={(event) => generation.onUpdate({ notes: event.target.value })}
+                  rows={3}
+                  value={generation.node.notes}
+                />
+              </label>
+            </DetailSection>
+            {generation.candidates.length ? <h2>{t('generation.candidates')}</h2> : null}
+            {generation.candidates.length ? (
+              <p className="inspector-generation__hint">{t('generation.review')}</p>
+            ) : null}
+            <div className="inspector-generation__candidates">
+              {candidateBatches(generation.candidates).map((batch, batchIndex) => (
+                <details
+                  key={batch.id}
+                  className="candidate-batch"
+                  open={
+                    batchIndex === 0 ||
+                    batch.items.some(
+                      ({ candidate }) => candidate.id === generation.selectedCandidateId,
+                    )
+                  }
+                >
+                  <summary>
+                    {batchIndex === 0
+                      ? locale === 'zh-CN'
+                        ? '最近一批'
+                        : 'Latest batch'
+                      : locale === 'zh-CN'
+                        ? '历史批次'
+                        : 'Previous batch'}{' '}
+                    · {batch.items.length}
+                  </summary>
+                  {batch.items.map(({ candidate, index }) => (
+                    <article
+                      aria-label={t('generation.candidateNumber', { number: index + 1 })}
+                      aria-current={
+                        generation.selectedCandidateId === candidate.id ? 'true' : undefined
+                      }
+                      className={
+                        generation.selectedCandidateId === candidate.id
+                          ? 'inspector-generation__candidate is-selected'
+                          : 'inspector-generation__candidate'
+                      }
+                      key={candidate.id}
+                    >
+                      <strong>{t('generation.candidateNumber', { number: index + 1 })}</strong>
+                      {candidate.view ? (
+                        <strong>{t(`generation.view.${candidate.view}`)}</strong>
+                      ) : null}
+                      {generation.selectedCandidateId === candidate.id ? (
+                        <strong className="inspector-generation__selected-label">
+                          {t('generation.selectedOnCanvas')}
+                        </strong>
+                      ) : null}
+                      {generation.previewUrls[candidate.id] ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setReview({ nodeId: generation.node.id, candidateId: candidate.id })
+                          }
+                          aria-label={`${t('generation.viewCandidate')} · ${t('generation.candidateNumber', { number: index + 1 })}`}
+                        >
+                          <img
+                            alt={t('generation.candidateNumber', { number: index + 1 })}
+                            src={generation.previewUrls[candidate.id]}
+                          />
+                        </button>
+                      ) : (
+                        <p>{t('generation.previewUnavailable')}</p>
+                      )}
+                      {candidate.inputSignature !== generation.signature ? (
+                        <small>{t('generation.stale')}</small>
+                      ) : null}
+                      <div>
+                        <button
+                          disabled={Boolean(generation.busyCandidateId)}
+                          onClick={() => generation.onKeep(candidate.id, 'design')}
+                          type="button"
+                        >
+                          {t('generation.keepDesign')}
+                        </button>
+                        <button
+                          disabled={Boolean(generation.busyCandidateId)}
+                          onClick={() => generation.onKeep(candidate.id, 'reference')}
+                          type="button"
+                        >
+                          {t('generation.keepReference')}
+                        </button>
+                        <button
+                          disabled={Boolean(generation.busyCandidateId)}
+                          onClick={() => generation.onDiscard(candidate.id)}
+                          type="button"
+                        >
+                          {t('common.discard')}
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </details>
+              ))}
             </div>
-            <div>
-              <dt>{t('inspector.size')}</dt>
-              <dd>
-                {Math.round(node.width)} × {Math.round(node.height)}
-              </dd>
-            </div>
-          </dl>
-        </DetailSection>
-      ) : null}
-      {node && ['reference', 'image', 'sketch'].includes(node.type) && onCreateConcept ? (
-        <DetailSection title={t('design.createConcept')}>
-          <ManualDesignEditor
-            key={node.id}
-            sourceId={node.id}
-            concept
-            busy={dnaBusy}
-            onCreate={onCreateConcept}
-          />
-        </DetailSection>
-      ) : null}
-      {selectedDesign ? (
-        <>
-          <DetailSection open title={t('inspector.design')}>
+            {review?.nodeId === generation.node.id && generation.candidates.length ? (
+              <CandidateReview
+                key={review.candidateId}
+                generation={generation}
+                initialId={review.candidateId}
+                onClose={() => setReview(undefined)}
+              />
+            ) : null}
+          </section>
+        ) : null}
+        {exploration ? (
+          <DetailSection open title={t('generation.continueExploration')}>
+            <p>{t('generation.manualStepHint')}</p>
+            <ExplorationToolButtons busy={exploration.busy} onChoose={exploration.onChoose} />
+            {exploration.status ? <p role="status">{exploration.status}</p> : null}
+          </DetailSection>
+        ) : null}
+        {node ? (
+          <DetailSection title={t('inspector.basic')}>
+            {node.type === 'text' && onSaveText ? (
+              <TextNoteEditor
+                key={`${node.id}:${node.updatedAt}`}
+                node={node}
+                busy={dnaBusy}
+                onSave={onSaveText}
+              />
+            ) : null}
+            {node.type === 'group' ? (
+              <label className="inspector-group-name">
+                {t('workspace.groupName')}
+                <input
+                  key={`${node.id}:${node.label}`}
+                  defaultValue={node.label}
+                  maxLength={80}
+                  disabled={node.locked || !onRenameGroup}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') event.currentTarget.blur();
+                  }}
+                  onBlur={(event) => {
+                    const label = event.currentTarget.value.trim() || t('node.group');
+                    if (label !== node.label) onRenameGroup?.(node.id, label);
+                  }}
+                />
+              </label>
+            ) : null}
             <dl>
               <div>
-                <dt>{t('inspector.kind')}</dt>
-                <dd>{translateDesignKind(locale, selectedDesign.kind)}</dd>
+                <dt>{t('inspector.type')}</dt>
+                <dd>{translateNodeType(locale, node.type)}</dd>
               </div>
               <div>
-                <dt>{t('inspector.decision')}</dt>
-                <dd className="inspector__status-chip">
-                  {selectedDesign.status === 'approved'
-                    ? t('inspector.approved')
-                    : translateDesignStatus(locale, selectedDesign.status)}
+                <dt>{t('inspector.position')}</dt>
+                <dd>
+                  {Math.round(node.x)}, {Math.round(node.y)}
                 </dd>
               </div>
-              {selectedDesign.parentDesignId ? (
+              <div>
+                <dt>{t('inspector.size')}</dt>
+                <dd>
+                  {Math.round(node.width)} × {Math.round(node.height)}
+                </dd>
+              </div>
+            </dl>
+          </DetailSection>
+        ) : null}
+        {node && ['reference', 'image', 'sketch'].includes(node.type) && onCreateConcept ? (
+          <DetailSection title={t('design.createConcept')}>
+            <ManualDesignEditor
+              key={node.id}
+              sourceId={node.id}
+              concept
+              busy={dnaBusy}
+              onCreate={onCreateConcept}
+            />
+          </DetailSection>
+        ) : null}
+        {selectedDesign ? (
+          <>
+            <DetailSection open title={t('inspector.design')}>
+              <dl>
                 <div>
-                  <dt>{t('inspector.lineageField')}</dt>
-                  <dd>
-                    {t('inspector.variantOf', {
-                      name: parentDesign?.name
-                        ? translateDemoLabel(locale, parentDesign.name)
-                        : t('inspector.missingParent'),
-                    })}
+                  <dt>{t('inspector.kind')}</dt>
+                  <dd>{translateDesignKind(locale, selectedDesign.kind)}</dd>
+                </div>
+                <div>
+                  <dt>{t('inspector.decision')}</dt>
+                  <dd className="inspector__status-chip">
+                    {selectedDesign.status === 'approved'
+                      ? t('inspector.approved')
+                      : translateDesignStatus(locale, selectedDesign.status)}
                   </dd>
+                </div>
+                {selectedDesign.parentDesignId ? (
+                  <div>
+                    <dt>{t('inspector.lineageField')}</dt>
+                    <dd>
+                      {t('inspector.variantOf', {
+                        name: parentDesign?.name
+                          ? translateDemoLabel(locale, parentDesign.name)
+                          : t('inspector.missingParent'),
+                      })}
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
+              {selectedDesign.status === 'approved' ? (
+                <p className="inspector__ready">{t('inspector.readyCad')}</p>
+              ) : null}
+              {onSaveDecision ? (
+                <DesignDecisionEditor
+                  key={`${selectedDesign.id}:${selectedDesign.status}`}
+                  design={selectedDesign}
+                  busy={dnaBusy}
+                  onSave={onSaveDecision}
+                />
+              ) : null}
+            </DetailSection>
+            {onCreateVariant ? (
+              <DetailSection title={t('design.createVariant')}>
+                <ManualDesignEditor
+                  key={selectedDesign.id}
+                  sourceId={selectedDesign.id}
+                  busy={dnaBusy}
+                  onCreate={onCreateVariant}
+                />
+              </DetailSection>
+            ) : null}
+            <DetailSection title={t('inspector.dna')}>
+              <DesignDnaEditor
+                key={selectedDesign.id}
+                design={selectedDesign}
+                busy={dnaBusy}
+                onSave={onSaveDna}
+              />
+            </DetailSection>
+            {manualViews ? (
+              <DetailSection title={t('views.title')}>
+                <ManualViewPanel
+                  key={`${selectedDesign.id}:${node?.id ?? 'design'}`}
+                  designId={selectedDesign.id}
+                  initialId={
+                    node?.type === 'viewset'
+                      ? (node as CanvasNode & { viewSetId: string }).viewSetId
+                      : undefined
+                  }
+                  data={manualViews}
+                  busy={dnaBusy}
+                />
+              </DetailSection>
+            ) : null}
+            {manualCMF ? (
+              <DetailSection title={t('cmf.title')}>
+                <ManualCMFPanel
+                  key={`${selectedDesign.id}:${node?.id ?? 'design'}`}
+                  designId={selectedDesign.id}
+                  initialId={
+                    node?.type === 'cmf' && 'cmfSetId' in node
+                      ? (node.cmfSetId as string)
+                      : undefined
+                  }
+                  data={manualCMF}
+                  busy={dnaBusy}
+                />
+              </DetailSection>
+            ) : null}
+            <DetailSection title={t('inspector.aiActions')}>
+              <p>{t('inspector.aiDescription')}</p>
+              <button onClick={onOpenAi} type="button">
+                {t('inspector.openAi')}
+              </button>
+            </DetailSection>
+          </>
+        ) : null}
+        {node?.type === 'cmf' && !manualCMF ? (
+          <DetailSection title={t('inspector.cmf')}>
+            <p>{t('inspector.cmfDescription')}</p>
+          </DetailSection>
+        ) : null}
+        {modelNode ? (
+          <DetailSection open title={t('inspector.view3d')}>
+            <dl>
+              <div>
+                <dt>{t('inspector.preview')}</dt>
+                <dd>
+                  {modelNode.previewAssetId ? t('inspector.captured') : t('inspector.noCapture')}
+                </dd>
+              </div>
+              <div>
+                <dt>{t('inspector.view')}</dt>
+                <dd>{modelNode.camera?.preset ?? t('threeD.perspective')}</dd>
+              </div>
+              {activeModelAsset ? (
+                <div>
+                  <dt>{t('inspector.model')}</dt>
+                  <dd>{activeModelAsset.name}</dd>
                 </div>
               ) : null}
             </dl>
-            {selectedDesign.status === 'approved' ? (
-              <p className="inspector__ready">{t('inspector.readyCad')}</p>
-            ) : null}
-            {onSaveDecision ? (
-              <DesignDecisionEditor
-                key={`${selectedDesign.id}:${selectedDesign.status}`}
-                design={selectedDesign}
-                busy={dnaBusy}
-                onSave={onSaveDecision}
-              />
-            ) : null}
           </DetailSection>
-          {onCreateVariant ? (
-            <DetailSection title={t('design.createVariant')}>
-              <ManualDesignEditor
-                key={selectedDesign.id}
-                sourceId={selectedDesign.id}
-                busy={dnaBusy}
-                onCreate={onCreateVariant}
-              />
-            </DetailSection>
-          ) : null}
-          <DetailSection title={t('inspector.dna')}>
-            <DesignDnaEditor
-              key={selectedDesign.id}
-              design={selectedDesign}
-              busy={dnaBusy}
-              onSave={onSaveDna}
-            />
-          </DetailSection>
-          {manualViews ? (
-            <DetailSection title={t('views.title')}>
-              <ManualViewPanel
-                key={`${selectedDesign.id}:${node?.id ?? 'design'}`}
-                designId={selectedDesign.id}
-                initialId={
-                  node?.type === 'viewset'
-                    ? (node as CanvasNode & { viewSetId: string }).viewSetId
-                    : undefined
-                }
-                data={manualViews}
-                busy={dnaBusy}
-              />
-            </DetailSection>
-          ) : null}
-          {manualCMF ? (
-            <DetailSection title={t('cmf.title')}>
-              <ManualCMFPanel
-                key={`${selectedDesign.id}:${node?.id ?? 'design'}`}
-                designId={selectedDesign.id}
-                initialId={
-                  node?.type === 'cmf' && 'cmfSetId' in node ? (node.cmfSetId as string) : undefined
-                }
-                data={manualCMF}
-                busy={dnaBusy}
-              />
-            </DetailSection>
-          ) : null}
-          <DetailSection title={t('inspector.aiActions')}>
-            <p>{t('inspector.aiDescription')}</p>
-            <button onClick={onOpenAi} type="button">
-              {t('inspector.openAi')}
-            </button>
-          </DetailSection>
-        </>
-      ) : null}
-      {node?.type === 'cmf' && !manualCMF ? (
-        <DetailSection title={t('inspector.cmf')}>
-          <p>{t('inspector.cmfDescription')}</p>
-        </DetailSection>
-      ) : null}
-      {modelNode ? (
-        <DetailSection open title={t('inspector.view3d')}>
-          <dl>
-            <div>
-              <dt>{t('inspector.preview')}</dt>
-              <dd>
-                {modelNode.previewAssetId ? t('inspector.captured') : t('inspector.noCapture')}
-              </dd>
-            </div>
-            <div>
-              <dt>{t('inspector.view')}</dt>
-              <dd>{modelNode.camera?.preset ?? t('threeD.perspective')}</dd>
-            </div>
-            {activeModelAsset ? (
-              <div>
-                <dt>{t('inspector.model')}</dt>
-                <dd>{activeModelAsset.name}</dd>
-              </div>
-            ) : null}
-          </dl>
-        </DetailSection>
-      ) : null}
+        ) : null}
+      </div>
+      {generationControls}
     </aside>
   );
 }

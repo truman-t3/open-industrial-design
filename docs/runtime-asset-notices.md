@@ -1,5 +1,9 @@
 # 草图字体和解码器原文核验
 
+## 2026-10-13 三维加载器增量复核
+
+应用自有 `model-loader.ts` 增加 LoadingManager 资源失败检测和共享 ImageBitmap 释放。已逐项核对仍使用现有 Three GLTFLoader／DRACOLoader、显式传入的本地解码路径、两个 Worker 上限、Meshopt 和取消／超时逻辑；未替换或修改 Draco 1.5.5 二进制、来源和 LICENSE，也未新增依赖或 CDN 路径。`licenses/release-assets.json` 中该应用源码文件的 SHA256 同步至本次实现；原始解码器字节校验仍由本地运行时构建测试执行。此记录仅覆盖加载器增量，不扩大历史许可或发行批准范围。
+
 ## 已执行替换（2026-10-03）
 
 按所有者要求，网页不再分发许可版本绑定未确认的旧 Liberation Sans 1.05。现使用 **Liberation Sans 2.1.5 / SIL OFL 1.1**；来源为 [Debian 官方字体包 2.1.5-3](https://deb.debian.org/debian/pool/main/f/fonts-liberation/fonts-liberation_2.1.5-3_all.deb)。包内同目录体系的完整版权文件和字体内版本／许可字段相符。OFL 允许随商业软件捆绑使用和分发，但需保留版权与许可，不单独销售字体；应用自有代码仍为 MPL-2.0。

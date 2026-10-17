@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BoxGeometry, Group, Mesh, MeshBasicMaterial } from 'three';
-import { loadModel } from './model-loader';
+import { BoxGeometry, Group, Mesh, MeshBasicMaterial, Texture } from 'three';
+import { disposeModel, loadModel } from './model-loader';
 
 const mocks = vi.hoisted(() => ({
   parse: vi.fn(),
   dispose: vi.fn(),
   path: vi.fn(),
   preload: vi.fn(),
+  manager: undefined as { onError?: (url: string) => void } | undefined,
 }));
 vi.mock('three/examples/jsm/loaders/DRACOLoader.js', () => ({
   DRACOLoader: class {
@@ -28,6 +29,9 @@ vi.mock('three/examples/jsm/loaders/DRACOLoader.js', () => ({
 }));
 vi.mock('three/examples/jsm/loaders/GLTFLoader.js', () => ({
   GLTFLoader: class {
+    constructor(manager: { onError?: (url: string) => void }) {
+      mocks.manager = manager;
+    }
     setDRACOLoader(decoder: { preload(): void }) {
       decoder.preload();
       return this;
@@ -106,6 +110,29 @@ describe('owned model loading', () => {
     finish({ scene: root });
     await rejected;
     await vi.waitFor(() => expect(dispose).toHaveBeenCalledOnce());
+  });
+  it('rejects a model when the loader reports a failed texture even if parsing resolves', async () => {
+    mocks.parse.mockImplementation(async () => {
+      mocks.manager?.onError?.('texture.png');
+      return { scene: scene() };
+    });
+    await expect(loadModel('model', '/local/').promise).rejects.toThrow('texture or buffer');
+  });
+  it('releases shared decoded bitmaps, textures and geometry exactly once', () => {
+    const close = vi.fn();
+    const texture = new Texture({ close } as unknown as ImageBitmap);
+    const material = new MeshBasicMaterial({ map: texture });
+    const geometry = new BoxGeometry();
+    const root = new Group();
+    root.add(new Mesh(geometry, material), new Mesh(geometry, material));
+    const textureDispose = vi.spyOn(texture, 'dispose'),
+      geometryDispose = vi.spyOn(geometry, 'dispose'),
+      materialDispose = vi.spyOn(material, 'dispose');
+    disposeModel(root);
+    expect(close).toHaveBeenCalledOnce();
+    expect(textureDispose).toHaveBeenCalledOnce();
+    expect(geometryDispose).toHaveBeenCalledOnce();
+    expect(materialDispose).toHaveBeenCalledOnce();
   });
   it('rejects empty geometry and releases resources', async () => {
     mocks.parse.mockResolvedValue({ scene: new Group() });

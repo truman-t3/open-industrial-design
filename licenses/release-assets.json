@@ -292,7 +292,7 @@
         {
           "packageName": "@open-industrial-design/three-viewer",
           "file": "src/model-loader.ts",
-          "sha256": "ffa437db95f1c6712f70e17c3b97677c17521537a2d985278fd3c6d2cd5134f4"
+          "sha256": "28cd9edf2b82d350673c00535ef94eb6d169282e9a90035578346fad15966316"
         }
       ],
       "remoteVersion": "1.5.5",

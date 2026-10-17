@@ -3,6 +3,10 @@
 > 本文档定义 Open Industrial Design 的核心领域模型。  
 > 目标：让 Canvas、AI、3D、Local Storage、未来 Cloud 和 Plugin 都围绕同一套稳定语义工作。
 
+## 三维评审增量（2026-10-13）
+
+三维优化复用已有 `Model3DNode.camera`、`previewAssetId`、`BaseNode.designId` 和 ImageNode；新增左／右／底视角以已有相机坐标保存，右视可使用旧 `side` 标记，其他新方向不扩展持久化 preset 枚举。截图 Asset 的现有 metadata 保存来源模型与拍摄相机，模型预览与独立图片卡原子落库，图片卡关联当时选择的 Design，不修改 Design 本身或父子关系。后续改变模型的设计关联不会追溯改写旧截图。glTF 配套资源在导入前嵌入现有模型 Blob，归档仍按原 Asset／Blob 规则打包。schema 9 和 Dexie 版本均不变，无新增迁移，旧工程读取语义保持。
+
 ## 当前选区与分组实现（2026-10-03）
 
 2026-10-04 用户资料库数据层：可选 `Project.researchLibrary` 保存 `ResearchEntry[]` 与 `ResearchCollection[]`。条目包含标题、说明、标签、来源链接、可选图片 Asset 引用及用户填写的品牌／产品／记录日期；没有图片时需有文字或链接，不虚构文件 Asset。收藏板只保存条目 ID，同一条目可属于多个收藏板，收藏组织不等于 Canvas Board 或 Design 血缘。最多 2000 条资料、200 个收藏板；校验字段白名单、长度、真实日期、身份唯一性、成员引用和图片项目归属。此字段加入未发布 schema 9，无新 Dexie 表，旧工程缺省不变；工程导入／导出都校验并保留记录。Repository 比较调用方读取的旧资料后单事务保存，旧版本写入拒绝；常规项目保存及画布快照保留数据库中的最新资料，不负责覆盖该字段。此处只有领域、存储与工程契约，收藏界面及分析文字证据尚待接通。

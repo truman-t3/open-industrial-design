@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { Vector3 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 /** Adapter only: camera persistence remains owned by CameraDirector. */
@@ -10,11 +11,13 @@ export function ViewerOrbitControls() {
   const invalidate = useThree((state) => state.invalidate);
   const get = useThree((state) => state.get);
   const set = useThree((state) => state.set);
+  const lastTarget = useRef(new Vector3());
   const active = useRef<OrbitControls | null>(null);
 
   useEffect(() => {
     const previous = get().controls;
     const controls = new OrbitControls(camera, element);
+    controls.target.copy(lastTarget.current);
     controls.enableDamping = true;
     controls.enablePan = true;
     controls.enableRotate = true;
@@ -25,6 +28,7 @@ export function ViewerOrbitControls() {
     set({ controls });
     invalidate();
     return () => {
+      lastTarget.current.copy(controls.target);
       controls.removeEventListener('change', onChange);
       controls.dispose();
       if (active.current === controls) active.current = null;

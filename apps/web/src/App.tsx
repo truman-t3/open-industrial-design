@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { dracoDecoderPath } from './runtime-assets';
 import { prepareEditMask, protectLocalEdit, protectCutout, composePattern } from './edit-mask';
 import { defaultPatternPlacement } from '@open-industrial-design/design-model';
@@ -87,10 +87,7 @@ import {
   validateProjectArchiveData,
   type ProjectArchiveData,
 } from '@open-industrial-design/project-file';
-import {
-  createModelMetadata,
-  validateModelFile,
-} from '@open-industrial-design/three-viewer/adapter';
+import { createModelMetadata } from '@open-industrial-design/three-viewer/adapter';
 import type {
   Board,
   BaseNode,
@@ -117,6 +114,7 @@ import type {
   ReferenceNode,
   MaterialKnowledge,
   Model3DNode,
+  ImageNode,
 } from '@open-industrial-design/design-model';
 import {
   PROJECT_SCHEMA_VERSION,
@@ -141,7 +139,6 @@ import {
   ActionCommandPalette,
   ActionContextMenu,
   CandidateTrayPanel,
-  LanguageSelector,
   ProviderSettings,
   useLocalization,
   type ProviderSettingsDraft,
@@ -153,6 +150,7 @@ import { loadProjectCover } from './project-cover';
 import { WorkspaceInspector } from './workspace-inspector';
 import { WorkspaceSidebar } from './workspace-sidebar';
 import { UiIcon } from './ui-icons';
+import { WorkspaceSettingsMenu } from './workspace-settings-menu';
 
 const database = new OpenIndustrialDesignDatabase();
 const repository = new DexieProjectRepository(database);
@@ -620,6 +618,7 @@ export function App() {
   const [queueOpen, setQueueOpen] = useState(false);
   const [materialsOpen, setMaterialsOpen] = useState(false);
   const [canvasFocused, setCanvasFocused] = useState(false);
+  const [boardSidebarOpen, setBoardSidebarOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [canvasToolsExpanded, setCanvasToolsExpanded] = useState(false);
   useEffect(() => {
@@ -719,6 +718,14 @@ export function App() {
   const [cmfVariants, setCMFVariants] = useState<CMFVariant[]>([]);
   const [activeModelAssetId, setActiveModelAssetId] = useState<string>();
   const [activeModelUrl, setActiveModelUrl] = useState<string>();
+  const [modelImportBusy, setModelImportBusy] = useState(false);
+  const modelImportController = useRef<AbortController | undefined>(undefined);
+  useEffect(
+    () => () => {
+      modelImportController.current?.abort();
+    },
+    [project.id, board.id, appView],
+  );
   const [viewerStatus, setViewerStatus] = useState<string>();
   const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -1207,11 +1214,14 @@ export function App() {
   const flushPendingSave = useCallback(async () => {
     if (!hydrated) return false;
     const attempt = ++saveAttempt.current;
-    const currentNodes = nodesRef.current;
-    const inputs = saveInputs.current;
+    let currentNodes = nodesRef.current;
+    let inputs = saveInputs.current;
     setSaveStatus('saving');
     setSaveError(undefined);
     const result = await saveQueue.current(async () => {
+      // Read at execution time: an earlier queued domain action may have added cards.
+      currentNodes = nodesRef.current;
+      inputs = saveInputs.current;
       const now = Date.now();
       await repository.saveSnapshot({
         project: { ...inputs.project, updatedAt: now },
@@ -2909,10 +2919,29 @@ export function App() {
     }
     void openModelAsset(asset);
   };
-  const importModel = async (file: File) => {
+  // A camera settling at the same time can supersede an autosave snapshot.
+  // Retry the local flush with current refs before committing a viewer mutation.
+  const flushViewerSave = useCallback(async () => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (await flushPendingSave()) return true;
+    }
+    return false;
+  }, [flushPendingSave]);
+  const importModel = async (files: File[]) => {
+    if (modelImportController.current) return;
+    const controller = new AbortController();
+    modelImportController.current = controller;
+    setModelImportBusy(true);
     setViewerStatus(undefined);
     try {
-      const validation = validateModelFile(file);
+      const { prepareModelImport } = await import('@open-industrial-design/three-viewer');
+      const prepared = await prepareModelImport(files, dracoDecoderPath, controller.signal, locale);
+      if (!(await flushViewerSave())) throw new Error(t('threeD.saveBeforeImport'));
+      controller.signal.throwIfAborted();
+      if (saveInputs.current.project.id !== project.id || saveInputs.current.board.id !== board.id)
+        return;
+      const file = prepared.blob;
+      const validation = prepared;
       const timestamp = Date.now();
       const assetId = crypto.randomUUID();
       const asset: Asset = {
@@ -2921,39 +2950,46 @@ export function App() {
         updatedAt: timestamp,
         projectId: project.id,
         type: 'model3d',
-        name: file.name,
+        name: prepared.name,
         mimeType: validation.mimeType,
         size: file.size,
         storage: { type: 'indexeddb', blobId: assetId },
-        metadata: createModelMetadata(validation.format, file.name),
+        metadata: createModelMetadata(validation.format, prepared.name),
       };
       const modelNode = createModel3DNode({
         boardId: board.id,
         assetId,
-        ...findFreeNodePosition(nodes, { x: 160, y: 180, width: 320, height: 220 }),
+        ...findFreeNodePosition(nodesRef.current, { x: 160, y: 180, width: 320, height: 220 }),
         width: 320,
         height: 220,
         rotation: 0,
-        zIndex: nodes.length + 1,
+        zIndex: nodesRef.current.length + 1,
       });
       const canvasModelNode = {
         ...modelNode,
-        label: `3D — ${file.name}`,
+        label: `3D — ${prepared.name}`,
       } as CanvasNode & Model3DNode;
-      await threeViewerStorage.saveImportedModel({
-        asset,
-        blob: file,
-        node: canvasModelNode,
+      const result = await saveQueue.current(async () => {
+        controller.signal.throwIfAborted();
+        await threeViewerStorage.saveImportedModel({ asset, blob: file, node: canvasModelNode });
+        if (saveInputs.current.board.id !== board.id) return;
+        // Publish before releasing the queue so the next snapshot includes this card.
+        commit([...nodesRef.current, canvasModelNode]);
+        setModelAssets((current) => [...current, asset]);
       });
-      setModelAssets((current) => [...current, asset]);
-      commit([...nodes, canvasModelNode]);
+      if (!result.ok) throw result.error;
+      if (controller.signal.aborted) return;
       await openModelAsset(asset);
     } catch (error) {
+      if (controller.signal.aborted) return;
       setViewerStatus(
         t('feedback.modelImportFailed', {
           error: error instanceof Error ? error.message : t('feedback.unknown'),
         }),
       );
+    } finally {
+      modelImportController.current = undefined;
+      setModelImportBusy(false);
     }
   };
   const persistViewerCamera = useCallback(
@@ -2962,7 +2998,7 @@ export function App() {
       if (sameCameraState(activeModelNode.camera, camera)) return;
       const updatedNode = { ...activeModelNode, camera };
       setNodes((current) =>
-        current.map((node) => (node.id === updatedNode.id ? updatedNode : node)),
+        current.map((node) => (node.id === updatedNode.id ? { ...node, camera } : node)),
       );
       void threeViewerStorage.saveViewerState(updatedNode).catch((error: unknown) => {
         setViewerStatus(
@@ -2975,7 +3011,7 @@ export function App() {
     [activeModelNode],
   );
   const captureViewer = useCallback(
-    async (blob: Blob, camera: CameraState) => {
+    async (blob: Blob, camera: CameraState, size: { width: number; height: number }) => {
       if (!activeModelAsset || !activeModelNode) return;
       const timestamp = Date.now();
       const captureId = crypto.randomUUID();
@@ -2988,18 +3024,53 @@ export function App() {
         name: `${activeModelAsset.name} preview.png`,
         mimeType: 'image/png',
         size: blob.size,
+        width: size.width,
+        height: size.height,
         storage: { type: 'indexeddb', blobId: captureId },
         metadata: {
           sourceModelAssetId: activeModelAsset.id,
           viewPreset: camera.preset ?? 'custom',
+          camera: { ...camera },
         },
       };
-      const updatedNode = { ...activeModelNode, camera, previewAssetId: captureId };
+      const updatedNode = { ...activeModelNode, previewAssetId: captureId };
+      const position = findFreeNodePosition(nodesRef.current, {
+        x: activeModelNode.x + activeModelNode.width + 40,
+        y: activeModelNode.y,
+        width: 320,
+        height: Math.max(80, (320 * size.height) / size.width),
+      });
+      const imageNode: ImageNode & { label: string } = {
+        id: crypto.randomUUID(),
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        boardId: board.id,
+        type: 'image',
+        assetId: captureId,
+        ...position,
+        width: 320,
+        height: Math.max(80, (320 * size.height) / size.width),
+        rotation: 0,
+        zIndex: nodesRef.current.length + 1,
+        label: asset.name,
+        ...(activeModelNode.designId ? { designId: activeModelNode.designId } : {}),
+      };
       try {
-        await threeViewerStorage.saveCapture({ asset, blob, node: updatedNode });
-        setNodes((current) =>
-          current.map((node) => (node.id === updatedNode.id ? updatedNode : node)),
-        );
+        if (!(await flushViewerSave())) throw new Error(t('threeD.saveBeforeImport'));
+        if (saveInputs.current.board.id !== board.id) return;
+        const result = await saveQueue.current(async () => {
+          if (saveInputs.current.board.id !== board.id) return;
+          await threeViewerStorage.saveCapture({ asset, blob, node: updatedNode, imageNode });
+          if (saveInputs.current.board.id !== board.id) return;
+          commit([
+            ...nodesRef.current.map((node) =>
+              node.id === updatedNode.id ? { ...node, previewAssetId: captureId } : node,
+            ),
+            imageNode as CanvasNode,
+          ]);
+        });
+        if (!result.ok) throw result.error;
+        if (saveInputs.current.board.id !== board.id) return;
         registerPreviewUrl(captureId, blob);
         setViewerStatus(t('feedback.captureSaved'));
       } catch (error) {
@@ -3010,7 +3081,15 @@ export function App() {
         );
       }
     },
-    [activeModelAsset, activeModelNode, project.id, registerPreviewUrl],
+    [
+      activeModelAsset,
+      activeModelNode,
+      project.id,
+      board.id,
+      registerPreviewUrl,
+      flushViewerSave,
+      commit,
+    ],
   );
   const handleViewerError = useCallback((message: string) => setViewerStatus(message), []);
   const namingDialog = namingIntent ? (
@@ -3152,10 +3231,6 @@ export function App() {
           </button>
           <div className="project-title">
             <strong>{translateDemoLabel(locale, project.name)}</strong>
-            <span aria-hidden="true" className="project-title__separator">
-              /
-            </span>
-            <span className="project-title__board">{translateDemoLabel(locale, board.name)}</span>
             <span
               className={
                 saveStatus === 'failed' ? 'save-indicator save-indicator--failed' : 'save-indicator'
@@ -3165,12 +3240,16 @@ export function App() {
               {saveLabel}
             </span>
           </div>
-          <div className="workspace-actions">
+          <nav
+            className="workspace-modes"
+            aria-label={locale === 'zh-CN' ? '工作模式' : 'Workspace modes'}
+          >
             <button
               className={
                 workspaceMode === 'canvas' ? 'workspace-tab workspace-tab--active' : 'workspace-tab'
               }
               onClick={() => setWorkspaceMode('canvas')}
+              aria-current={workspaceMode === 'canvas' ? 'page' : undefined}
               type="button"
             >
               {t('workspace.canvas')}
@@ -3180,6 +3259,7 @@ export function App() {
                 workspaceMode === 'graph' ? 'workspace-tab workspace-tab--active' : 'workspace-tab'
               }
               onClick={() => setWorkspaceMode('graph')}
+              aria-current={workspaceMode === 'graph' ? 'page' : undefined}
               type="button"
             >
               {t('workspace.graph')}
@@ -3189,11 +3269,13 @@ export function App() {
                 workspaceMode === 'viewer' ? 'workspace-tab workspace-tab--active' : 'workspace-tab'
               }
               onClick={openSelectedModel}
+              aria-current={workspaceMode === 'viewer' ? 'page' : undefined}
               type="button"
             >
               3D
             </button>
             <button
+              className="workspace-tab"
               onClick={() => {
                 setSketchDraft(undefined);
                 setEditingSketch(true);
@@ -3202,12 +3284,26 @@ export function App() {
             >
               {t('workspace.sketch')}
             </button>
-            <button onClick={() => setAiWorkbenchOpen((open) => !open)} type="button">
-              {t('workspace.ai')}
+          </nav>
+          <div className="workspace-actions">
+            <button
+              className="workspace-ai-toggle"
+              aria-label={locale === 'zh-CN' ? 'AI 助手' : 'AI assistant'}
+              aria-pressed={aiWorkbenchOpen}
+              onClick={() => setAiWorkbenchOpen((open) => !open)}
+              type="button"
+            >
+              <UiIcon name="sparkles" size={18} />
+              <span>{locale === 'zh-CN' ? 'AI 助手' : 'AI assistant'}</span>
             </button>
-            <LanguageSelector compact />
+            <WorkspaceSettingsMenu
+              onProviders={() => setProviderSettingsOpen(true)}
+              onAbout={() => setAboutOpen(true)}
+            />
             <details className="workspace-menu">
-              <summary>{t('workspace.project')}</summary>
+              <summary aria-label={t('workspace.project')} title={t('workspace.project')}>
+                <UiIcon name="more" size={18} />
+              </summary>
               <div>
                 <nav aria-label={t('workspace.boards')} className="workspace-menu__navigation">
                   <button onClick={() => void goHome()} type="button">
@@ -3245,12 +3341,6 @@ export function App() {
                 >
                   {t('workspace.import')}
                 </button>
-                <button onClick={() => setProviderSettingsOpen(true)} type="button">
-                  {t('workspace.providerSettings')}
-                </button>
-                <button onClick={() => setAboutOpen(true)} type="button">
-                  {locale === 'zh-CN' ? '关于与更新' : 'About & updates'}
-                </button>
                 <button onClick={() => setCommandPaletteOpen(true)} type="button">
                   {t('workspace.commands')}
                 </button>
@@ -3273,14 +3363,32 @@ export function App() {
           </div>
         ) : null}
         {workspaceMode === 'viewer' ? (
-          <section aria-label={t('threeD.workspace')} className="viewer-workspace">
+          <section
+            aria-label={t('threeD.workspace')}
+            className="viewer-workspace"
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              if (event.dataTransfer.files.length)
+                void importModel(Array.from(event.dataTransfer.files));
+            }}
+          >
             <div className="viewer-workspace__toolbar">
-              <button onClick={() => modelImportInputRef.current?.click()} type="button">
-                {t('threeD.import')}
+              <button
+                disabled={modelImportBusy}
+                onClick={() => modelImportInputRef.current?.click()}
+                type="button"
+              >
+                {t(modelImportBusy ? 'threeD.importing' : 'threeD.import')}
               </button>
               <label>
                 {t('threeD.model')}
                 <select
+                  aria-label={t('threeD.model')}
                   onChange={(event) => {
                     const asset = modelAssets.find(
                       (candidate) => candidate.id === event.target.value,
@@ -3297,6 +3405,42 @@ export function App() {
                   ))}
                 </select>
               </label>
+              {activeModelNode ? (
+                <label>
+                  {t('threeD.design')}
+                  <select
+                    aria-label={t('threeD.design')}
+                    value={activeModelNode.designId ?? ''}
+                    disabled={activeModelNode.locked}
+                    onChange={(event) => {
+                      const designId = event.target.value || undefined;
+                      void threeViewerStorage
+                        .saveModelDesign(activeModelNode.id, designId)
+                        .then((updated) => {
+                          setNodes((current) =>
+                            current.map((node) =>
+                              node.id === updated.id
+                                ? { ...node, designId: updated.designId }
+                                : node,
+                            ),
+                          );
+                        })
+                        .catch(() =>
+                          setViewerStatus(
+                            t('feedback.modelOpenFailed', { error: t('feedback.unknown') }),
+                          ),
+                        );
+                    }}
+                  >
+                    <option value="">{t('threeD.noDesign')}</option>
+                    {designs.map((design) => (
+                      <option key={design.id} value={design.id}>
+                        {design.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
               <button onClick={() => setWorkspaceMode('canvas')} type="button">
                 {t('threeD.return')}
               </button>
@@ -3314,7 +3458,7 @@ export function App() {
                   key={activeModelAsset.id}
                   modelUrl={activeModelUrl}
                   onCameraChange={persistViewerCamera}
-                  onCapture={(blob, camera) => void captureViewer(blob, camera)}
+                  onCapture={captureViewer}
                   onError={handleViewerError}
                   locale={locale}
                 />
@@ -3323,17 +3467,21 @@ export function App() {
               <div className="viewer-workspace__empty">
                 <h1>{t('threeD.title')}</h1>
                 <p>{t('threeD.empty')}</p>
+                <p>{t('threeD.importHint')}</p>
               </div>
             )}
             {viewerStatus ? (
-              <p className="viewer-workspace__status" role="status">
+              <p
+                className={`viewer-workspace__status${viewerStatus === t('feedback.captureSaved') ? ' is-success' : ''}`}
+                role="status"
+              >
                 {viewerStatus}
               </p>
             ) : null}
           </section>
         ) : (
           <div
-            className={`workspace${canvasFocused && workspaceMode === 'canvas' ? ' workspace--focused' : ''}`}
+            className={`workspace${workspaceMode === 'canvas' ? ' workspace--canvas' : ''}${!boardSidebarOpen && workspaceMode === 'canvas' ? ' workspace--boards-collapsed' : ''}${canvasFocused && workspaceMode === 'canvas' ? ' workspace--focused' : ''}`}
           >
             <WorkspaceSidebar
               boards={boards}
@@ -3354,18 +3502,32 @@ export function App() {
             <div className="workspace-surface">
               <div className="workspace-surface__toolbar">
                 <div className="workspace-surface__heading">
+                  {workspaceMode === 'canvas' && !canvasFocused ? (
+                    <button
+                      className="workspace-board-toggle"
+                      aria-label={t('workspace.boards')}
+                      type="button"
+                      aria-expanded={boardSidebarOpen}
+                      onClick={() => setBoardSidebarOpen((value) => !value)}
+                    >
+                      <UiIcon name="board" size={17} />
+                      <span>{t('workspace.boards')}</span>
+                    </button>
+                  ) : null}
                   {workspaceMode === 'canvas' ? (
                     <button
                       type="button"
+                      className="workspace-focus-toggle button--ghost button--icon"
+                      aria-label={t(
+                        canvasFocused ? 'workspace.exitFocus' : 'workspace.focusCanvas',
+                      )}
+                      title={t(canvasFocused ? 'workspace.exitFocus' : 'workspace.focusCanvas')}
                       aria-pressed={canvasFocused}
                       onClick={() => setCanvasFocused((value) => !value)}
                     >
-                      {t(canvasFocused ? 'workspace.exitFocus' : 'workspace.focusCanvas')}
+                      <UiIcon name={canvasFocused ? 'collapse' : 'expand'} size={17} />
                     </button>
                   ) : null}
-                  <span>
-                    {workspaceMode === 'canvas' ? t('workspace.canvas') : t('workspace.graph')}
-                  </span>
                   <strong>{translateDemoLabel(locale, board.name)}</strong>
                 </div>
                 {workspaceMode === 'canvas' ? (
@@ -3521,21 +3683,21 @@ export function App() {
                     </div>
                     <button
                       aria-label={t('workspace.undo')}
-                      className="workspace-surface__icon-button"
+                      className="workspace-surface__icon-button button--ghost button--icon"
                       onClick={undo}
                       title={t('workspace.undo')}
                       type="button"
                     >
-                      <UiIcon name="undo" size={14} />
+                      <UiIcon name="undo" size={16} />
                     </button>
                     <button
                       aria-label={t('workspace.redo')}
-                      className="workspace-surface__icon-button"
+                      className="workspace-surface__icon-button button--ghost button--icon"
                       onClick={redo}
                       title={t('workspace.redo')}
                       type="button"
                     >
-                      <UiIcon name="redo" size={14} />
+                      <UiIcon name="redo" size={16} />
                     </button>
                   </div>
                 ) : (
@@ -3592,53 +3754,58 @@ export function App() {
                         'workspace.image',
                       ] as const
                     ).map((item, index) => (
-                      <button
-                        aria-label={t(item)}
-                        aria-pressed={
-                          index < 2
-                            ? (index === 0 && canvasInteractionMode === 'select') ||
-                              (index === 1 && canvasInteractionMode === 'pan')
-                            : undefined
-                        }
-                        className={
-                          (index === 0 && canvasInteractionMode === 'select') ||
-                          (index === 1 && canvasInteractionMode === 'pan')
-                            ? 'tool-button tool-button--active'
-                            : 'tool-button'
-                        }
-                        disabled={generationBusy || !hydrated}
-                        key={item}
-                        onClick={
-                          index === 0
-                            ? () => setCanvasInteractionMode('select')
-                            : index === 1
-                              ? () => setCanvasInteractionMode('pan')
-                              : index === 2
-                                ? () =>
-                                    void saveTextNote(undefined, t('text.default'), 20).catch(() =>
-                                      setSaveError(t('text.failed')),
-                                    )
-                                : () => {
-                                    imageImportKindRef.current = 'image';
-                                    referenceImportInputRef.current?.click();
-                                  }
-                        }
-                        title={index === 1 ? t('workspace.panShortcut') : t(item)}
-                        type="button"
-                      >
-                        <UiIcon
-                          name={
-                            index === 0
-                              ? 'select'
-                              : index === 1
-                                ? 'hand'
-                                : index === 2
-                                  ? 'text'
-                                  : 'image'
+                      <Fragment key={item}>
+                        {index === 2 ? (
+                          <span aria-hidden="true" className="canvas-floating-tools__divider" />
+                        ) : null}
+                        <button
+                          aria-label={t(item)}
+                          aria-pressed={
+                            index < 2
+                              ? (index === 0 && canvasInteractionMode === 'select') ||
+                                (index === 1 && canvasInteractionMode === 'pan')
+                              : undefined
                           }
-                          size={17}
-                        />
-                      </button>
+                          className={
+                            (index === 0 && canvasInteractionMode === 'select') ||
+                            (index === 1 && canvasInteractionMode === 'pan')
+                              ? 'tool-button tool-button--active'
+                              : 'tool-button'
+                          }
+                          disabled={generationBusy || !hydrated}
+                          key={item}
+                          onClick={
+                            index === 0
+                              ? () => setCanvasInteractionMode('select')
+                              : index === 1
+                                ? () => setCanvasInteractionMode('pan')
+                                : index === 2
+                                  ? () =>
+                                      void saveTextNote(undefined, t('text.default'), 20).catch(
+                                        () => setSaveError(t('text.failed')),
+                                      )
+                                  : () => {
+                                      imageImportKindRef.current = 'image';
+                                      referenceImportInputRef.current?.click();
+                                    }
+                          }
+                          title={index === 1 ? t('workspace.panShortcut') : t(item)}
+                          type="button"
+                        >
+                          <UiIcon
+                            name={
+                              index === 0
+                                ? 'select'
+                                : index === 1
+                                  ? 'hand'
+                                  : index === 2
+                                    ? 'text'
+                                    : 'image'
+                            }
+                            size={16}
+                          />
+                        </button>
+                      </Fragment>
                     ))}
                     <span aria-hidden="true" className="canvas-floating-tools__divider" />
                     <button
@@ -3646,9 +3813,10 @@ export function App() {
                       className="tool-button"
                       disabled={selectedIds.length < 2}
                       title={t('workspace.groupHint')}
+                      aria-label={t('workspace.group')}
                       onClick={() => runWorkspaceAction('workspace.groupSelection')}
                     >
-                      {t('workspace.group')}
+                      <UiIcon name="group" size={18} />
                     </button>
                     <button
                       type="button"
@@ -3658,10 +3826,12 @@ export function App() {
                           (node) => node.type === 'group' && selectedIds.includes(node.id),
                         )
                       }
+                      aria-label={t('workspace.ungroup')}
                       onClick={() => runWorkspaceAction('workspace.ungroupSelection')}
                     >
-                      {t('workspace.ungroup')}
+                      <UiIcon name="ungroup" size={18} />
                     </button>
+                    <span aria-hidden="true" className="canvas-floating-tools__divider" />
                     <button
                       aria-label={t('workspace.duplicate')}
                       className="tool-button"
@@ -3670,7 +3840,7 @@ export function App() {
                       title={t('workspace.duplicate')}
                       type="button"
                     >
-                      <UiIcon name="copy" size={17} />
+                      <UiIcon name="copy" size={16} />
                     </button>
                     <button
                       aria-label={t('common.delete')}
@@ -3680,7 +3850,7 @@ export function App() {
                       title={t('common.delete')}
                       type="button"
                     >
-                      <UiIcon name="trash" size={17} />
+                      <UiIcon name="trash" size={16} />
                     </button>
                   </nav>
                   <CanvasWorkspace
@@ -3983,13 +4153,14 @@ export function App() {
           type="file"
         />
         <input
-          accept=".glb,.gltf,model/gltf-binary,model/gltf+json"
+          accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp,.ktx2,model/gltf-binary,model/gltf+json"
+          multiple
           aria-label={t('threeD.import')}
           className="archive-file-input"
           onChange={(event) => {
-            const file = event.currentTarget.files?.[0];
+            const files = Array.from(event.currentTarget.files ?? []);
             event.currentTarget.value = '';
-            if (file) void importModel(file);
+            if (files.length) void importModel(files);
           }}
           ref={modelImportInputRef}
           type="file"

@@ -2173,44 +2173,151 @@ export class DexieThreeViewerStorage {
   async saveImportedModel(input: { asset: Asset; blob: Blob; node: Model3DNode }) {
     const blobId =
       input.asset.storage.type === 'indexeddb' ? input.asset.storage.blobId : undefined;
-    if (!blobId) throw new Error('Imported 3D models must use IndexedDB Blob storage.');
+    if (!blobId || input.asset.type !== 'model3d' || input.node.assetId !== input.asset.id)
+      throw new Error('Invalid imported model.');
     await this.database.transaction(
       'rw',
-      [this.database.assets, this.database.assetBlobs, this.database.nodes, this.database.boards],
+      [
+        this.database.assets,
+        this.database.assetBlobs,
+        this.database.nodes,
+        this.database.boards,
+        this.database.projects,
+      ],
       async () => {
         const board = await this.database.boards.get(input.node.boardId);
-        if (!board) throw new Error('Cannot save a 3D model because its Board no longer exists.');
-        await Promise.all([
-          this.database.assets.put(input.asset),
-          this.database.assetBlobs.put({ id: blobId, blob: input.blob }),
-          this.database.nodes.put(input.node),
-          this.database.boards.put({
-            ...board,
-            nodeIds: [...new Set([...board.nodeIds, input.node.id])],
-            updatedAt: Date.now(),
-          }),
-        ]);
+        const project = await this.database.projects.get(input.asset.projectId);
+        if (
+          !board ||
+          !project ||
+          board.projectId !== project.id ||
+          !project.boardIds.includes(board.id)
+        )
+          throw new Error('The model Board is unavailable.');
+        if (
+          (await this.database.assets.get(input.asset.id)) ||
+          (await this.database.assetBlobs.get(blobId)) ||
+          (await this.database.nodes.get(input.node.id))
+        )
+          throw new Error('Model identity already exists.');
+        await this.database.assets.add(input.asset);
+        await this.database.assetBlobs.add({ id: blobId, blob: input.blob });
+        await this.database.nodes.add(input.node);
+        await this.database.boards.put({
+          ...board,
+          nodeIds: [...board.nodeIds, input.node.id],
+          updatedAt: Date.now(),
+        });
+        await this.database.projects.update(project.id, { updatedAt: Date.now() });
       },
     );
   }
 
-  saveViewerState(node: Model3DNode) {
-    return this.database.nodes.put(node).then(() => undefined);
+  async saveViewerState(node: Model3DNode) {
+    await this.database.transaction('rw', this.database.nodes, async () => {
+      const current = await this.database.nodes.get(node.id);
+      if (
+        !current ||
+        current.type !== 'model3d' ||
+        current.boardId !== node.boardId ||
+        (current as Model3DNode).assetId !== node.assetId
+      )
+        throw new Error('The model node is no longer available.');
+      // A delayed camera write must not restore stale previews, design links or geometry.
+      await this.database.nodes.put({
+        ...current,
+        camera: node.camera,
+        updatedAt: Date.now(),
+      } as Model3DNode);
+    });
   }
 
-  async saveCapture(input: { asset: Asset; blob: Blob; node: Model3DNode }) {
+  async saveModelDesign(nodeId: string, designId?: string) {
+    return this.database.transaction(
+      'rw',
+      [this.database.nodes, this.database.boards, this.database.designs],
+      async () => {
+        const current = await this.database.nodes.get(nodeId);
+        if (!current || current.type !== 'model3d' || current.locked)
+          throw new Error('The model cannot be edited.');
+        const board = await this.database.boards.get(current.boardId);
+        const design = designId ? await this.database.designs.get(designId) : undefined;
+        if (!board || (designId && (!design || design.projectId !== board.projectId)))
+          throw new Error('The design does not belong to this project.');
+        const updated = { ...current, updatedAt: Date.now() } as Model3DNode;
+        if (designId) updated.designId = designId;
+        else delete updated.designId;
+        await this.database.nodes.put(updated);
+        return updated;
+      },
+    );
+  }
+
+  async saveCapture(input: { asset: Asset; blob: Blob; node: Model3DNode; imageNode?: ImageNode }) {
     const blobId =
       input.asset.storage.type === 'indexeddb' ? input.asset.storage.blobId : undefined;
-    if (!blobId) throw new Error('3D captures must use IndexedDB Blob storage.');
+    if (!blobId || input.asset.type !== 'image' || input.node.previewAssetId !== input.asset.id)
+      throw new Error('Invalid model capture.');
     await this.database.transaction(
       'rw',
-      [this.database.assets, this.database.assetBlobs, this.database.nodes],
+      [
+        this.database.assets,
+        this.database.assetBlobs,
+        this.database.nodes,
+        this.database.boards,
+        this.database.projects,
+        this.database.designs,
+      ],
       async () => {
-        await Promise.all([
-          this.database.assets.put(input.asset),
-          this.database.assetBlobs.put({ id: blobId, blob: input.blob }),
-          this.database.nodes.put(input.node),
-        ]);
+        const current = await this.database.nodes.get(input.node.id);
+        const board = await this.database.boards.get(input.node.boardId);
+        if (
+          !current ||
+          current.type !== 'model3d' ||
+          (current as Model3DNode).assetId !== input.node.assetId ||
+          current.boardId !== input.node.boardId ||
+          !board ||
+          board.projectId !== input.asset.projectId ||
+          !board.nodeIds.includes(current.id)
+        )
+          throw new Error('The source model is no longer available.');
+        if (
+          (await this.database.assets.get(input.asset.id)) ||
+          (await this.database.assetBlobs.get(blobId))
+        )
+          throw new Error('Capture identity already exists.');
+        const image = input.imageNode;
+        if (image) {
+          if (
+            image.type !== 'image' ||
+            image.boardId !== board.id ||
+            image.assetId !== input.asset.id ||
+            image.designId !== current.designId ||
+            (await this.database.nodes.get(image.id))
+          )
+            throw new Error('Invalid capture image node.');
+          if (image.designId) {
+            const design = await this.database.designs.get(image.designId);
+            if (!design || design.projectId !== board.projectId)
+              throw new Error('Capture design is unavailable.');
+          }
+        }
+        await this.database.assets.add(input.asset);
+        await this.database.assetBlobs.add({ id: blobId, blob: input.blob });
+        await this.database.nodes.put({
+          ...current,
+          previewAssetId: input.asset.id,
+          updatedAt: Date.now(),
+        } as Model3DNode);
+        if (image) {
+          await this.database.nodes.add(image);
+          await this.database.boards.put({
+            ...board,
+            nodeIds: [...board.nodeIds, image.id],
+            updatedAt: Date.now(),
+          });
+        }
+        await this.database.projects.update(board.projectId, { updatedAt: Date.now() });
       },
     );
   }

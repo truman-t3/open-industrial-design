@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { LocalizationProvider } from '@open-industrial-design/ui';
 import { App } from './App';
 import './styles.css';
+import './workspace-visual.css';
 
 const rootElement = document.getElementById('root');
 

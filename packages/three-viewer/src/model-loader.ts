@@ -1,4 +1,4 @@
-import { Box3, type Material, type Mesh, type Object3D, Texture } from 'three';
+import { Box3, LoadingManager, type Material, type Mesh, type Object3D, Texture } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
@@ -25,7 +25,23 @@ export function disposeModel(scene: Object3D) {
     dispose(mesh.geometry);
     const materials: Material[] = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const material of materials) {
-      for (const value of Object.values(material)) if (value instanceof Texture) dispose(value);
+      for (const value of Object.values(material)) {
+        if (!(value instanceof Texture)) continue;
+        const images: unknown[] = Array.isArray(value.image) ? value.image : [value.image];
+        for (const image of images) {
+          if (
+            image &&
+            typeof image === 'object' &&
+            'close' in image &&
+            typeof image.close === 'function' &&
+            !disposed.has(image)
+          ) {
+            disposed.add(image);
+            image.close();
+          }
+        }
+        dispose(value);
+      }
       dispose(material);
     }
   });
@@ -34,7 +50,12 @@ export function disposeModel(scene: Object3D) {
 export function loadModel(url: string, decoderPath: string, timeoutMs = 30_000) {
   const controller = new AbortController();
   const draco = new ObservedDRACOLoader().setDecoderPath(decoderPath).setWorkerLimit(2);
-  const loader = new GLTFLoader().setDRACOLoader(draco).setMeshoptDecoder(MeshoptDecoder);
+  const manager = new LoadingManager();
+  let resourceFailed = false;
+  manager.onError = () => {
+    resourceFailed = true;
+  };
+  const loader = new GLTFLoader(manager).setDRACOLoader(draco).setMeshoptDecoder(MeshoptDecoder);
   let cancelled = false;
   let scene: Object3D | undefined;
   let rejectTask: (error: Error) => void;
@@ -51,6 +72,7 @@ export function loadModel(url: string, decoderPath: string, timeoutMs = 30_000) 
         return;
       }
       scene = model.scene;
+      if (resourceFailed) throw new Error('A model texture or buffer could not be loaded.');
       if (new Box3().setFromObject(scene).isEmpty()) throw new Error('No renderable geometry.');
       resolve(scene);
     })().catch(reject);

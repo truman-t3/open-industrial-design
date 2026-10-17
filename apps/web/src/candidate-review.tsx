@@ -49,14 +49,36 @@ export function CandidateReview({
     >
       <header>
         <h2 id="candidate-review-title">{t('generation.compare')}</h2>
-        <button type="button" onClick={onClose}>
+        <button className="button--ghost" type="button" onClick={onClose}>
           {t('common.close')}
         </button>
       </header>
       <p>{t('generation.review')}</p>
       {generation.node?.localEdit ? <p>{t('generation.mask.reviewHint')}</p> : null}
       <div className="candidate-review__controls">
-        <div role="group" aria-label={t('generation.compareMode')}>
+        <div
+          className="segmented-control"
+          role="group"
+          aria-label={t('generation.compareMode')}
+          onKeyDown={(event) => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const buttons = Array.from(
+              event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'),
+            );
+            const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
+            if (current < 0) return;
+            event.preventDefault();
+            const next =
+              event.key === 'Home'
+                ? 0
+                : event.key === 'End'
+                  ? buttons.length - 1
+                  : (current + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) %
+                    buttons.length;
+            buttons[next]?.focus();
+            buttons[next]?.click();
+          }}
+        >
           <button type="button" aria-pressed={mode === 'source'} onClick={() => setMode('source')}>
             {t('generation.compareSource')}
           </button>
@@ -194,6 +216,7 @@ export function CandidateReview({
         <button
           type="button"
           disabled={!candidate || busy}
+          className="button--secondary"
           onClick={() => candidate && generation.onKeep(candidate.id, 'reference')}
         >
           {t('generation.keepReference')}
@@ -201,6 +224,7 @@ export function CandidateReview({
         <button
           type="button"
           disabled={!candidate || busy}
+          className="button--ghost button--danger"
           onClick={() => candidate && generation.onDiscard(candidate.id)}
         >
           {t('common.discard')}

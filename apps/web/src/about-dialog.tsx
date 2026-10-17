@@ -7,6 +7,9 @@ import { checkRelease, RELEASE_PAGE } from './release-check';
 export function AboutDialog({ onClose }: { onClose(): void }) {
   const { locale } = useLocalization();
   const zh = locale === 'zh-CN';
+  // Desktop intercepts same-window navigation; its new-window handler denies popups.
+  const releaseTarget =
+    typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window ? '_self' : '_blank';
   const dialog = useRef<HTMLDialogElement>(null);
   const controller = useRef<AbortController | undefined>(undefined);
   const [busy, setBusy] = useState(false);
@@ -66,7 +69,7 @@ export function AboutDialog({ onClose }: { onClose(): void }) {
         >
           {busy ? (zh ? '正在检查…' : 'Checking…') : zh ? '检查更新' : 'Check for updates'}
         </button>
-        <a href={RELEASE_PAGE} rel="noreferrer">
+        <a href={RELEASE_PAGE} target={releaseTarget} rel="noopener noreferrer">
           {zh ? '官方发布与下载' : 'Official releases & downloads'}
         </a>
       </div>

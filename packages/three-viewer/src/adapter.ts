@@ -8,7 +8,8 @@ import type {
 export const MAX_MODEL_FILE_SIZE = 150 * 1024 * 1024;
 
 export type ModelFormat = 'glb' | 'gltf';
-export type ViewerPreset = 'perspective' | 'front' | 'side' | 'rear' | 'top';
+export type ViewerPreset =
+  'perspective' | 'front' | 'side' | 'rear' | 'top' | 'left' | 'right' | 'bottom';
 
 export interface ModelFileLike {
   name: string;
@@ -32,6 +33,7 @@ export interface ModelBoundsInfo {
 export interface ModelInspection {
   bounds: ModelBoundsInfo;
   meshCount: number;
+  triangleCount: number;
 }
 
 export function validateModelFile(file: ModelFileLike): ValidatedModelFile {

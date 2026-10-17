@@ -372,6 +372,39 @@ describe('candidate review interactions', () => {
     expect(onDiscard).not.toHaveBeenCalled();
   });
 
+  it('supports keyboard mode navigation and skips unavailable comparison modes', () => {
+    const generation = makeGeneration('candidate-a', vi.fn(), vi.fn());
+    const render = (current = generation) => (
+      <LocalizationProvider>
+        <CandidateReview generation={current} initialId="candidate-a" onClose={vi.fn()} />
+      </LocalizationProvider>
+    );
+    mounted = mount(render());
+    const buttons = [
+      ...mounted.container.querySelectorAll<HTMLButtonElement>('.segmented-control button'),
+    ];
+    const press = (key: string) =>
+      act(() => {
+        document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+      });
+    buttons[0]!.focus();
+    press('ArrowRight');
+    expect(document.activeElement).toBe(buttons[1]);
+    expect(buttons[1]!.getAttribute('aria-pressed')).toBe('true');
+    press('End');
+    expect(document.activeElement).toBe(buttons[2]);
+    press('ArrowRight');
+    expect(document.activeElement).toBe(buttons[0]);
+    mounted.render(render({ ...generation, candidates: [generation.candidates[0]!] }));
+    expect(buttons[1]!.disabled).toBe(true);
+    buttons[0]!.focus();
+    press('ArrowRight');
+    expect(document.activeElement).toBe(buttons[2]);
+    press('Home');
+    expect(document.activeElement).toBe(buttons[0]);
+    expect(generation.onRun).not.toHaveBeenCalled();
+  });
+
   it('routes discard to the selected candidate and does not retarget after it disappears', () => {
     const onKeep = vi.fn();
     const onDiscard = vi.fn();

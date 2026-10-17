@@ -2,7 +2,7 @@
 import { act, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { expect, it, vi } from 'vitest';
-import { OrthographicCamera, PerspectiveCamera } from 'three';
+import { OrthographicCamera, PerspectiveCamera, Vector3 } from 'three';
 import { ViewerOrbitControls } from './orbit-controls';
 import { CameraDirector } from './index';
 
@@ -16,9 +16,27 @@ vi.mock('@react-three/fiber', () => ({
 
 it('saving a camera does not replay the last command when the callback changes', async () => {
   const camera = new PerspectiveCamera();
-  runtime.state = { camera, controls: undefined, invalidate: vi.fn() };
+  runtime.state = {
+    camera,
+    size: { width: 1000, height: 800 },
+    controls: {
+      object: camera,
+      target: new Vector3(),
+      update: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    },
+    invalidate: vi.fn(),
+  };
   const root = createRoot(document.createElement('div'));
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  const bounds = {
+    center: [0, 0, 0],
+    size: [1, 1, 1],
+    min: [-0.5, -0.5, -0.5],
+    max: [0.5, 0.5, 0.5],
+    radius: 1,
+  } satisfies import('./adapter').ModelBoundsInfo;
   const command = {
     version: 0,
     type: 'restore' as const,
@@ -32,18 +50,33 @@ it('saving a camera does not replay the last command when the callback changes',
   const next = vi.fn();
   try {
     await act(async () =>
-      root.render(<CameraDirector command={command} mode="perspective" onCameraChange={first} />),
+      root.render(
+        <CameraDirector
+          bounds={bounds}
+          command={command}
+          mode="perspective"
+          onCameraChange={first}
+        />,
+      ),
     );
     expect(first).toHaveBeenCalledTimes(1);
     camera.position.set(1, 4, 2);
     await act(async () =>
-      root.render(<CameraDirector command={command} mode="perspective" onCameraChange={next} />),
+      root.render(
+        <CameraDirector
+          bounds={bounds}
+          command={command}
+          mode="perspective"
+          onCameraChange={next}
+        />,
+      ),
     );
     expect(camera.position.toArray()).toEqual([1, 4, 2]);
     expect(next).not.toHaveBeenCalled();
     await act(async () =>
       root.render(
         <CameraDirector
+          bounds={bounds}
           command={{ ...command, version: 1 }}
           mode="perspective"
           onCameraChange={next}
@@ -59,7 +92,18 @@ it('saving a camera does not replay the last command when the callback changes',
 
 it('fits orthographic models using the viewport frustum rather than a tiny fixed zoom', async () => {
   const camera = new OrthographicCamera(-500, 500, 400, -400);
-  runtime.state = { camera, controls: undefined, invalidate: vi.fn() };
+  runtime.state = {
+    camera,
+    size: { width: 1000, height: 800 },
+    controls: {
+      object: camera,
+      target: new Vector3(),
+      update: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    },
+    invalidate: vi.fn(),
+  };
   const root = createRoot(document.createElement('div'));
   const saved = vi.fn();
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -74,8 +118,8 @@ it('fits orthographic models using the viewport frustum rather than a tiny fixed
         />,
       ),
     );
-    expect(camera.zoom).toBe(500);
-    expect(saved.mock.calls[0][0].zoom).toBe(500);
+    expect(camera.zoom).toBeCloseTo(800 / 2.3);
+    expect(saved.mock.calls[0][0].zoom).toBeCloseTo(800 / 2.3);
   } finally {
     await act(async () => root.unmount());
   }
